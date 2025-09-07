@@ -182,9 +182,9 @@ class DistractionKillerBackground {
         console.log('Blocking rules cleared');
     }
 
-    handleNavigation(details) {
+    async handleNavigation(details) {
         const url = details.url;
-        const isBlocked = this.isSiteBlocked(url);
+        const isBlocked = await this.isSiteBlocked(url);
         
         if (isBlocked) {
             // Increment blocked attempts
@@ -193,16 +193,48 @@ class DistractionKillerBackground {
                 this.updateSession(this.currentSession);
             }
             
-            // Redirect to blocked page
+            // Store the blocked URL for potential temporary access
+            chrome.storage.local.set({ 
+                lastBlockedUrl: url,
+                lastBlockedTabId: details.tabId 
+            });
+            
+            // Redirect to blocked page with the original URL as parameter
+            const blockedPageUrl = chrome.runtime.getURL('blocked.html') + '?blocked=' + encodeURIComponent(url);
             chrome.tabs.update(details.tabId, {
-                url: chrome.runtime.getURL('blocked.html')
+                url: blockedPageUrl
             });
         }
     }
 
-    isSiteBlocked(url) {
+    async isSiteBlocked(url) {
         if (!this.currentSession || !this.currentSession.isActive) {
             return false;
+        }
+
+        // Check if there's temporary access granted for this URL/domain
+        try {
+            const result = await chrome.storage.local.get(['temporaryAccess']);
+            if (result.temporaryAccess && result.temporaryAccess.granted) {
+                const accessData = result.temporaryAccess;
+                const now = Date.now();
+                
+                // Check if access is still valid
+                if (now < accessData.endTime) {
+                    const urlObj = new URL(url);
+                    const hostname = urlObj.hostname.toLowerCase();
+                    
+                    // Check if this URL or domain has temporary access
+                    if (accessData.url === url || accessData.domain === hostname) {
+                        return false; // Allow access
+                    }
+                } else {
+                    // Access expired, remove it
+                    chrome.storage.local.remove(['temporaryAccess']);
+                }
+            }
+        } catch (error) {
+            console.error('Error checking temporary access:', error);
         }
 
         try {

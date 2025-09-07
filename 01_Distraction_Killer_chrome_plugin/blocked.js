@@ -3,11 +3,26 @@ class DistractionKillerBlocked {
     constructor() {
         this.currentSession = null;
         this.timerInterval = null;
-        this.challengeParagraph = "I'm about to waste precious time on this site instead of working toward my goals. Every minute spent here is a minute I could've used to learn something new, finish a task, or make progress on what truly matters. I know I'm capable of better choices—why am I letting distractions win?";
+        this.originalBlockedUrl = null;
+        this.challengeParagraph = "I'm about to waste precious time on this site instead of working toward my goals. Every minute spent here is a minute I could've used to learn something new, finish a task, or make progress on what truly matters. I know I'm capable of better choices. Why am I letting distractions win?";
+        this.getOriginalUrl();
         this.initializeElements();
         this.loadSessionData();
         this.setupEventListeners();
         this.startTimer();
+    }
+
+    getOriginalUrl() {
+        // Get the blocked URL from URL parameters
+        const urlParams = new URLSearchParams(window.location.search);
+        this.originalBlockedUrl = urlParams.get('blocked');
+        
+        if (!this.originalBlockedUrl) {
+            // Fallback: try to get from storage
+            chrome.storage.local.get(['lastBlockedUrl']).then(result => {
+                this.originalBlockedUrl = result.lastBlockedUrl;
+            });
+        }
     }
 
     initializeElements() {
@@ -92,6 +107,19 @@ class DistractionKillerBlocked {
 
         // Update challenge paragraph
         this.challengeParagraphEl.textContent = this.challengeParagraph;
+        
+        // Show which site was blocked
+        if (this.originalBlockedUrl) {
+            const domain = new URL(this.originalBlockedUrl).hostname;
+            const focusQuote = document.querySelector('.focus-quote p');
+            if (focusQuote) {
+                focusQuote.textContent = `You tried to access ${domain}. This website is blocked to help you maintain focus on what truly matters.`;
+            }
+        }
+        
+        // Enable the input field for typing
+        this.userInput.disabled = false;
+        this.userInput.focus(); // Automatically focus the input
     }
 
     startTimer() {
@@ -170,9 +198,16 @@ class DistractionKillerBlocked {
             return;
         }
 
+        if (!this.originalBlockedUrl) {
+            this.showNotification('Original blocked URL not found', 'error');
+            return;
+        }
+
         try {
-            // Create temporary access permission
+            // Create temporary access permission for this specific URL
             const accessData = {
+                url: this.originalBlockedUrl,
+                domain: new URL(this.originalBlockedUrl).hostname,
                 duration: duration * 60 * 1000, // Convert to milliseconds
                 startTime: Date.now(),
                 endTime: Date.now() + (duration * 60 * 1000),
@@ -189,10 +224,10 @@ class DistractionKillerBlocked {
 
             this.showNotification(`Temporary access granted for ${duration} minutes`, 'success');
             
-            // Close the blocked page and go back
+            // Redirect directly to the original blocked URL
             setTimeout(() => {
-                this.goBackToPreviousPage();
-            }, 2000);
+                window.location.href = this.originalBlockedUrl;
+            }, 1500);
 
         } catch (error) {
             console.error('Error granting temporary access:', error);
