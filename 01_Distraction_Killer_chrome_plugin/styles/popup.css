@@ -403,15 +403,6 @@ body {
     animation: fadeIn 0.3s ease;
 }
 
-/* Debug styles to ensure proper width */
-body {
-    border: 2px solid red !important; /* Temporary debug border */
-}
-
-.container {
-    border: 2px solid blue !important; /* Temporary debug border */
-}
-
 /* Responsive */
 @media (max-width: 400px) {
     body {

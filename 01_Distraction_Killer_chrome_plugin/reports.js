@@ -102,10 +102,19 @@ class DistractionKillerReports {
     }
 
     updateSummaryCards(sessions) {
-        // Calculate total focus time
+        // Calculate total focus time using the same logic as session list
         const totalMinutes = sessions.reduce((total, session) => {
-            const duration = session.duration - (session.pausedTime || 0);
-            return total + Math.floor(duration / 60000);
+            let actualDuration;
+            if (session.completed) {
+                // For completed sessions, use the full planned duration minus paused time
+                actualDuration = Math.floor((session.duration - (session.pausedTime || 0)) / 60000);
+            } else {
+                // For stopped sessions, calculate from start to end time
+                const endTime = session.endTime || Date.now();
+                const totalElapsed = endTime - session.startTime;
+                actualDuration = Math.floor((totalElapsed - (session.pausedTime || 0)) / 60000);
+            }
+            return total + actualDuration;
         }, 0);
 
         const hours = Math.floor(totalMinutes / 60);
@@ -145,17 +154,34 @@ class DistractionKillerReports {
 
         this.sessionList.innerHTML = sessions.map(session => {
             const sessionDate = new Date(session.startTime);
-            const duration = Math.floor((session.duration - (session.pausedTime || 0)) / 60000);
-            const focusScore = Math.max(0, 100 - ((session.blockedAttempts || 0) * 5));
             const status = session.completed ? 'Completed' : 'Stopped';
             const statusClass = session.completed ? 'completed' : 'stopped';
+            
+            // Calculate planned duration (the original session length)
+            const plannedDuration = Math.floor(session.duration / 60000);
+            
+            // Calculate actual duration (time actually worked)
+            let actualDuration;
+            if (session.completed) {
+                // For completed sessions, use the full planned duration minus paused time
+                actualDuration = Math.floor((session.duration - (session.pausedTime || 0)) / 60000);
+            } else {
+                // For stopped sessions, calculate from start to end time
+                const endTime = session.endTime || Date.now();
+                const totalElapsed = endTime - session.startTime;
+                actualDuration = Math.floor((totalElapsed - (session.pausedTime || 0)) / 60000);
+            }
+            
+            const focusScore = Math.max(0, 100 - ((session.blockedAttempts || 0) * 5));
+            const completionRate = Math.round((actualDuration / plannedDuration) * 100);
 
             return `
                 <div class="session-item">
                     <div class="session-info">
                         <div class="session-date">${sessionDate.toLocaleDateString()} at ${sessionDate.toLocaleTimeString()}</div>
                         <div class="session-goal">${session.goal || 'Deep Work Session'}</div>
-                        <div class="session-duration">${duration} minutes • ${status}</div>
+                        <div class="session-duration">${actualDuration} ${actualDuration === 1 ? 'minute' : 'minutes'} • ${status}</div>
+                        ${!session.completed ? `<div class="session-completion">Completed ${completionRate}% of planned time</div>` : ''}
                     </div>
                     <div class="session-stats">
                         <div class="stat-item">
@@ -166,10 +192,28 @@ class DistractionKillerReports {
                             <span class="stat-value">${focusScore}%</span>
                             <span class="stat-label">Focus</span>
                         </div>
+                        <div class="stat-item">
+                            <span class="stat-value">${this.formatTimeUnits(actualDuration)}/${this.formatTimeUnits(plannedDuration)}</span>
+                            <span class="stat-label">Time Done</span>
+                        </div>
                     </div>
                 </div>
             `;
         }).join('');
+    }
+
+    formatTimeUnits(minutes) {
+        if (minutes >= 60) {
+            const hours = Math.floor(minutes / 60);
+            const remainingMinutes = minutes % 60;
+            if (remainingMinutes === 0) {
+                return `${hours} ${hours === 1 ? 'hour' : 'hours'}`;
+            } else {
+                return `${hours}h ${remainingMinutes}m`;
+            }
+        } else {
+            return `${minutes} ${minutes === 1 ? 'min' : 'min'}`;
+        }
     }
 
     updateCharts(sessions) {
@@ -297,8 +341,17 @@ class DistractionKillerReports {
             }
             
             if (field === 'duration') {
-                const minutes = Math.floor((session.duration - (session.pausedTime || 0)) / 60000);
-                dailyData[date] += minutes;
+                let actualDuration;
+                if (session.completed) {
+                    // For completed sessions, use the full planned duration minus paused time
+                    actualDuration = Math.floor((session.duration - (session.pausedTime || 0)) / 60000);
+                } else {
+                    // For stopped sessions, calculate from start to end time
+                    const endTime = session.endTime || Date.now();
+                    const totalElapsed = endTime - session.startTime;
+                    actualDuration = Math.floor((totalElapsed - (session.pausedTime || 0)) / 60000);
+                }
+                dailyData[date] += actualDuration;
             } else {
                 dailyData[date] += session[field] || 0;
             }
@@ -334,10 +387,19 @@ class DistractionKillerReports {
     generateInsights(sessions) {
         const insights = [];
         
-        // Calculate total focus time
+        // Calculate total focus time using consistent duration logic
         const totalMinutes = sessions.reduce((total, session) => {
-            const duration = session.duration - (session.pausedTime || 0);
-            return total + Math.floor(duration / 60000);
+            let actualDuration;
+            if (session.completed) {
+                // For completed sessions, use the full planned duration minus paused time
+                actualDuration = Math.floor((session.duration - (session.pausedTime || 0)) / 60000);
+            } else {
+                // For stopped sessions, calculate from start to end time
+                const endTime = session.endTime || Date.now();
+                const totalElapsed = endTime - session.startTime;
+                actualDuration = Math.floor((totalElapsed - (session.pausedTime || 0)) / 60000);
+            }
+            return total + actualDuration;
         }, 0);
 
         // Calculate average session length
@@ -383,6 +445,28 @@ class DistractionKillerReports {
                 title: 'Distraction Management',
                 description: `You've blocked ${totalBlocked} distraction attempts. The friction mechanism is working!`
             });
+
+            // Analyze blocked site usage patterns
+            const blockedSessions = sessions.filter(session => session.blockedAttempts > 0);
+            const totalBlockedTime = blockedSessions.reduce((total, session) => {
+                let actualDuration;
+                if (session.completed) {
+                    // For completed sessions, use the full planned duration minus paused time
+                    actualDuration = Math.floor((session.duration - (session.pausedTime || 0)) / 60000);
+                } else {
+                    // For stopped sessions, calculate from start to end time
+                    const endTime = session.endTime || Date.now();
+                    const totalElapsed = endTime - session.startTime;
+                    actualDuration = Math.floor((totalElapsed - (session.pausedTime || 0)) / 60000);
+                }
+                return total + actualDuration;
+            }, 0);
+            
+            insights.push({
+                icon: '📊',
+                title: 'Blocked Site Usage Analysis',
+                description: `Out of ${blockedSessions.length} sessions with blocked attempts, you still completed ${totalBlockedTime} minutes of focused work. Your resistance to distractions is building!`
+            });
         }
 
         if (avgFocusScore > 80) {
@@ -396,6 +480,28 @@ class DistractionKillerReports {
                 icon: '💪',
                 title: 'Focus Improvement',
                 description: `Your average focus score is ${avgFocusScore}%. Try to minimize distractions to improve your focus.`
+            });
+        }
+
+        // Analyze completion rates
+        const completedSessions = sessions.filter(session => session.completed);
+        const stoppedSessions = sessions.filter(session => !session.completed);
+        const completionRate = Math.round((completedSessions.length / sessions.length) * 100);
+
+        if (stoppedSessions.length > 0) {
+            const avgStoppedTime = Math.round(stoppedSessions.reduce((total, session) => {
+                // For stopped sessions, calculate actual time from start to end
+                const endTime = session.endTime || Date.now();
+                const totalElapsed = endTime - session.startTime;
+                const actualTime = Math.floor((totalElapsed - (session.pausedTime || 0)) / 60000);
+                const plannedTime = Math.floor(session.duration / 60000);
+                return total + (actualTime / plannedTime * 100);
+            }, 0) / stoppedSessions.length);
+
+            insights.push({
+                icon: '⏱️',
+                title: 'Session Completion Analysis',
+                description: `You have a ${completionRate}% completion rate. When you stop early, you average ${avgStoppedTime}% of your planned time. Even partial sessions build focus!`
             });
         }
 
@@ -418,18 +524,18 @@ class DistractionKillerReports {
             switch (type) {
                 case 'daily':
                     data = this.filterSessionsByPeriod(this.sessionHistory, 'today');
-                    baseFilename = `DistractionKiller-Daily-${new Date().toISOString().split('T')[0]}`;
+                    baseFilename = `Distraction-Killer-Daily-${new Date().toISOString().split('T')[0]}`;
                     title = 'Daily Deep Work Report';
                     break;
                 case 'weekly':
                     data = this.filterSessionsByPeriod(this.sessionHistory, 'week');
-                    baseFilename = `DistractionKiller-Weekly-Week${this.getWeekNumber()}`;
+                    baseFilename = `Distraction-Killer-Weekly-Week${this.getWeekNumber()}`;
                     title = 'Weekly Deep Work Report';
                     break;
                 case 'all':
                 default:
                     data = this.sessionHistory;
-                    baseFilename = `DistractionKiller-Complete-${new Date().toISOString().split('T')[0]}`;
+                    baseFilename = `Distraction-Killer-Complete-${new Date().toISOString().split('T')[0]}`;
                     title = 'Complete Deep Work Report';
                     break;
             }
@@ -459,7 +565,16 @@ class DistractionKillerReports {
 
         const csvData = sessions.map(session => {
             const startDate = new Date(session.startTime);
-            const duration = Math.floor((session.duration - (session.pausedTime || 0)) / 60000);
+            let actualDuration;
+            if (session.completed) {
+                // For completed sessions, use the full planned duration minus paused time
+                actualDuration = Math.floor((session.duration - (session.pausedTime || 0)) / 60000);
+            } else {
+                // For stopped sessions, calculate from start to end time
+                const endTime = session.endTime || Date.now();
+                const totalElapsed = endTime - session.startTime;
+                actualDuration = Math.floor((totalElapsed - (session.pausedTime || 0)) / 60000);
+            }
             const focusScore = Math.max(0, 100 - ((session.blockedAttempts || 0) * 5));
             const quality = focusScore >= 90 ? 'Excellent' : 
                            focusScore >= 75 ? 'Good' : 
@@ -468,7 +583,7 @@ class DistractionKillerReports {
             return [
                 startDate.toLocaleDateString(),
                 startDate.toLocaleTimeString(),
-                duration,
+                actualDuration,
                 session.goal || 'No specific goal',
                 session.completed ? 'Yes' : 'No',
                 session.blockedAttempts || 0,
@@ -479,7 +594,17 @@ class DistractionKillerReports {
 
         // Add summary row
         const totalMinutes = sessions.reduce((total, session) => {
-            return total + Math.floor((session.duration - (session.pausedTime || 0)) / 60000);
+            let actualDuration;
+            if (session.completed) {
+                // For completed sessions, use the full planned duration minus paused time
+                actualDuration = Math.floor((session.duration - (session.pausedTime || 0)) / 60000);
+            } else {
+                // For stopped sessions, calculate from start to end time
+                const endTime = session.endTime || Date.now();
+                const totalElapsed = endTime - session.startTime;
+                actualDuration = Math.floor((totalElapsed - (session.pausedTime || 0)) / 60000);
+            }
+            return total + actualDuration;
         }, 0);
         const totalBlocked = sessions.reduce((total, session) => {
             return total + (session.blockedAttempts || 0);
@@ -513,7 +638,17 @@ class DistractionKillerReports {
 
     generateHTMLReport(sessions, title, baseFilename) {
         const totalMinutes = sessions.reduce((total, session) => {
-            return total + Math.floor((session.duration - (session.pausedTime || 0)) / 60000);
+            let actualDuration;
+            if (session.completed) {
+                // For completed sessions, use the full planned duration minus paused time
+                actualDuration = Math.floor((session.duration - (session.pausedTime || 0)) / 60000);
+            } else {
+                // For stopped sessions, calculate from start to end time
+                const endTime = session.endTime || Date.now();
+                const totalElapsed = endTime - session.startTime;
+                actualDuration = Math.floor((totalElapsed - (session.pausedTime || 0)) / 60000);
+            }
+            return total + actualDuration;
         }, 0);
         const totalBlocked = sessions.reduce((total, session) => {
             return total + (session.blockedAttempts || 0);
@@ -552,7 +687,7 @@ class DistractionKillerReports {
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>${title} - DistractionKiller</title>
+    <title>${title} - Distraction Killer</title>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <style>
         body {
@@ -698,7 +833,16 @@ class DistractionKillerReports {
                 <tbody>
                     ${sessions.map(session => {
                         const startDate = new Date(session.startTime);
-                        const duration = Math.floor((session.duration - (session.pausedTime || 0)) / 60000);
+                        let actualDuration;
+                        if (session.completed) {
+                            // For completed sessions, use the full planned duration minus paused time
+                            actualDuration = Math.floor((session.duration - (session.pausedTime || 0)) / 60000);
+                        } else {
+                            // For stopped sessions, calculate from start to end time
+                            const endTime = session.endTime || Date.now();
+                            const totalElapsed = endTime - session.startTime;
+                            actualDuration = Math.floor((totalElapsed - (session.pausedTime || 0)) / 60000);
+                        }
                         const focusScore = Math.max(0, 100 - ((session.blockedAttempts || 0) * 5));
                         const scoreClass = focusScore >= 90 ? 'score-excellent' : 
                                          focusScore >= 75 ? 'score-good' : 
@@ -710,7 +854,7 @@ class DistractionKillerReports {
                             <tr>
                                 <td>${startDate.toLocaleDateString()}</td>
                                 <td>${startDate.toLocaleTimeString()}</td>
-                                <td>${duration} min</td>
+                                <td>${actualDuration} min</td>
                                 <td>${session.goal || 'No specific goal'}</td>
                                 <td class="${statusClass}">${statusText}</td>
                                 <td>${session.blockedAttempts || 0}</td>
@@ -723,7 +867,7 @@ class DistractionKillerReports {
         </div>
 
         <div class="footer">
-            <p>Generated by DistractionKiller - Deep Focus Assistant</p>
+            <p>Generated by Distraction Killer - Deep Focus Assistant</p>
             <p>Keep up the great work! 🚀</p>
         </div>
     </div>

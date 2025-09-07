@@ -1,4 +1,4 @@
-# DistractionKiller - Deep Focus Assistant
+# Distraction Killer - Deep Focus Assistant
 
 A sophisticated Chrome extension designed to help you maintain deep focus during work sessions by blocking distracting websites and providing intelligent friction mechanisms.
 
@@ -30,12 +30,12 @@ A sophisticated Chrome extension designed to help you maintain deep focus during
 2. Open Chrome and navigate to `chrome://extensions/`
 3. Enable "Developer mode" in the top right
 4. Click "Load unpacked" and select the extension folder
-5. The DistractionKiller icon should appear in your browser toolbar
+5. The Distraction Killer icon should appear in your browser toolbar
 
 ## 📖 How to Use
 
 ### Starting a Deep Work Session
-1. Click the DistractionKiller icon in your browser toolbar
+1. Click the Distraction Killer icon in your browser toolbar
 2. Select your desired focus duration (25 min to custom)
 3. Optionally enter a focus goal
 4. Click "Start Deep Work"
@@ -49,7 +49,7 @@ A sophisticated Chrome extension designed to help you maintain deep focus during
    - Stop the session entirely
 
 ### Viewing Your Progress
-1. Click the DistractionKiller icon
+1. Click the Distraction Killer icon
 2. Click "📊 Reports" to view detailed analytics
 3. Export your data for external analysis
 

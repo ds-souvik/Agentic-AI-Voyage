@@ -1,6 +1,6 @@
 {
   "manifest_version": 3,
-  "name": "DistractionKiller - Deep Focus Assistant",
+  "name": "Distraction Killer - Deep Focus Assistant",
   "version": "1.0.0",
   "description": "Block distracting websites during deep work sessions. Stay focused, achieve more.",
   "permissions": [
@@ -25,7 +25,7 @@
   ],
   "action": {
     "default_popup": "popup_fixed.html",
-    "default_title": "DistractionKiller - Deep Focus Assistant",
+    "default_title": "Distraction Killer - Deep Focus Assistant",
     "default_icon": {
       "16": "icons/icon16.png",
       "32": "icons/icon32.png",

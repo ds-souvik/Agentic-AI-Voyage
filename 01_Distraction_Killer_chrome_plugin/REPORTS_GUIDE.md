@@ -1,4 +1,4 @@
-# 📊 DistractionKiller Reports System
+# 📊 Distraction Killer Reports System
 
 ## Enhanced User Experience
 
@@ -36,17 +36,17 @@ The reporting system now generates **two file formats** for each export to provi
 
 ### 1. **Daily Report**
 - Sessions from today only
-- Filename: `DistractionKiller-Daily-YYYY-MM-DD`
+- Filename: `Distraction-Killer-Daily-YYYY-MM-DD`
 - Perfect for end-of-day review
 
 ### 2. **Weekly Report** 
 - Sessions from the past 7 days
-- Filename: `DistractionKiller-Weekly-WeekXX`
+- Filename: `Distraction-Killer-Weekly-WeekXX`
 - Great for weekly progress tracking
 
 ### 3. **Complete Report**
 - All sessions ever recorded
-- Filename: `DistractionKiller-Complete-YYYY-MM-DD`
+- Filename: `Distraction-Killer-Complete-YYYY-MM-DD`
 - Comprehensive historical analysis
 
 ## 🎨 **Visual Enhancements**
@@ -100,7 +100,7 @@ The old JSON format has been completely replaced with these user-friendly format
 ---
 
 **Example Output Files:**
-- `DistractionKiller-Daily-2024-01-15.csv`
-- `DistractionKiller-Daily-2024-01-15.html`
+- `Distraction-Killer-Daily-2024-01-15.csv`
+- `Distraction-Killer-Daily-2024-01-15.html`
 
 Both files contain the same data but formatted for different use cases! 🎯
