@@ -274,6 +274,10 @@ class DistractionKillerPopup {
                 this.sessionHistory = this.sessionHistory.slice(0, 50);
             }
 
+            // Clear any temporary access immediately
+            await chrome.storage.local.remove(['temporaryAccess', 'lastBlockedUrl', 'lastBlockedTabId']);
+            console.log('Cleared temporary access from popup');
+
             await chrome.storage.local.set({ 
                 currentSession: null,
                 sessionHistory: this.sessionHistory

@@ -97,9 +97,14 @@ class DistractionKillerBackground {
                     this.completeSession(request.sessionData);
                     break;
                 case 'checkBlockedSite':
-                    const isBlocked = this.isSiteBlocked(request.url);
-                    sendResponse({ isBlocked, category: this.getBlockedCategory(request.url) });
-                    break;
+                    // Handle async isSiteBlocked
+                    this.isSiteBlocked(request.url).then(isBlocked => {
+                        sendResponse({ 
+                            isBlocked, 
+                            category: this.getBlockedCategory(request.url) 
+                        });
+                    });
+                    return true; // Keep message channel open for async response
                 case 'getSessionData':
                     sendResponse({ currentSession: this.currentSession });
                     break;
@@ -128,6 +133,10 @@ class DistractionKillerBackground {
         this.currentSession = sessionData;
         await chrome.storage.local.set({ currentSession: sessionData });
         
+        // Clear any existing temporary access from previous sessions
+        await chrome.storage.local.remove(['temporaryAccess', 'lastBlockedUrl', 'lastBlockedTabId']);
+        console.log('Cleared temporary access for new session');
+        
         // Set up blocking rules
         this.setupBlockingRules();
         
@@ -137,6 +146,9 @@ class DistractionKillerBackground {
     async stopSession() {
         this.currentSession = null;
         await chrome.storage.local.set({ currentSession: null });
+        
+        // Clear any temporary access when session ends
+        await chrome.storage.local.remove(['temporaryAccess', 'lastBlockedUrl', 'lastBlockedTabId']);
         
         // Clear blocking rules
         this.clearBlockingRules();
@@ -164,6 +176,9 @@ class DistractionKillerBackground {
             currentSession: null,
             sessionHistory: sessionHistory
         });
+        
+        // Clear any temporary access when session completes
+        await chrome.storage.local.remove(['temporaryAccess', 'lastBlockedUrl', 'lastBlockedTabId']);
         
         this.currentSession = null;
         this.clearBlockingRules();
@@ -215,23 +230,40 @@ class DistractionKillerBackground {
         // Check if there's temporary access granted for this URL/domain
         try {
             const result = await chrome.storage.local.get(['temporaryAccess']);
+            console.log('Checking temporary access for:', url, 'Result:', result);
+            
             if (result.temporaryAccess && result.temporaryAccess.granted) {
                 const accessData = result.temporaryAccess;
                 const now = Date.now();
                 
-                // Check if access is still valid
-                if (now < accessData.endTime) {
+                console.log('Temporary access found:', {
+                    url: accessData.url,
+                    domain: accessData.domain,
+                    sessionId: accessData.sessionId,
+                    currentSessionId: this.currentSession.id,
+                    endTime: accessData.endTime,
+                    now: now,
+                    timeValid: now < accessData.endTime,
+                    sessionValid: accessData.sessionId === this.currentSession.id
+                });
+                
+                // Check if access is still valid and for the current session
+                if (now < accessData.endTime && accessData.sessionId === this.currentSession.id) {
                     const urlObj = new URL(url);
                     const hostname = urlObj.hostname.toLowerCase();
                     
                     // Check if this URL or domain has temporary access
                     if (accessData.url === url || accessData.domain === hostname) {
+                        console.log('Allowing access due to temporary permission');
                         return false; // Allow access
                     }
                 } else {
-                    // Access expired, remove it
+                    // Access expired or wrong session, remove it
+                    console.log('Removing expired/invalid temporary access');
                     chrome.storage.local.remove(['temporaryAccess']);
                 }
+            } else {
+                console.log('No temporary access found');
             }
         } catch (error) {
             console.error('Error checking temporary access:', error);

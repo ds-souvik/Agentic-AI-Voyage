@@ -204,10 +204,11 @@ class DistractionKillerBlocked {
         }
 
         try {
-            // Create temporary access permission for this specific URL
+            // Create temporary access permission for this specific URL and session
             const accessData = {
                 url: this.originalBlockedUrl,
                 domain: new URL(this.originalBlockedUrl).hostname,
+                sessionId: this.currentSession.id, // Tie access to current session
                 duration: duration * 60 * 1000, // Convert to milliseconds
                 startTime: Date.now(),
                 endTime: Date.now() + (duration * 60 * 1000),
@@ -268,6 +269,10 @@ class DistractionKillerBlocked {
         if (!confirmed) return;
 
         try {
+            // Clear any temporary access immediately
+            await chrome.storage.local.remove(['temporaryAccess', 'lastBlockedUrl', 'lastBlockedTabId']);
+            console.log('Cleared temporary access from blocked page');
+            
             // Notify background script to stop session
             chrome.runtime.sendMessage({ action: 'stopSession' });
             
