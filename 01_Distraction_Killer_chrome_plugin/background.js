@@ -2,10 +2,12 @@
 class DistractionKillerBackground {
     constructor() {
         this.currentSession = null;
+        this.userSettings = null;
         this.blockedSites = this.initializeBlockedSites();
         this.setupMessageListener();
         this.setupNavigationListener();
         this.loadSessionData();
+        this.loadUserSettings();
     }
 
     initializeBlockedSites() {
@@ -108,6 +110,9 @@ class DistractionKillerBackground {
                 case 'getSessionData':
                     sendResponse({ currentSession: this.currentSession });
                     break;
+                case 'settingsUpdated':
+                    this.userSettings = request.settings;
+                    break;
             }
         });
     }
@@ -126,6 +131,15 @@ class DistractionKillerBackground {
             this.currentSession = result.currentSession;
         } catch (error) {
             console.error('Error loading session data:', error);
+        }
+    }
+
+    async loadUserSettings() {
+        try {
+            const result = await chrome.storage.local.get(['userSettings']);
+            this.userSettings = result.userSettings;
+        } catch (error) {
+            console.error('Error loading user settings:', error);
         }
     }
 
@@ -275,12 +289,29 @@ class DistractionKillerBackground {
             const pathname = urlObj.pathname.toLowerCase();
             const search = urlObj.search.toLowerCase();
             
-            // Check exact domain matches
+            // Check exact domain matches (respecting user settings)
             for (const category in this.blockedSites) {
                 if (category === 'keywords') continue;
                 
+                // Check if this category is enabled in user settings
+                if (this.userSettings && this.userSettings.siteCategories) {
+                    const categoryKey = this.getCategoryKey(category);
+                    if (categoryKey && !this.userSettings.siteCategories[categoryKey]) {
+                        continue; // Skip this category if disabled
+                    }
+                }
+                
                 for (const domain of this.blockedSites[category]) {
                     if (hostname === domain || hostname.endsWith('.' + domain)) {
+                        return true;
+                    }
+                }
+            }
+            
+            // Check custom sites from user settings
+            if (this.userSettings && this.userSettings.customSites) {
+                for (const customSite of this.userSettings.customSites) {
+                    if (hostname === customSite || hostname.endsWith('.' + customSite)) {
                         return true;
                     }
                 }
@@ -296,11 +327,32 @@ class DistractionKillerBackground {
                 }
             }
             
+            // Check custom keywords from user settings
+            if (this.userSettings && this.userSettings.customKeywords) {
+                for (const keyword of this.userSettings.customKeywords) {
+                    if (fullUrl.includes(keyword.toLowerCase())) {
+                        return true;
+                    }
+                }
+            }
+            
             return false;
         } catch (error) {
             console.error('Error checking if site is blocked:', error);
             return false;
         }
+    }
+
+    getCategoryKey(category) {
+        // Map internal category names to settings keys
+        const categoryMap = {
+            'social': 'socialMedia',
+            'ecommerce': 'shopping',
+            'news': 'news',
+            'porn': 'adult',
+            'entertainment': 'entertainment'
+        };
+        return categoryMap[category] || category;
     }
 
     getBlockedCategory(url) {

@@ -8,6 +8,7 @@ class DistractionKillerBlocked {
         this.getOriginalUrl();
         this.initializeElements();
         this.loadSessionData();
+        this.loadUserSettings();
         this.setupEventListeners();
         this.startTimer();
     }
@@ -79,6 +80,21 @@ class DistractionKillerBlocked {
             this.updateDisplay();
         } catch (error) {
             console.error('Error loading session data:', error);
+        }
+    }
+
+    async loadUserSettings() {
+        try {
+            const result = await chrome.storage.local.get(['userSettings']);
+            if (result.userSettings && result.userSettings.frictionText) {
+                this.challengeParagraph = result.userSettings.frictionText;
+                // Update display if already loaded
+                if (this.challengeParagraphEl) {
+                    this.challengeParagraphEl.textContent = this.challengeParagraph;
+                }
+            }
+        } catch (error) {
+            console.error('Error loading user settings:', error);
         }
     }
 

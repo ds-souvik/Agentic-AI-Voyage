@@ -13,6 +13,9 @@ class DistractionKillerContent {
             return;
         }
 
+        // Set up message listener
+        this.setupMessageListener();
+
         // Load session data
         await this.loadSessionData();
         
@@ -54,18 +57,20 @@ class DistractionKillerContent {
         window.location.href = chrome.runtime.getURL('blocked.html');
     }
 
-    // Listen for session updates
-    chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
-        if (request.action === 'sessionUpdated') {
-            this.currentSession = request.sessionData;
-            
-            // If session is no longer active, allow normal browsing
-            if (!this.currentSession || !this.currentSession.isActive) {
-                // Remove any blocking overlays
-                this.removeBlockingOverlay();
+    setupMessageListener() {
+        // Listen for session updates
+        chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
+            if (request.action === 'sessionUpdated') {
+                this.currentSession = request.sessionData;
+                
+                // If session is no longer active, allow normal browsing
+                if (!this.currentSession || !this.currentSession.isActive) {
+                    // Remove any blocking overlays
+                    this.removeBlockingOverlay();
+                }
             }
-        }
-    });
+        });
+    }
 
     removeBlockingOverlay() {
         // Remove any blocking overlays if they exist

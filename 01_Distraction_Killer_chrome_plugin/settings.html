@@ -1,0 +1,395 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Settings - Distraction Killer</title>
+    <link rel="stylesheet" href="styles/settings.css">
+</head>
+<body>
+    <div class="settings-container">
+        <!-- Header -->
+        <header class="settings-header">
+            <div class="header-content">
+                <div class="logo">
+                    <div class="logo-icon">⚙️</div>
+                    <h1>Settings</h1>
+                </div>
+                <button class="back-btn" id="backToPopup">
+                    <span class="btn-icon">⬅️</span>
+                    Back to Extension
+                </button>
+            </div>
+        </header>
+
+        <!-- Main Content -->
+        <main class="settings-content">
+            <!-- Blocking Behavior Section -->
+            <section class="settings-section" id="blockingSection">
+                <div class="section-header">
+                    <div class="section-icon">🚫</div>
+                    <h2>Blocking Behavior</h2>
+                    <p>Customize how websites are blocked and what content triggers blocking</p>
+                </div>
+
+                <!-- Custom Blocked Sites -->
+                <div class="setting-group">
+                    <h3>Custom Blocked Sites</h3>
+                    <p class="setting-description">Add additional websites to block beyond the default list</p>
+                    
+                    <div class="input-group">
+                        <input type="url" id="customSiteInput" placeholder="https://example.com" class="text-input">
+                        <button class="add-btn" id="addCustomSite">
+                            <span class="btn-icon">➕</span>
+                            Add Site
+                        </button>
+                    </div>
+                    
+                    <div class="custom-sites-list" id="customSitesList">
+                        <!-- Custom sites will be populated here -->
+                    </div>
+                </div>
+
+                <!-- Site Categories -->
+                <div class="setting-group">
+                    <h3>Site Categories</h3>
+                    <p class="setting-description">Enable or disable blocking for different types of websites</p>
+                    
+                    <div class="category-toggles" id="categoryToggles">
+                        <div class="toggle-item">
+                            <label class="toggle-label">
+                                <input type="checkbox" class="toggle-input" id="socialMedia" checked>
+                                <span class="toggle-slider"></span>
+                                <span class="toggle-text">Social Media</span>
+                            </label>
+                            <span class="category-description">Facebook, Twitter, Instagram, TikTok, etc.</span>
+                        </div>
+                        
+                        <div class="toggle-item">
+                            <label class="toggle-label">
+                                <input type="checkbox" class="toggle-input" id="news" checked>
+                                <span class="toggle-slider"></span>
+                                <span class="toggle-text">News & Media</span>
+                            </label>
+                            <span class="category-description">News websites, blogs, online magazines</span>
+                        </div>
+                        
+                        <div class="toggle-item">
+                            <label class="toggle-label">
+                                <input type="checkbox" class="toggle-input" id="shopping" checked>
+                                <span class="toggle-slider"></span>
+                                <span class="toggle-text">Shopping & E-commerce</span>
+                            </label>
+                            <span class="category-description">Amazon, eBay, online stores</span>
+                        </div>
+                        
+                        <div class="toggle-item">
+                            <label class="toggle-label">
+                                <input type="checkbox" class="toggle-input" id="entertainment" checked>
+                                <span class="toggle-slider"></span>
+                                <span class="toggle-text">Entertainment</span>
+                            </label>
+                            <span class="category-description">YouTube, Netflix, streaming sites</span>
+                        </div>
+                        
+                        <div class="toggle-item">
+                            <label class="toggle-label">
+                                <input type="checkbox" class="toggle-input" id="adult" checked>
+                                <span class="toggle-slider"></span>
+                                <span class="toggle-text">Adult Content</span>
+                            </label>
+                            <span class="category-description">Adult websites and explicit content</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Keyword Blocking -->
+                <div class="setting-group">
+                    <h3>Keyword Blocking</h3>
+                    <p class="setting-description">Block websites containing specific keywords in their URL or content</p>
+                    
+                    <div class="input-group">
+                        <input type="text" id="keywordInput" placeholder="Enter keyword (e.g., 'game', 'sports')" class="text-input">
+                        <button class="add-btn" id="addKeyword">
+                            <span class="btn-icon">➕</span>
+                            Add Keyword
+                        </button>
+                    </div>
+                    
+                    <div class="keywords-list" id="keywordsList">
+                        <!-- Keywords will be populated here -->
+                    </div>
+                </div>
+
+                <!-- Friction Settings -->
+                <div class="setting-group">
+                    <h3>Friction Challenge Text</h3>
+                    <p class="setting-description">Customize the text users must type to access blocked sites</p>
+                    
+                    <textarea id="frictionText" class="friction-textarea" rows="4" placeholder="Enter custom challenge text..."></textarea>
+                    
+                    <div class="friction-buttons">
+                        <button class="secondary-btn" id="resetFrictionText">Reset to Default</button>
+                        <button class="primary-btn" id="saveFrictionText">Save Changes</button>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Notifications & Alerts Section -->
+            <section class="settings-section" id="notificationsSection">
+                <div class="section-header">
+                    <div class="section-icon">🔔</div>
+                    <h2>Notifications & Alerts</h2>
+                    <p>Control when and how you receive notifications from the extension</p>
+                </div>
+
+                <!-- Session Notifications -->
+                <div class="setting-group">
+                    <h3>Session Notifications</h3>
+                    <p class="setting-description">Get notified when sessions start, end, or reach milestones</p>
+                    
+                    <div class="notification-toggles">
+                        <div class="toggle-item">
+                            <label class="toggle-label">
+                                <input type="checkbox" class="toggle-input" id="sessionStart" checked>
+                                <span class="toggle-slider"></span>
+                                <span class="toggle-text">Session Start</span>
+                            </label>
+                            <span class="category-description">Notify when a focus session begins</span>
+                        </div>
+                        
+                        <div class="toggle-item">
+                            <label class="toggle-label">
+                                <input type="checkbox" class="toggle-input" id="sessionEnd" checked>
+                                <span class="toggle-slider"></span>
+                                <span class="toggle-text">Session End</span>
+                            </label>
+                            <span class="category-description">Notify when a focus session completes</span>
+                        </div>
+                        
+                        <div class="toggle-item">
+                            <label class="toggle-label">
+                                <input type="checkbox" class="toggle-input" id="sessionMilestone" checked>
+                                <span class="toggle-slider"></span>
+                                <span class="toggle-text">Milestone Alerts</span>
+                            </label>
+                            <span class="category-description">Notify at session milestones (25%, 50%, 75%)</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Achievement Celebrations -->
+                <div class="setting-group">
+                    <h3>Achievement Celebrations</h3>
+                    <p class="setting-description">Celebrate your productivity milestones and accomplishments</p>
+                    
+                    <div class="achievement-toggles">
+                        <div class="toggle-item">
+                            <label class="toggle-label">
+                                <input type="checkbox" class="toggle-input" id="dailyGoal" checked>
+                                <span class="toggle-slider"></span>
+                                <span class="toggle-text">Daily Goal Achievement</span>
+                            </label>
+                            <span class="category-description">Celebrate when you reach daily focus time goals</span>
+                        </div>
+                        
+                        <div class="toggle-item">
+                            <label class="toggle-label">
+                                <input type="checkbox" class="toggle-input" id="weeklyStreak" checked>
+                                <span class="toggle-slider"></span>
+                                <span class="toggle-text">Weekly Streak</span>
+                            </label>
+                            <span class="category-description">Celebrate consistent weekly focus sessions</span>
+                        </div>
+                        
+                        <div class="toggle-item">
+                            <label class="toggle-label">
+                                <input type="checkbox" class="toggle-input" id="focusTime" checked>
+                                <span class="toggle-slider"></span>
+                                <span class="toggle-text">Total Focus Time Milestones</span>
+                            </label>
+                            <span class="category-description">Celebrate reaching 10h, 25h, 50h+ total focus time</span>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Appearance & Interface Section -->
+            <section class="settings-section" id="appearanceSection">
+                <div class="section-header">
+                    <div class="section-icon">🎨</div>
+                    <h2>Appearance & Interface</h2>
+                    <p>Customize the look and feel of your Distraction Killer experience</p>
+                </div>
+
+                <!-- Theme Options -->
+                <div class="setting-group">
+                    <h3>Theme Options</h3>
+                    <p class="setting-description">Choose your preferred color scheme and visual style</p>
+                    
+                    <div class="theme-selector">
+                        <div class="theme-option" data-theme="default">
+                            <div class="theme-preview default-theme">
+                                <div class="theme-header"></div>
+                                <div class="theme-content">
+                                    <div class="theme-element"></div>
+                                    <div class="theme-element"></div>
+                                </div>
+                            </div>
+                            <span class="theme-name">Default Blue</span>
+                        </div>
+                        
+                        <div class="theme-option" data-theme="dark">
+                            <div class="theme-preview dark-theme">
+                                <div class="theme-header"></div>
+                                <div class="theme-content">
+                                    <div class="theme-element"></div>
+                                    <div class="theme-element"></div>
+                                </div>
+                            </div>
+                            <span class="theme-name">Dark Mode</span>
+                        </div>
+                        
+                        <div class="theme-option" data-theme="forest">
+                            <div class="theme-preview forest-theme">
+                                <div class="theme-header"></div>
+                                <div class="theme-content">
+                                    <div class="theme-element"></div>
+                                    <div class="theme-element"></div>
+                                </div>
+                            </div>
+                            <span class="theme-name">Forest Green</span>
+                        </div>
+                        
+                        <div class="theme-option" data-theme="sunset">
+                            <div class="theme-preview sunset-theme">
+                                <div class="theme-header"></div>
+                                <div class="theme-content">
+                                    <div class="theme-element"></div>
+                                    <div class="theme-element"></div>
+                                </div>
+                            </div>
+                            <span class="theme-name">Sunset Orange</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Timer Style -->
+                <div class="setting-group">
+                    <h3>Timer Style</h3>
+                    <p class="setting-description">Choose how the session timer appears and behaves</p>
+                    
+                    <div class="timer-styles">
+                        <label class="radio-option">
+                            <input type="radio" name="timerStyle" value="circular" checked>
+                            <span class="radio-custom"></span>
+                            <div class="option-content">
+                                <span class="option-title">Circular Progress</span>
+                                <span class="option-description">Classic circular timer with progress ring</span>
+                            </div>
+                        </label>
+                        
+                        <label class="radio-option">
+                            <input type="radio" name="timerStyle" value="linear">
+                            <span class="radio-custom"></span>
+                            <div class="option-content">
+                                <span class="option-title">Linear Progress Bar</span>
+                                <span class="option-description">Horizontal progress bar with time display</span>
+                            </div>
+                        </label>
+                        
+                        <label class="radio-option">
+                            <input type="radio" name="timerStyle" value="minimal">
+                            <span class="radio-custom"></span>
+                            <div class="option-content">
+                                <span class="option-title">Minimal Text</span>
+                                <span class="option-description">Simple text display without graphics</span>
+                            </div>
+                        </label>
+                    </div>
+                </div>
+
+                <!-- Sound Effects -->
+                <div class="setting-group">
+                    <h3>Sound Effects</h3>
+                    <p class="setting-description">Audio feedback for various actions and events</p>
+                    
+                    <div class="sound-toggles">
+                        <div class="toggle-item">
+                            <label class="toggle-label">
+                                <input type="checkbox" class="toggle-input" id="soundSession" checked>
+                                <span class="toggle-slider"></span>
+                                <span class="toggle-text">Session Start/End Sounds</span>
+                            </label>
+                            <span class="category-description">Play sounds when sessions begin and complete</span>
+                        </div>
+                        
+                        <div class="toggle-item">
+                            <label class="toggle-label">
+                                <input type="checkbox" class="toggle-input" id="soundBlocking">
+                                <span class="toggle-slider"></span>
+                                <span class="toggle-text">Site Blocking Sound</span>
+                            </label>
+                            <span class="category-description">Play sound when a website is blocked</span>
+                        </div>
+                        
+                        <div class="toggle-item">
+                            <label class="toggle-label">
+                                <input type="checkbox" class="toggle-input" id="soundMilestone" checked>
+                                <span class="toggle-slider"></span>
+                                <span class="toggle-text">Achievement Sounds</span>
+                            </label>
+                            <span class="category-description">Play celebratory sounds for milestones</span>
+                        </div>
+                    </div>
+                    
+                    <div class="volume-control">
+                        <label for="volumeSlider">Volume:</label>
+                        <input type="range" id="volumeSlider" min="0" max="100" value="50" class="volume-slider">
+                        <span id="volumeValue">50%</span>
+                    </div>
+                </div>
+
+                <!-- Animation Speed -->
+                <div class="setting-group">
+                    <h3>Animation Speed</h3>
+                    <p class="setting-description">Control the speed of transitions and animations</p>
+                    
+                    <div class="animation-controls">
+                        <label for="animationSpeed">Animation Speed:</label>
+                        <input type="range" id="animationSpeed" min="0.5" max="2" step="0.1" value="1" class="speed-slider">
+                        <div class="speed-labels">
+                            <span>Slow</span>
+                            <span>Normal</span>
+                            <span>Fast</span>
+                        </div>
+                        <span id="speedValue">1x</span>
+                    </div>
+                    
+                    <div class="toggle-item">
+                        <label class="toggle-label">
+                            <input type="checkbox" class="toggle-input" id="reduceMotion">
+                            <span class="toggle-slider"></span>
+                            <span class="toggle-text">Reduce Motion</span>
+                        </label>
+                        <span class="category-description">Minimize animations for accessibility</span>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Save Settings -->
+            <div class="settings-actions">
+                <button class="secondary-btn" id="resetSettings">Reset to Defaults</button>
+                <button class="primary-btn" id="saveSettings">Save All Settings</button>
+            </div>
+        </main>
+
+        <!-- Footer -->
+        <footer class="settings-footer">
+            <p>Distraction Killer Settings • All changes are saved automatically</p>
+        </footer>
+    </div>
+
+    <script src="settings.js"></script>
+</body>
+</html>

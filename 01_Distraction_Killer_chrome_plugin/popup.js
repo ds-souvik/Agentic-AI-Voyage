@@ -479,8 +479,7 @@ class DistractionKillerPopup {
     }
 
     showSettings() {
-        // TODO: Implement settings view
-        this.showNotification('Settings feature coming soon!', 'info');
+        chrome.tabs.create({ url: chrome.runtime.getURL('settings.html') });
     }
 
     showHelp() {

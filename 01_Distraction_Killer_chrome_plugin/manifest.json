@@ -41,7 +41,7 @@
   },
   "web_accessible_resources": [
     {
-      "resources": ["blocked.html", "styles/*", "images/*"],
+      "resources": ["blocked.html", "reports.html", "settings.html", "styles/*", "images/*"],
       "matches": ["<all_urls>"]
     }
   ]
