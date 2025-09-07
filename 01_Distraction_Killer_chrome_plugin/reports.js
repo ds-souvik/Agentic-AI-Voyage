@@ -413,74 +413,367 @@ class DistractionKillerReports {
 
     async exportReport(type) {
         try {
-            let data, filename, title;
+            let data, baseFilename, title;
             
             switch (type) {
                 case 'daily':
                     data = this.filterSessionsByPeriod(this.sessionHistory, 'today');
-                    filename = `distraction-killer-daily-${new Date().toISOString().split('T')[0]}.json`;
+                    baseFilename = `DistractionKiller-Daily-${new Date().toISOString().split('T')[0]}`;
                     title = 'Daily Deep Work Report';
                     break;
                 case 'weekly':
                     data = this.filterSessionsByPeriod(this.sessionHistory, 'week');
-                    filename = `distraction-killer-weekly-${this.getWeekNumber()}.json`;
+                    baseFilename = `DistractionKiller-Weekly-Week${this.getWeekNumber()}`;
                     title = 'Weekly Deep Work Report';
                     break;
                 case 'all':
                 default:
                     data = this.sessionHistory;
-                    filename = `distraction-killer-all-data-${new Date().toISOString().split('T')[0]}.json`;
+                    baseFilename = `DistractionKiller-Complete-${new Date().toISOString().split('T')[0]}`;
                     title = 'Complete Deep Work Report';
                     break;
             }
 
-            const report = this.generateReport(data, title);
-            this.downloadFile(JSON.stringify(report, null, 2), filename, 'application/json');
+            // Generate both CSV and HTML reports
+            await this.generateCSVReport(data, title, baseFilename);
+            await this.generateHTMLReport(data, title, baseFilename);
             
-            this.showNotification(`${title} exported successfully!`, 'success');
+            this.showNotification(`${title} exported as CSV and HTML!`, 'success');
         } catch (error) {
             console.error('Error exporting report:', error);
             this.showNotification('Failed to export report. Please try again.', 'error');
         }
     }
 
-    generateReport(sessions, title) {
-        const totalMinutes = sessions.reduce((total, session) => {
-            const duration = session.duration - (session.pausedTime || 0);
-            return total + Math.floor(duration / 60000);
-        }, 0);
+    generateCSVReport(sessions, title, baseFilename) {
+        const csvHeaders = [
+            'Date',
+            'Start Time',
+            'Duration (Minutes)',
+            'Goal',
+            'Completed',
+            'Distractions Blocked',
+            'Focus Score (%)',
+            'Session Quality'
+        ];
 
+        const csvData = sessions.map(session => {
+            const startDate = new Date(session.startTime);
+            const duration = Math.floor((session.duration - (session.pausedTime || 0)) / 60000);
+            const focusScore = Math.max(0, 100 - ((session.blockedAttempts || 0) * 5));
+            const quality = focusScore >= 90 ? 'Excellent' : 
+                           focusScore >= 75 ? 'Good' : 
+                           focusScore >= 60 ? 'Fair' : 'Needs Improvement';
+
+            return [
+                startDate.toLocaleDateString(),
+                startDate.toLocaleTimeString(),
+                duration,
+                session.goal || 'No specific goal',
+                session.completed ? 'Yes' : 'No',
+                session.blockedAttempts || 0,
+                focusScore,
+                quality
+            ];
+        });
+
+        // Add summary row
+        const totalMinutes = sessions.reduce((total, session) => {
+            return total + Math.floor((session.duration - (session.pausedTime || 0)) / 60000);
+        }, 0);
         const totalBlocked = sessions.reduce((total, session) => {
             return total + (session.blockedAttempts || 0);
         }, 0);
-
         const avgFocusScore = sessions.length > 0 
             ? Math.round(sessions.reduce((total, session) => {
                 const score = Math.max(0, 100 - ((session.blockedAttempts || 0) * 5));
                 return total + score;
-            }, 0) / sessions.length)
-            : 0;
+            }, 0) / sessions.length) : 0;
 
-        return {
+        csvData.unshift(['']); // Empty row
+        csvData.unshift([
+            'SUMMARY',
+            `${sessions.length} sessions`,
+            `${totalMinutes} total minutes`,
+            `${Math.floor(totalMinutes / 60)}h ${totalMinutes % 60}m`,
+            `${sessions.filter(s => s.completed).length} completed`,
+            `${totalBlocked} total blocked`,
+            `${avgFocusScore}% average`,
+            new Date().toLocaleDateString()
+        ]);
+        csvData.unshift(['']); // Empty row
+        csvData.unshift(csvHeaders);
+
+        const csvContent = csvData.map(row => 
+            row.map(cell => `"${cell}"`).join(',')
+        ).join('\n');
+
+        this.downloadFile(csvContent, `${baseFilename}.csv`, 'text/csv');
+    }
+
+    generateHTMLReport(sessions, title, baseFilename) {
+        const totalMinutes = sessions.reduce((total, session) => {
+            return total + Math.floor((session.duration - (session.pausedTime || 0)) / 60000);
+        }, 0);
+        const totalBlocked = sessions.reduce((total, session) => {
+            return total + (session.blockedAttempts || 0);
+        }, 0);
+        const avgFocusScore = sessions.length > 0 
+            ? Math.round(sessions.reduce((total, session) => {
+                const score = Math.max(0, 100 - ((session.blockedAttempts || 0) * 5));
+                return total + score;
+            }, 0) / sessions.length) : 0;
+
+        const dailyData = this.groupSessionsByDay(sessions);
+        const chartData = Object.entries(dailyData).map(([date, minutes]) => ({
+            date,
+            minutes
+        }));
+
+        const htmlContent = this.generateHTMLTemplate(
             title,
-            generatedAt: new Date().toISOString(),
-            summary: {
+            {
                 totalSessions: sessions.length,
-                totalFocusTimeMinutes: totalMinutes,
-                totalFocusTimeHours: Math.floor(totalMinutes / 60),
-                totalDistractionsBlocked: totalBlocked,
-                averageFocusScore: avgFocusScore
+                totalFocusTime: `${Math.floor(totalMinutes / 60)}h ${totalMinutes % 60}m`,
+                totalBlocked,
+                avgFocusScore,
+                completedSessions: sessions.filter(s => s.completed).length
             },
-            sessions: sessions.map(session => ({
-                id: session.id,
-                startTime: new Date(session.startTime).toISOString(),
-                duration: session.duration,
-                goal: session.goal,
-                blockedAttempts: session.blockedAttempts || 0,
-                completed: session.completed,
-                focusScore: Math.max(0, 100 - ((session.blockedAttempts || 0) * 5))
-            }))
-        };
+            sessions,
+            chartData
+        );
+
+        this.downloadFile(htmlContent, `${baseFilename}.html`, 'text/html');
+    }
+
+    generateHTMLTemplate(title, summary, sessions, chartData) {
+        return `<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>${title} - DistractionKiller</title>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+        }
+        .container {
+            background: white;
+            border-radius: 12px;
+            padding: 40px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.1);
+        }
+        .header {
+            text-align: center;
+            margin-bottom: 40px;
+            border-bottom: 2px solid #e2e8f0;
+            padding-bottom: 20px;
+        }
+        .header h1 {
+            color: #2d3748;
+            margin-bottom: 10px;
+            font-size: 32px;
+        }
+        .header p {
+            color: #718096;
+            font-size: 16px;
+        }
+        .summary-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 20px;
+            margin-bottom: 40px;
+        }
+        .summary-card {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 24px;
+            border-radius: 12px;
+            text-align: center;
+        }
+        .summary-card h3 {
+            font-size: 32px;
+            margin-bottom: 8px;
+            font-weight: 700;
+        }
+        .summary-card p {
+            font-size: 14px;
+            opacity: 0.9;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+        .chart-container {
+            background: #f7fafc;
+            padding: 30px;
+            border-radius: 12px;
+            margin-bottom: 40px;
+        }
+        .chart-container h2 {
+            color: #2d3748;
+            margin-bottom: 20px;
+            text-align: center;
+        }
+        .sessions-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+        }
+        .sessions-table th,
+        .sessions-table td {
+            padding: 12px;
+            text-align: left;
+            border-bottom: 1px solid #e2e8f0;
+        }
+        .sessions-table th {
+            background: #f7fafc;
+            font-weight: 600;
+            color: #2d3748;
+        }
+        .status-completed { color: #48bb78; font-weight: 500; }
+        .status-stopped { color: #f56565; font-weight: 500; }
+        .score-excellent { color: #48bb78; font-weight: 600; }
+        .score-good { color: #4299e1; font-weight: 600; }
+        .score-fair { color: #ed8936; font-weight: 600; }
+        .score-poor { color: #f56565; font-weight: 600; }
+        .footer {
+            text-align: center;
+            margin-top: 40px;
+            padding-top: 20px;
+            border-top: 1px solid #e2e8f0;
+            color: #718096;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🎯 ${title}</h1>
+            <p>Generated on ${new Date().toLocaleDateString()} at ${new Date().toLocaleTimeString()}</p>
+        </div>
+
+        <div class="summary-grid">
+            <div class="summary-card">
+                <h3>${summary.totalSessions}</h3>
+                <p>Total Sessions</p>
+            </div>
+            <div class="summary-card">
+                <h3>${summary.totalFocusTime}</h3>
+                <p>Focus Time</p>
+            </div>
+            <div class="summary-card">
+                <h3>${summary.totalBlocked}</h3>
+                <p>Distractions Blocked</p>
+            </div>
+            <div class="summary-card">
+                <h3>${summary.avgFocusScore}%</h3>
+                <p>Average Focus Score</p>
+            </div>
+        </div>
+
+        <div class="chart-container">
+            <h2>📈 Daily Focus Time Trend</h2>
+            <canvas id="focusChart" width="400" height="200"></canvas>
+        </div>
+
+        <div class="chart-container">
+            <h2>📊 Session Details</h2>
+            <table class="sessions-table">
+                <thead>
+                    <tr>
+                        <th>Date</th>
+                        <th>Start Time</th>
+                        <th>Duration</th>
+                        <th>Goal</th>
+                        <th>Status</th>
+                        <th>Blocked</th>
+                        <th>Focus Score</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    ${sessions.map(session => {
+                        const startDate = new Date(session.startTime);
+                        const duration = Math.floor((session.duration - (session.pausedTime || 0)) / 60000);
+                        const focusScore = Math.max(0, 100 - ((session.blockedAttempts || 0) * 5));
+                        const scoreClass = focusScore >= 90 ? 'score-excellent' : 
+                                         focusScore >= 75 ? 'score-good' : 
+                                         focusScore >= 60 ? 'score-fair' : 'score-poor';
+                        const statusClass = session.completed ? 'status-completed' : 'status-stopped';
+                        const statusText = session.completed ? 'Completed' : 'Stopped';
+
+                        return `
+                            <tr>
+                                <td>${startDate.toLocaleDateString()}</td>
+                                <td>${startDate.toLocaleTimeString()}</td>
+                                <td>${duration} min</td>
+                                <td>${session.goal || 'No specific goal'}</td>
+                                <td class="${statusClass}">${statusText}</td>
+                                <td>${session.blockedAttempts || 0}</td>
+                                <td class="${scoreClass}">${focusScore}%</td>
+                            </tr>
+                        `;
+                    }).join('')}
+                </tbody>
+            </table>
+        </div>
+
+        <div class="footer">
+            <p>Generated by DistractionKiller - Deep Focus Assistant</p>
+            <p>Keep up the great work! 🚀</p>
+        </div>
+    </div>
+
+    <script>
+        // Generate chart
+        const ctx = document.getElementById('focusChart').getContext('2d');
+        const chartData = ${JSON.stringify(chartData)};
+        
+        new Chart(ctx, {
+            type: 'line',
+            data: {
+                labels: chartData.map(d => d.date),
+                datasets: [{
+                    label: 'Focus Time (minutes)',
+                    data: chartData.map(d => d.minutes),
+                    borderColor: '#667eea',
+                    backgroundColor: 'rgba(102, 126, 234, 0.1)',
+                    borderWidth: 3,
+                    fill: true,
+                    tension: 0.4
+                }]
+            },
+            options: {
+                responsive: true,
+                scales: {
+                    y: {
+                        beginAtZero: true,
+                        title: {
+                            display: true,
+                            text: 'Minutes'
+                        }
+                    },
+                    x: {
+                        title: {
+                            display: true,
+                            text: 'Date'
+                        }
+                    }
+                },
+                plugins: {
+                    legend: {
+                        display: false
+                    }
+                }
+            }
+        });
+    </script>
+</body>
+</html>`;
     }
 
     downloadFile(content, filename, contentType) {
