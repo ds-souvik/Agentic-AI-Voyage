@@ -1,0 +1,182 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>DistractionKiller Icon Generator</title>
+    <style>
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+            background: #f7fafc;
+        }
+        .container {
+            background: white;
+            padding: 30px;
+            border-radius: 12px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+        }
+        h1 {
+            color: #2d3748;
+            text-align: center;
+            margin-bottom: 30px;
+        }
+        .icon-preview {
+            display: flex;
+            gap: 20px;
+            justify-content: center;
+            margin: 30px 0;
+            flex-wrap: wrap;
+        }
+        .icon-item {
+            text-align: center;
+            padding: 20px;
+            border: 2px solid #e2e8f0;
+            border-radius: 8px;
+            background: #f7fafc;
+        }
+        .icon {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            margin: 0 auto 10px;
+            box-shadow: 0 4px 12px rgba(102, 126, 234, 0.3);
+        }
+        .icon-16 { width: 16px; height: 16px; font-size: 10px; }
+        .icon-32 { width: 32px; height: 32px; font-size: 18px; }
+        .icon-48 { width: 48px; height: 48px; font-size: 28px; }
+        .icon-128 { width: 128px; height: 128px; font-size: 72px; }
+        .instructions {
+            background: #e6fffa;
+            border: 1px solid #81e6d9;
+            border-radius: 8px;
+            padding: 20px;
+            margin: 20px 0;
+        }
+        .instructions h3 {
+            color: #234e52;
+            margin-top: 0;
+        }
+        .instructions ol {
+            color: #2d3748;
+        }
+        .download-btn {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 8px;
+            font-weight: 500;
+            cursor: pointer;
+            margin: 10px 5px;
+            transition: all 0.2s ease;
+        }
+        .download-btn:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 4px 12px rgba(102, 126, 234, 0.3);
+        }
+        .canvas-container {
+            display: none;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🎯 DistractionKiller Icon Generator</h1>
+        
+        <div class="instructions">
+            <h3>How to Create Icons:</h3>
+            <ol>
+                <li>Right-click on each icon below</li>
+                <li>Select "Save image as..."</li>
+                <li>Save them as icon16.png, icon32.png, icon48.png, and icon128.png</li>
+                <li>Place all files in the <code>icons/</code> folder</li>
+                <li>Update the manifest.json to include the icon references</li>
+            </ol>
+        </div>
+
+        <div class="icon-preview">
+            <div class="icon-item">
+                <div class="icon icon-16" id="icon16">🎯</div>
+                <div>16x16</div>
+                <button class="download-btn" onclick="downloadIcon(16)">Download</button>
+            </div>
+            <div class="icon-item">
+                <div class="icon icon-32" id="icon32">🎯</div>
+                <div>32x32</div>
+                <button class="download-btn" onclick="downloadIcon(32)">Download</button>
+            </div>
+            <div class="icon-item">
+                <div class="icon icon-48" id="icon48">🎯</div>
+                <div>48x48</div>
+                <button class="download-btn" onclick="downloadIcon(48)">Download</button>
+            </div>
+            <div class="icon-item">
+                <div class="icon icon-128" id="icon128">🎯</div>
+                <div>128x128</div>
+                <button class="download-btn" onclick="downloadIcon(128)">Download</button>
+            </div>
+        </div>
+
+        <div class="instructions">
+            <h3>Alternative Method - Use Canvas:</h3>
+            <p>Click the buttons below to generate and download proper PNG files:</p>
+            <button class="download-btn" onclick="generateAllIcons()">Generate All Icons</button>
+        </div>
+
+        <div class="canvas-container">
+            <canvas id="canvas" width="128" height="128"></canvas>
+        </div>
+    </div>
+
+    <script>
+        function downloadIcon(size) {
+            const canvas = document.createElement('canvas');
+            canvas.width = size;
+            canvas.height = size;
+            const ctx = canvas.getContext('2d');
+            
+            // Create gradient background
+            const gradient = ctx.createRadialGradient(size/2, size/2, 0, size/2, size/2, size/2);
+            gradient.addColorStop(0, '#667eea');
+            gradient.addColorStop(1, '#764ba2');
+            
+            // Draw circle
+            ctx.fillStyle = gradient;
+            ctx.beginPath();
+            ctx.arc(size/2, size/2, size/2 - 2, 0, 2 * Math.PI);
+            ctx.fill();
+            
+            // Draw target symbol
+            ctx.fillStyle = 'white';
+            ctx.beginPath();
+            ctx.arc(size/2, size/2, size/4, 0, 2 * Math.PI);
+            ctx.fill();
+            
+            // Inner circle
+            ctx.fillStyle = gradient;
+            ctx.beginPath();
+            ctx.arc(size/2, size/2, size/8, 0, 2 * Math.PI);
+            ctx.fill();
+            
+            // Download
+            const link = document.createElement('a');
+            link.download = `icon${size}.png`;
+            link.href = canvas.toDataURL();
+            link.click();
+        }
+
+        function generateAllIcons() {
+            [16, 32, 48, 128].forEach((size, index) => {
+                setTimeout(() => downloadIcon(size), index * 500);
+            });
+        }
+    </script>
+</body>
+</html>

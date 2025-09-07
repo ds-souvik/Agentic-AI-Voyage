@@ -1,0 +1,138 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>DistractionKiller - Deep Focus Assistant</title>
+    <link rel="stylesheet" href="styles/popup_fixed.css">
+</head>
+<body>
+    <div class="popup-container">
+        <!-- Header -->
+        <header class="popup-header">
+            <div class="logo">
+                <div class="logo-icon">🎯</div>
+                <h1>DistractionKiller</h1>
+            </div>
+            <div class="status-indicator" id="statusIndicator">
+                <span class="status-dot"></span>
+                <span class="status-text">Inactive</span>
+            </div>
+        </header>
+
+        <!-- Main Content -->
+        <main class="popup-main">
+            <!-- Session Setup -->
+            <div class="session-setup" id="sessionSetup">
+                <h2>Start Deep Work Session</h2>
+                <div class="form-group">
+                    <label for="sessionDuration">Focus Duration</label>
+                    <select id="sessionDuration" class="duration-select">
+                        <option value="25">25 minutes (Pomodoro)</option>
+                        <option value="45">45 minutes (Deep Work)</option>
+                        <option value="60">1 hour (Extended Focus)</option>
+                        <option value="90">1.5 hours (Intensive)</option>
+                        <option value="120">2 hours (Marathon)</option>
+                        <option value="custom">Custom Duration</option>
+                    </select>
+                </div>
+                
+                <div class="form-group custom-duration" id="customDuration" style="display: none;">
+                    <label for="customMinutes">Custom Minutes</label>
+                    <input type="number" id="customMinutes" min="5" max="480" placeholder="Enter minutes">
+                </div>
+
+                <div class="form-group">
+                    <label for="focusGoal">Focus Goal (Optional)</label>
+                    <input type="text" id="focusGoal" placeholder="What do you want to accomplish?">
+                </div>
+
+                <button class="start-btn" id="startSession">
+                    <span class="btn-icon">🚀</span>
+                    Start Deep Work
+                </button>
+            </div>
+
+            <!-- Active Session -->
+            <div class="active-session" id="activeSession" style="display: none;">
+                <div class="session-info">
+                    <h2>Deep Work in Progress</h2>
+                    <div class="goal-display" id="goalDisplay"></div>
+                </div>
+                
+                <div class="timer-container">
+                    <div class="timer-circle">
+                        <svg class="timer-svg" viewBox="0 0 100 100">
+                            <circle class="timer-bg" cx="50" cy="50" r="45"></circle>
+                            <circle class="timer-progress" cx="50" cy="50" r="45" id="timerProgress"></circle>
+                        </svg>
+                        <div class="timer-text">
+                            <span class="time-remaining" id="timeRemaining">00:00</span>
+                            <span class="time-label">remaining</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="session-stats">
+                    <div class="stat">
+                        <span class="stat-value" id="blockedAttempts">0</span>
+                        <span class="stat-label">Blocked Attempts</span>
+                    </div>
+                    <div class="stat">
+                        <span class="stat-value" id="focusScore">100%</span>
+                        <span class="stat-label">Focus Score</span>
+                    </div>
+                </div>
+
+                <div class="session-actions">
+                    <button class="action-btn secondary" id="pauseSession">
+                        <span class="btn-icon">⏸️</span>
+                        Pause
+                    </button>
+                    <button class="action-btn danger" id="stopSession">
+                        <span class="btn-icon">⏹️</span>
+                        Stop Session
+                    </button>
+                </div>
+            </div>
+
+            <!-- Session Complete -->
+            <div class="session-complete" id="sessionComplete" style="display: none;">
+                <div class="completion-icon">🎉</div>
+                <h2>Session Complete!</h2>
+                <div class="completion-stats">
+                    <div class="stat">
+                        <span class="stat-value" id="totalTime">0 min</span>
+                        <span class="stat-label">Total Focus Time</span>
+                    </div>
+                    <div class="stat">
+                        <span class="stat-value" id="blockedTotal">0</span>
+                        <span class="stat-label">Distractions Blocked</span>
+                    </div>
+                </div>
+                <div class="completion-actions">
+                    <button class="action-btn primary" id="startNewSession">
+                        <span class="btn-icon">🔄</span>
+                        Start New Session
+                    </button>
+                    <button class="action-btn secondary" id="viewReport">
+                        <span class="btn-icon">📊</span>
+                        View Report
+                    </button>
+                </div>
+            </div>
+        </main>
+
+        <!-- Footer -->
+        <footer class="popup-footer">
+            <div class="footer-links">
+                <button class="footer-btn" id="viewReports">📊 Reports</button>
+                <button class="footer-btn" id="settings">⚙️ Settings</button>
+                <button class="footer-btn" id="help">❓ Help</button>
+            </div>
+        </footer>
+    </div>
+
+    <script src="popup.js"></script>
+</body>
+</html>
