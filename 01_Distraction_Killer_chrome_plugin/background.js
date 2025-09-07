@@ -12,18 +12,6 @@ class DistractionKillerBackground {
 
     initializeBlockedSites() {
         return {
-            "porn": [
-                "pornhub.com", "xvideos.com", "xhamster.com", "xnxx.com", "redtube.com",
-                "youporn.com", "tube8.com", "porn.com", "xvideos2.com", "spankbang.com",
-                "sex.com", "beeg.com", "youporn.xxx", "xtube.com", "youjizz.com",
-                "pornhd.com", "zoosexmovies.com", "tnaflix.com", "keezmovies.com",
-                "hclips.com", "hentaihaven.com", "porndig.com", "4tube.com", "fapdu.com",
-                "empflix.com", "hentaicafe.com", "hentaibooks.com", "hentaiperks.com",
-                "porn05.com", "tushy.com", "bangbros.com", "lewdplace.com", "nuvid.com",
-                "redporn.me", "xxx.com", "hdporn.com", "pornmd.com", "eporner.com",
-                "xhamster2.com", "hentairules.com", "pornhd88.com", "pornrabbit.com",
-                "porn4k.com", "youjizz.xxx", "sexvid.xxx", "hclips.xxx", "xtube.xxx"
-            ],
             "social": [
                 "facebook.com", "instagram.com", "twitter.com", "x.com", "tiktok.com",
                 "snapchat.com", "pinterest.com", "reddit.com", "tumblr.com", "discord.com",
@@ -50,13 +38,25 @@ class DistractionKillerBackground {
                 "opindia.com", "news18.com", "deccanherald.com", "newindianexpress.com",
                 "tribuneindia.com", "firstpost.com"
             ],
+            "porn": [
+                "pornhub.com", "xvideos.com", "xhamster.com", "xnxx.com", "redtube.com",
+                "youporn.com", "tube8.com", "porn.com", "xvideos2.com", "spankbang.com",
+                "sex.com", "beeg.com", "youporn.xxx", "xtube.com", "youjizz.com",
+                "pornhd.com", "zoosexmovies.com", "tnaflix.com", "keezmovies.com",
+                "hclips.com", "hentaihaven.com", "porndig.com", "4tube.com", "fapdu.com",
+                "empflix.com", "hentaicafe.com", "hentaibooks.com", "hentaiperks.com",
+                "porn05.com", "tushy.com", "bangbros.com", "lewdplace.com", "nuvid.com",
+                "redporn.me", "xxx.com", "hdporn.com", "pornmd.com", "eporner.com",
+                "xhamster2.com", "hentairules.com", "pornhd88.com", "pornrabbit.com",
+                "porn4k.com", "youjizz.xxx", "sexvid.xxx", "hclips.xxx", "xtube.xxx"
+            ],
+            "entertainment": [
+                "youtube.com", "netflix.com", "hulu.com", "disney.com", "hbo.com",
+                "primevideo.com", "spotify.com", "soundcloud.com", "twitch.tv",
+                "vimeo.com", "dailymotion.com", "crunchyroll.com", "funimation.com",
+                "paramountplus.com", "peacock.com", "appletv.com", "max.com"
+            ],
             "keywords": {
-                "porn": [
-                    "porn", "xxx", "sex", "adult", "hentai", "cam", "escort", "fuck",
-                    "nude", "erotic", "fetish", "onlyfans", "bdsm", "anal", "orgy",
-                    "milf", "teen", "hardcore", "xhamster", "xnxx", "spank", "redtube",
-                    "youporn", "xvideos", "tnaflix", "fap", "amateur"
-                ],
                 "social": [
                     "facebook", "instagram", "twitter", "x.com", "snapchat", "tiktok",
                     "reddit", "pinterest", "linkedin", "tumblr", "discord", "twitch",
@@ -78,6 +78,17 @@ class DistractionKillerBackground {
                     "moneycontrol", "financialexpress", "scroll", "thewire", "opindia",
                     "news18", "deccanherald", "newindianexpress", "tribuneindia",
                     "firstpost", "press", "journal", "times", "daily"
+                ],
+                "porn": [
+                    "porn", "xxx", "sex", "adult", "hentai", "cam", "escort", "fuck",
+                    "nude", "erotic", "fetish", "onlyfans", "bdsm", "anal", "orgy",
+                    "milf", "teen", "hardcore", "xhamster", "xnxx", "spank", "redtube",
+                    "youporn", "xvideos", "tnaflix", "fap", "amateur"
+                ],
+                "entertainment": [
+                    "youtube", "netflix", "hulu", "disney", "hbo", "primevideo",
+                    "spotify", "soundcloud", "twitch", "vimeo", "dailymotion",
+                    "crunchyroll", "funimation", "paramountplus", "peacock", "appletv", "max"
                 ]
             }
         };
@@ -112,6 +123,10 @@ class DistractionKillerBackground {
                     break;
                 case 'settingsUpdated':
                     this.userSettings = request.settings;
+                    console.log('Settings updated in background:', this.userSettings);
+                    console.log('Social media enabled:', this.userSettings?.siteCategories?.socialMedia);
+                    // Reload settings to ensure they're properly applied
+                    this.loadUserSettings();
                     break;
             }
         });
@@ -138,6 +153,45 @@ class DistractionKillerBackground {
         try {
             const result = await chrome.storage.local.get(['userSettings']);
             this.userSettings = result.userSettings;
+            console.log('User settings loaded on startup:', this.userSettings);
+            
+            // If no settings exist, create default settings
+            if (!this.userSettings) {
+                console.log('No user settings found, creating defaults');
+                this.userSettings = {
+                    customSites: [],
+                    siteCategories: {
+                        socialMedia: true,
+                        news: true,
+                        shopping: true,
+                        entertainment: true,
+                        adult: true
+                    },
+                    customKeywords: [],
+                    frictionText: "I'm about to waste precious time on this site instead of working toward my goals. Every minute spent here is a minute I could've used to learn something new, finish a task, or make progress on what truly matters. I know I'm capable of better choices. Why am I letting distractions win?",
+                    notifications: {
+                        sessionStart: true,
+                        sessionEnd: true,
+                        sessionMilestone: true,
+                        dailyGoal: true,
+                        weeklyStreak: true,
+                        focusTime: true
+                    },
+                    theme: 'auto',
+                    timerStyle: 'circular',
+                    sounds: {
+                        session: true,
+                        blocking: false,
+                        milestone: true,
+                        volume: 50
+                    },
+                    animations: {
+                        speed: 1.0,
+                        reduceMotion: false
+                    }
+                };
+                await chrome.storage.local.set({ userSettings: this.userSettings });
+            }
         } catch (error) {
             console.error('Error loading user settings:', error);
         }
@@ -241,6 +295,11 @@ class DistractionKillerBackground {
             return false;
         }
 
+        console.log('=== BLOCKING CHECK ===');
+        console.log('URL:', url);
+        console.log('User settings:', this.userSettings);
+        console.log('Current session:', this.currentSession);
+
         // Check if there's temporary access granted for this URL/domain
         try {
             const result = await chrome.storage.local.get(['temporaryAccess']);
@@ -296,13 +355,19 @@ class DistractionKillerBackground {
                 // Check if this category is enabled in user settings
                 if (this.userSettings && this.userSettings.siteCategories) {
                     const categoryKey = this.getCategoryKey(category);
-                    if (categoryKey && !this.userSettings.siteCategories[categoryKey]) {
+                    const isEnabled = this.userSettings.siteCategories[categoryKey];
+                    console.log(`Checking category ${category} -> ${categoryKey}, enabled:`, isEnabled);
+                    if (categoryKey && !isEnabled) {
+                        console.log(`Skipping category ${category} because it's disabled in settings`);
                         continue; // Skip this category if disabled
                     }
+                } else {
+                    console.log('No user settings or siteCategories found, using default blocking');
                 }
                 
                 for (const domain of this.blockedSites[category]) {
                     if (hostname === domain || hostname.endsWith('.' + domain)) {
+                        console.log(`Blocking ${url} - matched domain ${domain} in category ${category}`);
                         return true;
                     }
                 }
@@ -312,16 +377,29 @@ class DistractionKillerBackground {
             if (this.userSettings && this.userSettings.customSites) {
                 for (const customSite of this.userSettings.customSites) {
                     if (hostname === customSite || hostname.endsWith('.' + customSite)) {
+                        console.log(`Blocking ${url} - matched custom site ${customSite}`);
                         return true;
                     }
                 }
             }
             
-            // Check keyword matches
+            // Check keyword matches (respecting user settings)
             const fullUrl = (hostname + pathname + search).toLowerCase();
             for (const category in this.blockedSites.keywords) {
+                // Check if this category is enabled in user settings
+                if (this.userSettings && this.userSettings.siteCategories) {
+                    const categoryKey = this.getCategoryKey(category);
+                    const isEnabled = this.userSettings.siteCategories[categoryKey];
+                    console.log(`Checking keyword category ${category} -> ${categoryKey}, enabled:`, isEnabled);
+                    if (categoryKey && !isEnabled) {
+                        console.log(`Skipping keyword category ${category} because it's disabled in settings`);
+                        continue; // Skip this category if disabled
+                    }
+                }
+                
                 for (const keyword of this.blockedSites.keywords[category]) {
                     if (fullUrl.includes(keyword.toLowerCase())) {
+                        console.log(`Blocking ${url} - matched keyword ${keyword} in category ${category}`);
                         return true;
                     }
                 }
@@ -331,11 +409,13 @@ class DistractionKillerBackground {
             if (this.userSettings && this.userSettings.customKeywords) {
                 for (const keyword of this.userSettings.customKeywords) {
                     if (fullUrl.includes(keyword.toLowerCase())) {
+                        console.log(`Blocking ${url} - matched custom keyword ${keyword}`);
                         return true;
                     }
                 }
             }
             
+            console.log(`Allowing ${url} - no blocking rules matched`);
             return false;
         } catch (error) {
             console.error('Error checking if site is blocked:', error);
