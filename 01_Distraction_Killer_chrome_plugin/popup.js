@@ -83,6 +83,15 @@ class DistractionKillerPopup {
             this.currentSession = result.currentSession || null;
             this.sessionHistory = result.sessionHistory || [];
 
+            // Convert achievedMilestones from array to Set if it exists
+            if (this.currentSession && this.currentSession.achievedMilestones) {
+                if (Array.isArray(this.currentSession.achievedMilestones)) {
+                    this.currentSession.achievedMilestones = new Set(this.currentSession.achievedMilestones);
+                } else if (!(this.currentSession.achievedMilestones instanceof Set)) {
+                    this.currentSession.achievedMilestones = new Set();
+                }
+            }
+
             if (this.currentSession && this.currentSession.isActive) {
                 this.showActiveSession();
                 this.startTimer();
@@ -114,7 +123,8 @@ class DistractionKillerPopup {
             isPaused: false,
             pausedTime: 0,
             blockedAttempts: 0,
-            completed: false
+            completed: false,
+            achievedMilestones: new Set() // Track milestones for this session
         };
 
         try {
@@ -131,6 +141,7 @@ class DistractionKillerPopup {
             this.startTimer();
             this.updateStatus('active');
             
+            // Show start notification in popup (as requested)
             this.showNotification(`Deep work session started for ${duration} minutes!`, 'success');
         } catch (error) {
             console.error('Error starting session:', error);
@@ -194,7 +205,16 @@ class DistractionKillerPopup {
         if (!this.currentSession) return;
 
         const now = Date.now();
-        const remainingTime = this.currentSession.endTime - now - this.currentSession.pausedTime;
+        
+        // Calculate remaining time correctly
+        let remainingTime;
+        if (this.currentSession.isPaused) {
+            // If paused, remaining time doesn't change
+            remainingTime = this.currentSession.endTime - this.currentSession.startTime - this.currentSession.pausedTime;
+        } else {
+            // If not paused, calculate based on current time
+            remainingTime = this.currentSession.endTime - now;
+        }
 
         if (remainingTime <= 0) {
             this.completeSession();
@@ -224,8 +244,7 @@ class DistractionKillerPopup {
         const milestones = [0.25, 0.5, 0.75]; // 25%, 50%, 75%
         
         for (const milestone of milestones) {
-            if (progress >= milestone && !this.currentSession.achievedMilestones) {
-                this.currentSession.achievedMilestones = this.currentSession.achievedMilestones || new Set();
+            if (progress >= milestone) {
                 const milestoneKey = `${Math.floor(milestone * 100)}%`;
                 
                 if (!this.currentSession.achievedMilestones.has(milestoneKey)) {
@@ -315,7 +334,7 @@ class DistractionKillerPopup {
             this.showSessionComplete();
             this.updateStatus('inactive');
             
-            // Show stop notification in popup
+            // Show stop notification in popup (as requested)
             this.showNotification('Deep work session stopped!', 'info');
         } catch (error) {
             console.error('Error stopping session:', error);
@@ -350,8 +369,7 @@ class DistractionKillerPopup {
             this.showSessionComplete();
             this.updateStatus('inactive');
             
-            // Show completion notification in popup
-            this.showNotification('🎉 Deep work session completed! Great job!', 'success');
+            // DO NOT show completion notification in popup - let background script handle it as system notification
         } catch (error) {
             console.error('Error completing session:', error);
         }

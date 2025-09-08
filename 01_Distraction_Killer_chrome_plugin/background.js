@@ -96,20 +96,91 @@ class DistractionKillerBackground {
         };
     }
 
+    convertAchievedMilestonesToSet(sessionData) {
+        if (sessionData && sessionData.achievedMilestones) {
+            if (Array.isArray(sessionData.achievedMilestones)) {
+                sessionData.achievedMilestones = new Set(sessionData.achievedMilestones);
+            } else if (!(sessionData.achievedMilestones instanceof Set)) {
+                sessionData.achievedMilestones = new Set();
+            }
+        }
+        return sessionData;
+    }
+
+    getBaseDomain(hostname) {
+        // Extract base domain from hostname
+        // e.g., www.linkedin.com -> linkedin.com, subdomain.example.com -> example.com
+        const parts = hostname.split('.');
+        if (parts.length >= 2) {
+            return parts.slice(-2).join('.');
+        }
+        return hostname;
+    }
+
+    checkTemporaryAccess(url, hostname, fullUrl, accessData) {
+        // Check exact URL match
+        if (accessData.url === url) {
+            console.log('✅ Exact URL match');
+            return true;
+        }
+
+        // Check domain matches
+        const accessUrlObj = new URL(accessData.url);
+        const accessHostname = accessUrlObj.hostname.toLowerCase();
+        const baseDomain = this.getBaseDomain(hostname);
+        const accessBaseDomain = accessData.baseDomain || this.getBaseDomain(accessData.domain);
+
+        if (hostname === accessHostname || 
+            hostname === accessData.domain ||
+            baseDomain === accessBaseDomain ||
+            hostname.endsWith('.' + accessData.domain) ||
+            accessData.domain.endsWith('.' + hostname) ||
+            hostname.endsWith('.' + accessBaseDomain) ||
+            accessBaseDomain.endsWith('.' + hostname)) {
+            console.log('✅ Domain match');
+            return true;
+        }
+
+        // Check keyword match - if access was granted for a keyword, allow any URL containing that keyword
+        if (accessData.keyword) {
+            if (fullUrl.includes(accessData.keyword.toLowerCase()) || 
+                hostname.includes(accessData.keyword.toLowerCase())) {
+                console.log('✅ Keyword match for:', accessData.keyword);
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+    storeBlockingReason(url, type, value, category) {
+        // Store the reason why this URL was blocked for temporary access
+        const blockingReason = {
+            url: url,
+            type: type, // 'domain' or 'keyword'
+            value: value, // the domain or keyword that caused blocking
+            category: category,
+            timestamp: Date.now()
+        };
+        
+        chrome.storage.local.set({ blockingReason: blockingReason });
+        console.log('Stored blocking reason:', blockingReason);
+    }
+
     setupMessageListener() {
         chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
             switch (request.action) {
                 case 'startSession':
-                    this.startSession(request.sessionData);
+                    this.startSession(this.convertAchievedMilestonesToSet(request.sessionData));
                     break;
                 case 'stopSession':
                     this.stopSession();
                     break;
                 case 'updateSession':
-                    this.updateSession(request.sessionData);
+                    this.updateSession(this.convertAchievedMilestonesToSet(request.sessionData));
                     break;
                 case 'completeSession':
-                    this.completeSession(request.sessionData);
+                    this.completeSession(this.convertAchievedMilestonesToSet(request.sessionData));
                     break;
                 case 'checkBlockedSite':
                     // Handle async isSiteBlocked
@@ -131,7 +202,11 @@ class DistractionKillerBackground {
                     this.loadUserSettings();
                     break;
                 case 'checkMilestone':
-                    this.checkMilestone(request.sessionData);
+                    this.checkMilestone(this.convertAchievedMilestonesToSet(request.sessionData));
+                    break;
+                case 'grantTemporaryAccess':
+                    // Handle temporary access grant
+                    console.log('Temporary access granted:', request.accessData);
                     break;
             }
         });
@@ -149,6 +224,16 @@ class DistractionKillerBackground {
         try {
             const result = await chrome.storage.local.get(['currentSession']);
             this.currentSession = result.currentSession;
+            
+            // Convert achievedMilestones from array to Set if it exists
+            if (this.currentSession && this.currentSession.achievedMilestones) {
+                if (Array.isArray(this.currentSession.achievedMilestones)) {
+                    this.currentSession.achievedMilestones = new Set(this.currentSession.achievedMilestones);
+                } else if (!(this.currentSession.achievedMilestones instanceof Set)) {
+                    this.currentSession.achievedMilestones = new Set();
+                }
+            }
+            
             if (this.currentSession && this.currentSession.isActive) {
                 this.achievedMilestones.clear();
             }
@@ -217,27 +302,11 @@ class DistractionKillerBackground {
         // Set up blocking rules
         this.setupBlockingRules();
         
-        // Show start notification if enabled
-        if (this.userSettings?.notifications?.sessionStart) {
-            this.showNotification(
-                'Deep Work Session Started! 🚀',
-                `Focus session for ${Math.floor(sessionData.duration / 60000)} minutes has begun. Stay focused!`,
-                'session-start'
-            );
-        }
-        
         console.log('Deep work session started:', sessionData);
     }
 
     async stopSession() {
-        // Show stop notification if enabled
-        if (this.userSettings?.notifications?.sessionEnd) {
-            this.showNotification(
-                'Deep Work Session Stopped ⏹️',
-                'Your focus session has been stopped. You can start a new one anytime.',
-                'session-stop'
-            );
-        }
+        console.log('Deep work session stopped');
 
         this.currentSession = null;
         this.achievedMilestones.clear();
@@ -248,8 +317,6 @@ class DistractionKillerBackground {
         
         // Clear blocking rules
         this.clearBlockingRules();
-        
-        console.log('Deep work session stopped');
     }
 
     async updateSession(sessionData) {
@@ -263,6 +330,7 @@ class DistractionKillerBackground {
     async completeSession(sessionData) {
         // Show completion notification if enabled
         if (this.userSettings?.notifications?.sessionEnd) {
+            console.log('Showing completion notification...');
             this.showNotification(
                 'Deep Work Session Completed! 🎉',
                 `Congratulations! You completed your ${Math.floor(sessionData.duration / 60000)}-minute focus session. Great job!`,
@@ -307,7 +375,15 @@ class DistractionKillerBackground {
         for (const threshold of this.milestoneThresholds) {
             const milestoneKey = `${Math.floor(threshold * 100)}%`;
             
-            if (progress >= threshold && !this.achievedMilestones.has(milestoneKey)) {
+            // Check both the session's achievedMilestones and the background's achievedMilestones
+            const sessionHasMilestone = sessionData.achievedMilestones && sessionData.achievedMilestones.has(milestoneKey);
+            const backgroundHasMilestone = this.achievedMilestones.has(milestoneKey);
+            
+            if (progress >= threshold && !sessionHasMilestone && !backgroundHasMilestone) {
+                // Add to both sets
+                if (sessionData.achievedMilestones) {
+                    sessionData.achievedMilestones.add(milestoneKey);
+                }
                 this.achievedMilestones.add(milestoneKey);
                 
                 const milestoneMessages = {
@@ -327,6 +403,7 @@ class DistractionKillerBackground {
 
                 const milestone = milestoneMessages[milestoneKey];
                 if (milestone) {
+                    console.log(`Showing milestone notification: ${milestoneKey}`);
                     this.showNotification(milestone.title, milestone.message, 'milestone');
                 }
             }
@@ -379,7 +456,7 @@ class DistractionKillerBackground {
         console.log('User settings:', this.userSettings);
         console.log('Current session:', this.currentSession);
 
-        // Check if there's temporary access granted for this URL/domain
+        // Check if there's temporary access granted for this URL/domain/keyword
         try {
             const result = await chrome.storage.local.get(['temporaryAccess']);
             console.log('Checking temporary access for:', url, 'Result:', result);
@@ -391,6 +468,7 @@ class DistractionKillerBackground {
                 console.log('Temporary access found:', {
                     url: accessData.url,
                     domain: accessData.domain,
+                    keyword: accessData.keyword,
                     sessionId: accessData.sessionId,
                     currentSessionId: this.currentSession.id,
                     endTime: accessData.endTime,
@@ -403,11 +481,18 @@ class DistractionKillerBackground {
                 if (now < accessData.endTime && accessData.sessionId === this.currentSession.id) {
                     const urlObj = new URL(url);
                     const hostname = urlObj.hostname.toLowerCase();
+                    const pathname = urlObj.pathname.toLowerCase();
+                    const search = urlObj.search.toLowerCase();
+                    const fullUrl = (hostname + pathname + search).toLowerCase();
                     
-                    // Check if this URL or domain has temporary access
-                    if (accessData.url === url || accessData.domain === hostname) {
-                        console.log('Allowing access due to temporary permission');
+                    // Check if this URL has temporary access
+                    const hasAccess = this.checkTemporaryAccess(url, hostname, fullUrl, accessData);
+                    
+                    if (hasAccess) {
+                        console.log('✅ Allowing access due to temporary permission');
                         return false; // Allow access
+                    } else {
+                        console.log('❌ No temporary access match found for:', hostname);
                     }
                 } else {
                     // Access expired or wrong session, remove it
@@ -426,6 +511,7 @@ class DistractionKillerBackground {
             const hostname = urlObj.hostname.toLowerCase();
             const pathname = urlObj.pathname.toLowerCase();
             const search = urlObj.search.toLowerCase();
+            const fullUrl = (hostname + pathname + search).toLowerCase();
             
             // Check exact domain matches (respecting user settings)
             for (const category in this.blockedSites) {
@@ -447,6 +533,8 @@ class DistractionKillerBackground {
                 for (const domain of this.blockedSites[category]) {
                     if (hostname === domain || hostname.endsWith('.' + domain)) {
                         console.log(`Blocking ${url} - matched domain ${domain} in category ${category}`);
+                        // Store blocking reason for temporary access
+                        this.storeBlockingReason(url, 'domain', domain, category);
                         return true;
                     }
                 }
@@ -457,13 +545,14 @@ class DistractionKillerBackground {
                 for (const customSite of this.userSettings.customSites) {
                     if (hostname === customSite || hostname.endsWith('.' + customSite)) {
                         console.log(`Blocking ${url} - matched custom site ${customSite}`);
+                        // Store blocking reason for temporary access
+                        this.storeBlockingReason(url, 'domain', customSite, 'custom');
                         return true;
                     }
                 }
             }
             
             // Check keyword matches (respecting user settings)
-            const fullUrl = (hostname + pathname + search).toLowerCase();
             console.log('Checking keywords in URL:', fullUrl);
             
             for (const category in this.blockedSites.keywords) {
@@ -483,6 +572,8 @@ class DistractionKillerBackground {
                 for (const keyword of this.blockedSites.keywords[category]) {
                     if (fullUrl.includes(keyword.toLowerCase())) {
                         console.log(`Blocking ${url} - matched keyword "${keyword}" in category ${category}`);
+                        // Store blocking reason for temporary access
+                        this.storeBlockingReason(url, 'keyword', keyword, category);
                         return true;
                     }
                 }
@@ -493,6 +584,8 @@ class DistractionKillerBackground {
                 for (const keyword of this.userSettings.customKeywords) {
                     if (fullUrl.includes(keyword.toLowerCase())) {
                         console.log(`Blocking ${url} - matched custom keyword "${keyword}"`);
+                        // Store blocking reason for temporary access
+                        this.storeBlockingReason(url, 'keyword', keyword, 'custom');
                         return true;
                     }
                 }
@@ -572,9 +665,17 @@ class DistractionKillerBackground {
             };
 
             // Show the notification
-            await chrome.notifications.create(`distraction-killer-${type}-${Date.now()}`, notificationOptions);
+            const notificationId = `distraction-killer-${type}-${Date.now()}`;
+            await chrome.notifications.create(notificationId, notificationOptions);
             
-            console.log(`Notification shown: ${title} - ${message}`);
+            console.log(`System notification shown: ${title} - ${message}`);
+            
+            // Auto-dismiss after 5 seconds for non-critical notifications
+            if (type !== 'session-complete') {
+                setTimeout(() => {
+                    chrome.notifications.clear(notificationId);
+                }, 5000);
+            }
         } catch (error) {
             console.error('Error showing notification:', error);
         }

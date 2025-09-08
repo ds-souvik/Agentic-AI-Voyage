@@ -26,6 +26,16 @@ class DistractionKillerBlocked {
         }
     }
 
+    getBaseDomain(hostname) {
+        // Extract base domain from hostname
+        // e.g., www.linkedin.com -> linkedin.com, subdomain.example.com -> example.com
+        const parts = hostname.split('.');
+        if (parts.length >= 2) {
+            return parts.slice(-2).join('.');
+        }
+        return hostname;
+    }
+
     initializeElements() {
         // Timer elements
         this.timerProgress = document.getElementById('timerProgress');
@@ -77,6 +87,10 @@ class DistractionKillerBlocked {
         try {
             const response = await chrome.runtime.sendMessage({ action: 'getSessionData' });
             this.currentSession = response.currentSession;
+            
+            // Also load blocking reason
+            const result = await chrome.storage.local.get(['blockingReason']);
+            this.blockingReason = result.blockingReason;
             this.updateDisplay();
         } catch (error) {
             console.error('Error loading session data:', error);
@@ -221,15 +235,37 @@ class DistractionKillerBlocked {
 
         try {
             // Create temporary access permission for this specific URL and session
+            const urlObj = new URL(this.originalBlockedUrl);
+            const domain = urlObj.hostname.toLowerCase();
+            
             const accessData = {
                 url: this.originalBlockedUrl,
-                domain: new URL(this.originalBlockedUrl).hostname,
+                domain: domain,
+                baseDomain: this.getBaseDomain(domain), // Store base domain for better matching
                 sessionId: this.currentSession.id, // Tie access to current session
                 duration: duration * 60 * 1000, // Convert to milliseconds
                 startTime: Date.now(),
                 endTime: Date.now() + (duration * 60 * 1000),
                 granted: true
             };
+
+            // If we have blocking reason, include it for better access matching
+            if (this.blockingReason) {
+                accessData.blockingType = this.blockingReason.type;
+                accessData.blockingValue = this.blockingReason.value;
+                accessData.blockingCategory = this.blockingReason.category;
+                
+                // If blocked by keyword, store the keyword for access matching
+                if (this.blockingReason.type === 'keyword') {
+                    accessData.keyword = this.blockingReason.value;
+                }
+                
+                console.log('Including blocking reason in access data:', {
+                    type: this.blockingReason.type,
+                    value: this.blockingReason.value,
+                    category: this.blockingReason.category
+                });
+            }
 
             await chrome.storage.local.set({ temporaryAccess: accessData });
 
