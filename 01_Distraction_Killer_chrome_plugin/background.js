@@ -4,6 +4,8 @@ class DistractionKillerBackground {
         this.currentSession = null;
         this.userSettings = null;
         this.blockedSites = this.initializeBlockedSites();
+        this.milestoneThresholds = [0.25, 0.5, 0.75]; // 25%, 50%, 75%
+        this.achievedMilestones = new Set();
         this.setupMessageListener();
         this.setupNavigationListener();
         this.loadSessionData();
@@ -128,6 +130,9 @@ class DistractionKillerBackground {
                     // Reload settings to ensure they're properly applied
                     this.loadUserSettings();
                     break;
+                case 'checkMilestone':
+                    this.checkMilestone(request.sessionData);
+                    break;
             }
         });
     }
@@ -144,6 +149,9 @@ class DistractionKillerBackground {
         try {
             const result = await chrome.storage.local.get(['currentSession']);
             this.currentSession = result.currentSession;
+            if (this.currentSession && this.currentSession.isActive) {
+                this.achievedMilestones.clear();
+            }
         } catch (error) {
             console.error('Error loading session data:', error);
         }
@@ -199,6 +207,7 @@ class DistractionKillerBackground {
 
     async startSession(sessionData) {
         this.currentSession = sessionData;
+        this.achievedMilestones.clear(); // Reset milestones for new session
         await chrome.storage.local.set({ currentSession: sessionData });
         
         // Clear any existing temporary access from previous sessions
@@ -208,11 +217,30 @@ class DistractionKillerBackground {
         // Set up blocking rules
         this.setupBlockingRules();
         
+        // Show start notification if enabled
+        if (this.userSettings?.notifications?.sessionStart) {
+            this.showNotification(
+                'Deep Work Session Started! 🚀',
+                `Focus session for ${Math.floor(sessionData.duration / 60000)} minutes has begun. Stay focused!`,
+                'session-start'
+            );
+        }
+        
         console.log('Deep work session started:', sessionData);
     }
 
     async stopSession() {
+        // Show stop notification if enabled
+        if (this.userSettings?.notifications?.sessionEnd) {
+            this.showNotification(
+                'Deep Work Session Stopped ⏹️',
+                'Your focus session has been stopped. You can start a new one anytime.',
+                'session-stop'
+            );
+        }
+
         this.currentSession = null;
+        this.achievedMilestones.clear();
         await chrome.storage.local.set({ currentSession: null });
         
         // Clear any temporary access when session ends
@@ -227,9 +255,21 @@ class DistractionKillerBackground {
     async updateSession(sessionData) {
         this.currentSession = sessionData;
         await chrome.storage.local.set({ currentSession: sessionData });
+        
+        // Check for milestones
+        this.checkMilestone(sessionData);
     }
 
     async completeSession(sessionData) {
+        // Show completion notification if enabled
+        if (this.userSettings?.notifications?.sessionEnd) {
+            this.showNotification(
+                'Deep Work Session Completed! 🎉',
+                `Congratulations! You completed your ${Math.floor(sessionData.duration / 60000)}-minute focus session. Great job!`,
+                'session-complete'
+            );
+        }
+
         // Save completed session to history
         const result = await chrome.storage.local.get(['sessionHistory']);
         const sessionHistory = result.sessionHistory || [];
@@ -249,9 +289,48 @@ class DistractionKillerBackground {
         await chrome.storage.local.remove(['temporaryAccess', 'lastBlockedUrl', 'lastBlockedTabId']);
         
         this.currentSession = null;
+        this.achievedMilestones.clear();
         this.clearBlockingRules();
         
         console.log('Deep work session completed:', sessionData);
+    }
+
+    checkMilestone(sessionData) {
+        if (!sessionData || !sessionData.isActive || !this.userSettings?.notifications?.sessionMilestone) {
+            return;
+        }
+
+        const now = Date.now();
+        const elapsed = now - sessionData.startTime - (sessionData.pausedTime || 0);
+        const progress = elapsed / sessionData.duration;
+
+        for (const threshold of this.milestoneThresholds) {
+            const milestoneKey = `${Math.floor(threshold * 100)}%`;
+            
+            if (progress >= threshold && !this.achievedMilestones.has(milestoneKey)) {
+                this.achievedMilestones.add(milestoneKey);
+                
+                const milestoneMessages = {
+                    '25%': {
+                        title: '25% Complete! 🎯',
+                        message: 'You\'re making great progress! Keep up the focus!'
+                    },
+                    '50%': {
+                        title: 'Halfway There! 💪',
+                        message: 'You\'re doing amazing! The hardest part is behind you!'
+                    },
+                    '75%': {
+                        title: 'Almost Done! 🔥',
+                        message: 'You\'re in the final stretch! Finish strong!'
+                    }
+                };
+
+                const milestone = milestoneMessages[milestoneKey];
+                if (milestone) {
+                    this.showNotification(milestone.title, milestone.message, 'milestone');
+                }
+            }
+        }
     }
 
     setupBlockingRules() {
@@ -471,6 +550,33 @@ class DistractionKillerBackground {
         } catch (error) {
             console.error('Error getting blocked category:', error);
             return 'unknown';
+        }
+    }
+
+    async showNotification(title, message, type = 'info') {
+        try {
+            // Check if notifications are enabled
+            if (!this.userSettings?.notifications) {
+                console.log('Notifications disabled in settings');
+                return;
+            }
+
+            // Create notification options
+            const notificationOptions = {
+                type: 'basic',
+                iconUrl: 'icons/icon48.png',
+                title: title,
+                message: message,
+                priority: 2,
+                requireInteraction: type === 'session-complete' || type === 'milestone'
+            };
+
+            // Show the notification
+            await chrome.notifications.create(`distraction-killer-${type}-${Date.now()}`, notificationOptions);
+            
+            console.log(`Notification shown: ${title} - ${message}`);
+        } catch (error) {
+            console.error('Error showing notification:', error);
         }
     }
 }

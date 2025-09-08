@@ -215,6 +215,30 @@ class DistractionKillerPopup {
         const offset = circumference - (progress * circumference);
         
         this.timerProgress.style.strokeDashoffset = offset;
+
+        // Check for milestones
+        this.checkMilestone(progress);
+    }
+
+    checkMilestone(progress) {
+        const milestones = [0.25, 0.5, 0.75]; // 25%, 50%, 75%
+        
+        for (const milestone of milestones) {
+            if (progress >= milestone && !this.currentSession.achievedMilestones) {
+                this.currentSession.achievedMilestones = this.currentSession.achievedMilestones || new Set();
+                const milestoneKey = `${Math.floor(milestone * 100)}%`;
+                
+                if (!this.currentSession.achievedMilestones.has(milestoneKey)) {
+                    this.currentSession.achievedMilestones.add(milestoneKey);
+                    
+                    // Notify background script to show milestone notification
+                    chrome.runtime.sendMessage({
+                        action: 'checkMilestone',
+                        sessionData: this.currentSession
+                    });
+                }
+            }
+        }
     }
 
     updateStats() {
@@ -290,6 +314,9 @@ class DistractionKillerPopup {
             clearInterval(this.timerInterval);
             this.showSessionComplete();
             this.updateStatus('inactive');
+            
+            // Show stop notification in popup
+            this.showNotification('Deep work session stopped!', 'info');
         } catch (error) {
             console.error('Error stopping session:', error);
         }
@@ -323,6 +350,7 @@ class DistractionKillerPopup {
             this.showSessionComplete();
             this.updateStatus('inactive');
             
+            // Show completion notification in popup
             this.showNotification('🎉 Deep work session completed! Great job!', 'success');
         } catch (error) {
             console.error('Error completing session:', error);

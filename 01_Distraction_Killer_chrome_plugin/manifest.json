@@ -8,7 +8,8 @@
     "tabs",
     "activeTab",
     "webNavigation",
-    "declarativeNetRequest"
+    "declarativeNetRequest",
+    "notifications"
   ],
   "host_permissions": [
     "<all_urls>"
