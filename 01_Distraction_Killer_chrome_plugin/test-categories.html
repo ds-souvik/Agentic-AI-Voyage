@@ -31,6 +31,12 @@
         .test-button:hover {
             background: #5a67d8;
         }
+        .test-button.keyword {
+            background: #e53e3e;
+        }
+        .test-button.keyword:hover {
+            background: #c53030;
+        }
         .result {
             margin: 10px 0;
             padding: 10px;
@@ -51,49 +57,103 @@
             color: #0c5460;
             border: 1px solid #bee5eb;
         }
+        .warning {
+            background: #fff3cd;
+            color: #856404;
+            border: 1px solid #ffeaa7;
+        }
+        .test-group {
+            margin: 15px 0;
+            padding: 15px;
+            border: 1px solid #e2e8f0;
+            border-radius: 6px;
+        }
+        .test-group h4 {
+            margin: 0 0 10px 0;
+            color: #2d3748;
+        }
     </style>
 </head>
 <body>
     <h1>Distraction Killer - Category Test</h1>
-    <p>This page helps you test if all blocking categories are working correctly.</p>
+    <p>This page helps you test if all blocking categories are working correctly for both domains and keywords.</p>
 
     <div class="test-section">
         <h2>Test Instructions</h2>
         <ol>
             <li>Open the Distraction Killer extension settings</li>
-            <li>Disable a category (e.g., uncheck "Shopping & E-commerce")</li>
+            <li>Disable a category (e.g., uncheck "News & Media")</li>
             <li>Start a focus session</li>
-            <li>Click the test buttons below to try accessing blocked sites</li>
-            <li>Verify that disabled categories are NOT blocked</li>
+            <li>Test both domain and keyword blocking using the buttons below</li>
+            <li>Verify that disabled categories are NOT blocked (both domains and keywords)</li>
         </ol>
     </div>
 
     <div class="test-section">
         <h2>Category Tests</h2>
         
-        <h3>Social Media (should be blocked when enabled)</h3>
-        <button class="test-button" onclick="testSite('https://instagram.com')">Test Instagram</button>
-        <button class="test-button" onclick="testSite('https://facebook.com')">Test Facebook</button>
-        <button class="test-button" onclick="testSite('https://twitter.com')">Test Twitter</button>
+        <div class="test-group">
+            <h3>Social Media (should be blocked when enabled)</h3>
+            <h4>Domain Tests:</h4>
+            <button class="test-button" onclick="testSite('https://instagram.com')">Test Instagram</button>
+            <button class="test-button" onclick="testSite('https://facebook.com')">Test Facebook</button>
+            <button class="test-button" onclick="testSite('https://twitter.com')">Test Twitter</button>
+            
+            <h4>Keyword Tests (search for these terms):</h4>
+            <button class="test-button keyword" onclick="testKeyword('instagram')">Search "instagram"</button>
+            <button class="test-button keyword" onclick="testKeyword('facebook')">Search "facebook"</button>
+            <button class="test-button keyword" onclick="testKeyword('twitter')">Search "twitter"</button>
+        </div>
         
-        <h3>Shopping & E-commerce (should be blocked when enabled)</h3>
-        <button class="test-button" onclick="testSite('https://amazon.com')">Test Amazon</button>
-        <button class="test-button" onclick="testSite('https://flipkart.com')">Test Flipkart</button>
-        <button class="test-button" onclick="testSite('https://ebay.com')">Test eBay</button>
+        <div class="test-group">
+            <h3>Shopping & E-commerce (should be blocked when enabled)</h3>
+            <h4>Domain Tests:</h4>
+            <button class="test-button" onclick="testSite('https://amazon.com')">Test Amazon</button>
+            <button class="test-button" onclick="testSite('https://flipkart.com')">Test Flipkart</button>
+            <button class="test-button" onclick="testSite('https://ebay.com')">Test eBay</button>
+            
+            <h4>Keyword Tests (search for these terms):</h4>
+            <button class="test-button keyword" onclick="testKeyword('amazon')">Search "amazon"</button>
+            <button class="test-button keyword" onclick="testKeyword('flipkart')">Search "flipkart"</button>
+            <button class="test-button keyword" onclick="testKeyword('shop')">Search "shop"</button>
+        </div>
         
-        <h3>News & Media (should be blocked when enabled)</h3>
-        <button class="test-button" onclick="testSite('https://cnn.com')">Test CNN</button>
-        <button class="test-button" onclick="testSite('https://bbc.com')">Test BBC</button>
-        <button class="test-button" onclick="testSite('https://nytimes.com')">Test NY Times</button>
+        <div class="test-group">
+            <h3>News & Media (should be blocked when enabled)</h3>
+            <h4>Domain Tests:</h4>
+            <button class="test-button" onclick="testSite('https://cnn.com')">Test CNN</button>
+            <button class="test-button" onclick="testSite('https://bbc.com')">Test BBC</button>
+            <button class="test-button" onclick="testSite('https://nytimes.com')">Test NY Times</button>
+            
+            <h4>Keyword Tests (search for these terms):</h4>
+            <button class="test-button keyword" onclick="testKeyword('cnn')">Search "cnn"</button>
+            <button class="test-button keyword" onclick="testKeyword('bbc')">Search "bbc"</button>
+            <button class="test-button keyword" onclick="testKeyword('news')">Search "news"</button>
+        </div>
         
-        <h3>Entertainment (should be blocked when enabled)</h3>
-        <button class="test-button" onclick="testSite('https://youtube.com')">Test YouTube</button>
-        <button class="test-button" onclick="testSite('https://netflix.com')">Test Netflix</button>
-        <button class="test-button" onclick="testSite('https://spotify.com')">Test Spotify</button>
+        <div class="test-group">
+            <h3>Entertainment (should be blocked when enabled)</h3>
+            <h4>Domain Tests:</h4>
+            <button class="test-button" onclick="testSite('https://youtube.com')">Test YouTube</button>
+            <button class="test-button" onclick="testSite('https://netflix.com')">Test Netflix</button>
+            <button class="test-button" onclick="testSite('https://spotify.com')">Test Spotify</button>
+            
+            <h4>Keyword Tests (search for these terms):</h4>
+            <button class="test-button keyword" onclick="testKeyword('youtube')">Search "youtube"</button>
+            <button class="test-button keyword" onclick="testKeyword('netflix')">Search "netflix"</button>
+            <button class="test-button keyword" onclick="testKeyword('spotify')">Search "spotify"</button>
+        </div>
         
-        <h3>Adult Content (should be blocked when enabled)</h3>
-        <button class="test-button" onclick="testSite('https://pornhub.com')">Test PornHub</button>
-        <button class="test-button" onclick="testSite('https://xvideos.com')">Test XVideos</button>
+        <div class="test-group">
+            <h3>Adult Content (should be blocked when enabled)</h3>
+            <h4>Domain Tests:</h4>
+            <button class="test-button" onclick="testSite('https://pornhub.com')">Test PornHub</button>
+            <button class="test-button" onclick="testSite('https://xvideos.com')">Test XVideos</button>
+            
+            <h4>Keyword Tests (search for these terms):</h4>
+            <button class="test-button keyword" onclick="testKeyword('porn')">Search "porn"</button>
+            <button class="test-button keyword" onclick="testKeyword('xxx')">Search "xxx"</button>
+        </div>
     </div>
 
     <div class="test-section">
@@ -105,6 +165,7 @@
         <h2>Debug Information</h2>
         <button class="test-button" onclick="checkSettings()">Check Current Settings</button>
         <button class="test-button" onclick="checkSession()">Check Session Status</button>
+        <button class="test-button" onclick="testKeywordBlocking()">Test Keyword Blocking Logic</button>
         <div id="debug"></div>
     </div>
 
@@ -113,7 +174,15 @@
             const resultDiv = document.getElementById('results');
             const testResult = document.createElement('div');
             testResult.className = 'result info';
-            testResult.innerHTML = `Testing: ${url} - <a href="${url}" target="_blank">Click to test</a>`;
+            testResult.innerHTML = `Testing Domain: ${url} - <a href="${url}" target="_blank">Click to test</a>`;
+            resultDiv.appendChild(testResult);
+        }
+
+        function testKeyword(keyword) {
+            const resultDiv = document.getElementById('results');
+            const testResult = document.createElement('div');
+            testResult.className = 'result warning';
+            testResult.innerHTML = `Testing Keyword: "${keyword}" - <a href="https://www.google.com/search?q=${encodeURIComponent(keyword)}" target="_blank">Search for "${keyword}"</a>`;
             resultDiv.appendChild(testResult);
         }
 
@@ -159,6 +228,38 @@
                 debugDiv.innerHTML = html;
             } catch (error) {
                 document.getElementById('debug').innerHTML = '<div class="result error">Error checking session: ' + error.message + '</div>';
+            }
+        }
+
+        async function testKeywordBlocking() {
+            try {
+                const debugDiv = document.getElementById('debug');
+                let html = '<h3>Keyword Blocking Test:</h3>';
+                
+                // Test URLs with keywords
+                const testUrls = [
+                    'https://www.google.com/search?q=cnn',
+                    'https://www.google.com/search?q=amazon',
+                    'https://www.google.com/search?q=instagram',
+                    'https://www.google.com/search?q=youtube',
+                    'https://www.google.com/search?q=porn'
+                ];
+                
+                for (const url of testUrls) {
+                    try {
+                        const response = await chrome.runtime.sendMessage({
+                            action: 'checkBlockedSite',
+                            url: url
+                        });
+                        html += `<p><strong>${url}:</strong> ${response.isBlocked ? '🚫 BLOCKED' : '✅ ALLOWED'} (Category: ${response.category})</p>`;
+                    } catch (error) {
+                        html += `<p><strong>${url}:</strong> Error testing - ${error.message}</p>`;
+                    }
+                }
+                
+                debugDiv.innerHTML = html;
+            } catch (error) {
+                document.getElementById('debug').innerHTML = '<div class="result error">Error testing keyword blocking: ' + error.message + '</div>';
             }
         }
 

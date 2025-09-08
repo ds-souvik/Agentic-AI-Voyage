@@ -356,9 +356,9 @@ class DistractionKillerBackground {
                 if (this.userSettings && this.userSettings.siteCategories) {
                     const categoryKey = this.getCategoryKey(category);
                     const isEnabled = this.userSettings.siteCategories[categoryKey];
-                    console.log(`Checking category ${category} -> ${categoryKey}, enabled:`, isEnabled);
+                    console.log(`Checking domain category ${category} -> ${categoryKey}, enabled:`, isEnabled);
                     if (categoryKey && !isEnabled) {
-                        console.log(`Skipping category ${category} because it's disabled in settings`);
+                        console.log(`Skipping domain category ${category} because it's disabled in settings`);
                         continue; // Skip this category if disabled
                     }
                 } else {
@@ -385,6 +385,8 @@ class DistractionKillerBackground {
             
             // Check keyword matches (respecting user settings)
             const fullUrl = (hostname + pathname + search).toLowerCase();
+            console.log('Checking keywords in URL:', fullUrl);
+            
             for (const category in this.blockedSites.keywords) {
                 // Check if this category is enabled in user settings
                 if (this.userSettings && this.userSettings.siteCategories) {
@@ -395,11 +397,13 @@ class DistractionKillerBackground {
                         console.log(`Skipping keyword category ${category} because it's disabled in settings`);
                         continue; // Skip this category if disabled
                     }
+                } else {
+                    console.log('No user settings found for keyword checking, using default blocking');
                 }
                 
                 for (const keyword of this.blockedSites.keywords[category]) {
                     if (fullUrl.includes(keyword.toLowerCase())) {
-                        console.log(`Blocking ${url} - matched keyword ${keyword} in category ${category}`);
+                        console.log(`Blocking ${url} - matched keyword "${keyword}" in category ${category}`);
                         return true;
                     }
                 }
@@ -409,7 +413,7 @@ class DistractionKillerBackground {
             if (this.userSettings && this.userSettings.customKeywords) {
                 for (const keyword of this.userSettings.customKeywords) {
                     if (fullUrl.includes(keyword.toLowerCase())) {
-                        console.log(`Blocking ${url} - matched custom keyword ${keyword}`);
+                        console.log(`Blocking ${url} - matched custom keyword "${keyword}"`);
                         return true;
                     }
                 }
