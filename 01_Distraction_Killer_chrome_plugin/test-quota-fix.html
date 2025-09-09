@@ -1,0 +1,147 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Quota Fix Test</title>
+    <style>
+        body { 
+            font-family: Arial, sans-serif; 
+            margin: 20px; 
+            background: #f5f5f5;
+        }
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            background: white;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        button { 
+            padding: 10px 15px; 
+            margin: 5px; 
+            cursor: pointer; 
+            background: #007bff;
+            color: white;
+            border: none;
+            border-radius: 4px;
+        }
+        button:hover {
+            background: #0056b3;
+        }
+        #output { 
+            border: 1px solid #ccc; 
+            padding: 15px; 
+            margin-top: 20px; 
+            min-height: 200px; 
+            background: #f9f9f9; 
+            white-space: pre-wrap; 
+            font-family: monospace; 
+            border-radius: 4px;
+        }
+        .success {
+            color: #28a745;
+            font-weight: bold;
+        }
+        .error {
+            color: #dc3545;
+            font-weight: bold;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🔧 Quota Fix Test</h1>
+        <p>This page tests the quota fix for the porn blocklist integration.</p>
+        
+        <div>
+            <button onclick="testQuotaFix()">🧪 Test Quota Fix</button>
+            <button onclick="testBlocklistStats()">📊 Test Blocklist Stats</button>
+            <button onclick="testBlocking()">🚫 Test Blocking</button>
+            <button onclick="clearOutput()">🗑️ Clear Output</button>
+        </div>
+
+        <div id="output">Quota Fix Test Page Loaded. Click buttons above to test the quota fix.</div>
+    </div>
+
+    <script>
+        const outputDiv = document.getElementById('output');
+        
+        const log = (message, type = 'info') => {
+            const timestamp = new Date().toLocaleTimeString();
+            const prefix = type === 'success' ? '✅' : type === 'error' ? '❌' : 'ℹ️';
+            outputDiv.textContent += `[${timestamp}] ${prefix} ${message}\n`;
+            outputDiv.scrollTop = outputDiv.scrollHeight;
+            console.log(message);
+        };
+
+        async function testQuotaFix() {
+            log('--- Testing Quota Fix ---');
+            
+            try {
+                // Test if extension loads without quota errors
+                const response = await chrome.runtime.sendMessage({ action: 'getSessionData' });
+                log('Extension loaded successfully without quota errors', 'success');
+                log(`Session data: ${JSON.stringify(response)}`);
+            } catch (e) {
+                log(`Extension failed to load: ${e.message}`, 'error');
+            }
+        }
+
+        async function testBlocklistStats() {
+            log('--- Testing Blocklist Stats ---');
+            
+            try {
+                const response = await chrome.runtime.sendMessage({ action: 'getPornBlocklistStats' });
+                log('Blocklist stats retrieved successfully', 'success');
+                log(`Stats: ${JSON.stringify(response, null, 2)}`);
+                
+                if (response.loaded) {
+                    log(`External blocklist available with ${response.count} domains`, 'success');
+                } else {
+                    log(`Using fallback blocklist with ${response.count} domains`, 'info');
+                }
+            } catch (e) {
+                log(`Failed to get blocklist stats: ${e.message}`, 'error');
+            }
+        }
+
+        async function testBlocking() {
+            log('--- Testing Blocking Functionality ---');
+            
+            const testUrls = [
+                'https://pornhub.com',
+                'https://xvideos.com',
+                'https://facebook.com',
+                'https://google.com'
+            ];
+
+            for (const url of testUrls) {
+                try {
+                    const response = await chrome.runtime.sendMessage({ 
+                        action: 'checkBlockedSite', 
+                        url: url 
+                    });
+                    const status = response.isBlocked ? 'BLOCKED' : 'ALLOWED';
+                    const category = response.category || 'unknown';
+                    log(`${url}: ${status} (${category})`);
+                } catch (e) {
+                    log(`Error testing ${url}: ${e.message}`, 'error');
+                }
+            }
+        }
+
+        function clearOutput() {
+            outputDiv.textContent = '';
+        }
+
+        // Initialize on page load
+        document.addEventListener('DOMContentLoaded', () => {
+            log('Quota Fix Test Page Loaded');
+            log('The quota fix prevents storing the large blocklist in Chrome storage');
+            log('Instead, it loads the blocklist on-demand when needed');
+        });
+    </script>
+</body>
+</html>

@@ -1,0 +1,269 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Session Status Test</title>
+    <style>
+        body { 
+            font-family: Arial, sans-serif; 
+            margin: 20px; 
+            background: #f5f5f5;
+        }
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            background: white;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        button { 
+            padding: 10px 15px; 
+            margin: 5px; 
+            cursor: pointer; 
+            background: #007bff;
+            color: white;
+            border: none;
+            border-radius: 4px;
+        }
+        button:hover {
+            background: #0056b3;
+        }
+        #output { 
+            border: 1px solid #ccc; 
+            padding: 15px; 
+            margin-top: 20px; 
+            min-height: 200px; 
+            background: #f9f9f9; 
+            white-space: pre-wrap; 
+            font-family: monospace; 
+            border-radius: 4px;
+        }
+        .success {
+            color: #28a745;
+            font-weight: bold;
+        }
+        .error {
+            color: #dc3545;
+            font-weight: bold;
+        }
+        .test-section {
+            background: #f8f9fa;
+            padding: 15px;
+            margin: 10px 0;
+            border-radius: 6px;
+            border-left: 4px solid #007bff;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🔍 Session Status Test</h1>
+        <p>This page tests the session status persistence when the popup is closed and reopened.</p>
+        
+        <div class="test-section">
+            <h3>🧪 Test Session Status Persistence</h3>
+            <button onclick="testSessionStatus()">Test Session Status</button>
+            <button onclick="simulateActiveSession()">Simulate Active Session</button>
+            <button onclick="checkSessionData()">Check Session Data</button>
+            <button onclick="clearSessionData()">Clear Session Data</button>
+        </div>
+
+        <div class="test-section">
+            <h3>🔧 Test Popup Behavior</h3>
+            <button onclick="openPopup()">Open Popup</button>
+            <button onclick="closePopup()">Close Popup</button>
+            <button onclick="reopenPopup()">Reopen Popup</button>
+        </div>
+
+        <div>
+            <button onclick="clearOutput()">🗑️ Clear Output</button>
+        </div>
+
+        <div id="output">Session Status Test Page Loaded. Click buttons above to test session status persistence.</div>
+    </div>
+
+    <script>
+        const outputDiv = document.getElementById('output');
+        
+        const log = (message, type = 'info') => {
+            const timestamp = new Date().toLocaleTimeString();
+            const prefix = type === 'success' ? '✅' : type === 'error' ? '❌' : 'ℹ️';
+            outputDiv.textContent += `[${timestamp}] ${prefix} ${message}\n`;
+            outputDiv.scrollTop = outputDiv.scrollHeight;
+            console.log(message);
+        };
+
+        async function testSessionStatus() {
+            log('--- Testing Session Status Persistence ---');
+            
+            try {
+                // Check current session data
+                const result = await chrome.storage.local.get(['currentSession']);
+                const session = result.currentSession;
+                
+                if (session) {
+                    log(`Session found: ID ${session.id}`);
+                    log(`Session active: ${session.isActive}`);
+                    log(`Session paused: ${session.isPaused || false}`);
+                    log(`Session start time: ${new Date(session.startTime).toLocaleString()}`);
+                    log(`Session end time: ${new Date(session.endTime).toLocaleString()}`);
+                    log(`Session duration: ${Math.floor(session.duration / 60000)} minutes`);
+                    
+                    if (session.isActive) {
+                        const now = Date.now();
+                        const remaining = session.endTime - now;
+                        const remainingMinutes = Math.floor(remaining / 60000);
+                        log(`Time remaining: ${remainingMinutes} minutes`);
+                        
+                        if (remaining > 0) {
+                            log('Session should show as ACTIVE in popup', 'success');
+                        } else {
+                            log('Session should have completed automatically', 'error');
+                        }
+                    } else {
+                        log('Session is not active - should show as INACTIVE in popup', 'error');
+                    }
+                } else {
+                    log('No active session found', 'error');
+                }
+            } catch (e) {
+                log(`Error testing session status: ${e.message}`, 'error');
+            }
+        }
+
+        async function simulateActiveSession() {
+            log('--- Simulating Active Session ---');
+            
+            try {
+                const sessionData = {
+                    id: Date.now().toString(),
+                    startTime: Date.now(),
+                    duration: 25 * 60 * 1000, // 25 minutes
+                    endTime: Date.now() + (25 * 60 * 1000),
+                    goal: 'Test session for status persistence',
+                    isActive: true,
+                    isPaused: false,
+                    pausedTime: 0,
+                    blockedAttempts: 0,
+                    completed: false,
+                    achievedMilestones: []
+                };
+                
+                await chrome.storage.local.set({ currentSession: sessionData });
+                log('Active session created successfully', 'success');
+                log('Session should now show as ACTIVE in popup', 'success');
+                
+                // Test the session data
+                await testSessionStatus();
+            } catch (e) {
+                log(`Error simulating active session: ${e.message}`, 'error');
+            }
+        }
+
+        async function checkSessionData() {
+            log('--- Checking Session Data Integrity ---');
+            
+            try {
+                const result = await chrome.storage.local.get(['currentSession', 'sessionHistory']);
+                const session = result.currentSession;
+                const history = result.sessionHistory || [];
+                
+                log(`Current session: ${session ? 'Present' : 'None'}`);
+                log(`Session history entries: ${history.length}`);
+                
+                if (session) {
+                    // Check if session data is valid
+                    const requiredFields = ['id', 'startTime', 'duration', 'endTime', 'isActive'];
+                    const missingFields = requiredFields.filter(field => !(field in session));
+                    
+                    if (missingFields.length === 0) {
+                        log('Session data structure is valid', 'success');
+                    } else {
+                        log(`Session data missing fields: ${missingFields.join(', ')}`, 'error');
+                    }
+                    
+                    // Check if session is logically consistent
+                    if (session.startTime && session.endTime && session.duration) {
+                        const calculatedEndTime = session.startTime + session.duration;
+                        const timeDiff = Math.abs(session.endTime - calculatedEndTime);
+                        
+                        if (timeDiff < 1000) { // Within 1 second
+                            log('Session timing is consistent', 'success');
+                        } else {
+                            log(`Session timing inconsistency: ${timeDiff}ms difference`, 'error');
+                        }
+                    }
+                }
+            } catch (e) {
+                log(`Error checking session data: ${e.message}`, 'error');
+            }
+        }
+
+        async function clearSessionData() {
+            log('--- Clearing Session Data ---');
+            
+            try {
+                await chrome.storage.local.remove(['currentSession', 'sessionHistory']);
+                log('Session data cleared successfully', 'success');
+                log('Popup should now show as INACTIVE', 'success');
+            } catch (e) {
+                log(`Error clearing session data: ${e.message}`, 'error');
+            }
+        }
+
+        async function openPopup() {
+            log('--- Opening Popup ---');
+            
+            try {
+                // This would open the popup, but we can't do that programmatically
+                // Instead, we'll just log the instruction
+                log('Please open the popup manually to test the status display');
+                log('The popup should show the current session status correctly');
+            } catch (e) {
+                log(`Error opening popup: ${e.message}`, 'error');
+            }
+        }
+
+        async function closePopup() {
+            log('--- Closing Popup ---');
+            
+            try {
+                // This would close the popup, but we can't do that programmatically
+                log('Please close the popup manually');
+                log('The session should remain active in the background');
+            } catch (e) {
+                log(`Error closing popup: ${e.message}`, 'error');
+            }
+        }
+
+        async function reopenPopup() {
+            log('--- Reopening Popup ---');
+            
+            try {
+                // This would reopen the popup, but we can't do that programmatically
+                log('Please reopen the popup manually');
+                log('The status should still show as ACTIVE if session is active');
+                log('This tests the fix for the status persistence issue');
+            } catch (e) {
+                log(`Error reopening popup: ${e.message}`, 'error');
+            }
+        }
+
+        function clearOutput() {
+            outputDiv.textContent = '';
+        }
+
+        // Initialize on page load
+        document.addEventListener('DOMContentLoaded', () => {
+            log('Session Status Test Page Loaded');
+            log('This test will verify:');
+            log('1. Session data is properly stored and retrieved');
+            log('2. Session status persists when popup is closed/reopened');
+            log('3. Active sessions show correct status in popup');
+            log('4. Session data integrity is maintained');
+        });
+    </script>
+</body>
+</html>

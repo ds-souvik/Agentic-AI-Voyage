@@ -275,6 +275,13 @@ class DistractionKillerBlocked {
                 accessData: accessData
             });
 
+            // Track gamification event for override
+            chrome.runtime.sendMessage({
+                action: 'trackGamificationEvent',
+                eventType: 'override',
+                data: { url: this.originalBlockedUrl, duration }
+            });
+
             this.showNotification(`Temporary access granted for ${duration} minutes`, 'success');
             
             // Redirect directly to the original blocked URL

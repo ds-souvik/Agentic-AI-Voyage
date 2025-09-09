@@ -3,10 +3,63 @@ class DistractionKillerReports {
     constructor() {
         this.sessionHistory = [];
         this.currentPeriod = 'today';
+        this.gamification = null;
         this.initializeElements();
         this.loadSessionData();
         this.setupEventListeners();
+        this.initializeGamification();
         this.updateDisplay();
+        this.updateGamificationSection();
+    }
+
+    async initializeGamification() {
+        try {
+            // Check if gamification is already available
+            if (window.gamification) {
+                this.gamification = window.gamification;
+                this.updateGamificationSection();
+                return;
+            }
+
+            // Wait a bit for the script to load
+            setTimeout(() => {
+                if (window.gamification) {
+                    this.gamification = window.gamification;
+                    this.updateGamificationSection();
+                } else {
+                    console.warn('Gamification not available, using fallback');
+                    this.gamification = {
+                        getGamificationSummary: () => ({ 
+                            totalPoints: 0, 
+                            currentLevel: 'Seedling Focus', 
+                            dailyStreak: 0, 
+                            weeklyStreak: 0, 
+                            earnedBadges: [],
+                            pointsToNextLevel: 50
+                        }),
+                        getGamificationReportData: () => ({ summary: {}, recentSessions: [] }),
+                        getCurrentLevel: () => ({ name: 'Seedling Focus', min: 0, max: 49 })
+                    };
+                    this.updateGamificationSection();
+                }
+            }, 1000);
+        } catch (error) {
+            console.error('Error initializing gamification in reports:', error);
+            // Fallback gamification object
+            this.gamification = {
+                getGamificationSummary: () => ({ 
+                    totalPoints: 0, 
+                    currentLevel: 'Seedling Focus', 
+                    dailyStreak: 0, 
+                    weeklyStreak: 0, 
+                    earnedBadges: [],
+                    pointsToNextLevel: 50
+                }),
+                getGamificationReportData: () => ({ summary: {}, recentSessions: [] }),
+                getCurrentLevel: () => ({ name: 'Seedling Focus', min: 0, max: 49 })
+            };
+            this.updateGamificationSection();
+        }
     }
 
     initializeElements() {
@@ -76,6 +129,7 @@ class DistractionKillerReports {
         this.updateSessionList(filteredSessions);
         this.updateCharts(filteredSessions);
         this.updateInsights(filteredSessions);
+        this.updateGamificationSection();
     }
 
     filterSessionsByPeriod(sessions) {
@@ -515,6 +569,294 @@ class DistractionKillerReports {
         }
 
         return insights;
+    }
+
+    updateGamificationSection() {
+        if (!this.gamification) {
+            return;
+        }
+
+        // Find or create gamification section
+        let gamificationSection = document.getElementById('gamificationSection');
+        if (!gamificationSection) {
+            gamificationSection = this.createGamificationSection();
+            this.insertGamificationSection(gamificationSection);
+        }
+
+        // Update gamification data
+        const summary = this.gamification.getGamificationSummary();
+        const reportData = this.gamification.getGamificationReportData();
+
+        this.updateGamificationSummary(gamificationSection, summary);
+        this.updateGamificationSessions(gamificationSection, reportData.recentSessions);
+        this.updateGamificationBadges(gamificationSection, summary.earnedBadges);
+    }
+
+    createGamificationSection() {
+        const section = document.createElement('div');
+        section.id = 'gamificationSection';
+        section.className = 'gamification-section';
+        section.innerHTML = `
+            <div class="section-header">
+                <h2>🎯 Gamification Progress</h2>
+            </div>
+            <div class="gamification-summary">
+                <div class="gamification-stats">
+                    <div class="stat-card">
+                        <div class="stat-value" id="gamificationTotalPoints">0</div>
+                        <div class="stat-label">Total Points</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-value" id="gamificationCurrentLevel">Loading...</div>
+                        <div class="stat-label">Current Level</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-value" id="gamificationDailyStreak">0</div>
+                        <div class="stat-label">Day Streak</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-value" id="gamificationWeeklyStreak">0</div>
+                        <div class="stat-label">Week Streak</div>
+                    </div>
+                </div>
+                <div class="level-progress">
+                    <div class="progress-label">Progress to Next Level</div>
+                    <div class="progress-bar">
+                        <div class="progress-fill" id="gamificationProgressFill"></div>
+                    </div>
+                    <div class="progress-text" id="gamificationProgressText">Loading...</div>
+                </div>
+            </div>
+            <div class="gamification-sessions">
+                <h3>Recent Session Details</h3>
+                <div class="sessions-list" id="gamificationSessionsList"></div>
+            </div>
+            <div class="gamification-badges">
+                <h3>Achievements</h3>
+                <div class="badges-grid" id="gamificationBadgesGrid"></div>
+            </div>
+        `;
+
+        // Add styles
+        const style = document.createElement('style');
+        style.textContent = `
+            .gamification-section {
+                background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+                border-radius: 12px;
+                padding: 24px;
+                margin: 24px 0;
+                color: white;
+                box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+            }
+            
+            .section-header h2 {
+                margin: 0 0 20px 0;
+                font-size: 20px;
+                font-weight: 600;
+            }
+            
+            .gamification-stats {
+                display: grid;
+                grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+                gap: 16px;
+                margin-bottom: 24px;
+            }
+            
+            .stat-card {
+                background: rgba(255, 255, 255, 0.1);
+                border-radius: 8px;
+                padding: 16px;
+                text-align: center;
+            }
+            
+            .stat-value {
+                font-size: 24px;
+                font-weight: 700;
+                margin-bottom: 4px;
+            }
+            
+            .stat-label {
+                font-size: 12px;
+                opacity: 0.8;
+            }
+            
+            .level-progress {
+                margin-bottom: 24px;
+            }
+            
+            .progress-label {
+                font-size: 14px;
+                margin-bottom: 8px;
+                font-weight: 500;
+            }
+            
+            .progress-bar {
+                background: rgba(255, 255, 255, 0.2);
+                border-radius: 8px;
+                height: 8px;
+                overflow: hidden;
+                margin-bottom: 4px;
+            }
+            
+            .progress-fill {
+                background: rgba(255, 255, 255, 0.8);
+                height: 100%;
+                border-radius: 8px;
+                transition: width 0.3s ease;
+            }
+            
+            .progress-text {
+                font-size: 12px;
+                opacity: 0.8;
+                text-align: center;
+            }
+            
+            .gamification-sessions h3,
+            .gamification-badges h3 {
+                font-size: 16px;
+                margin: 0 0 16px 0;
+                font-weight: 600;
+            }
+            
+            .sessions-list {
+                display: flex;
+                flex-direction: column;
+                gap: 8px;
+            }
+            
+            .session-item {
+                background: rgba(255, 255, 255, 0.1);
+                border-radius: 6px;
+                padding: 12px;
+                font-size: 12px;
+            }
+            
+            .session-header {
+                display: flex;
+                justify-content: space-between;
+                align-items: center;
+                margin-bottom: 4px;
+            }
+            
+            .session-points {
+                font-weight: 600;
+                color: #4ade80;
+            }
+            
+            .session-details {
+                display: grid;
+                grid-template-columns: repeat(auto-fit, minmax(80px, 1fr));
+                gap: 8px;
+                font-size: 11px;
+                opacity: 0.8;
+            }
+            
+            .badges-grid {
+                display: grid;
+                grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+                gap: 12px;
+            }
+            
+            .badge-item {
+                background: rgba(255, 255, 255, 0.1);
+                border-radius: 8px;
+                padding: 12px;
+                text-align: center;
+            }
+            
+            .badge-name {
+                font-weight: 600;
+                margin-bottom: 4px;
+            }
+            
+            .badge-description {
+                font-size: 11px;
+                opacity: 0.8;
+            }
+        `;
+        document.head.appendChild(style);
+
+        return section;
+    }
+
+    insertGamificationSection(section) {
+        // Insert after the insights section
+        const insightsSection = document.querySelector('.insights-section');
+        if (insightsSection && insightsSection.nextSibling) {
+            insightsSection.parentNode.insertBefore(section, insightsSection.nextSibling);
+        } else {
+            // Fallback: append to main content
+            const mainContent = document.querySelector('.reports-main');
+            if (mainContent) {
+                mainContent.appendChild(section);
+            }
+        }
+    }
+
+    updateGamificationSummary(section, summary) {
+        const totalPoints = section.querySelector('#gamificationTotalPoints');
+        const currentLevel = section.querySelector('#gamificationCurrentLevel');
+        const dailyStreak = section.querySelector('#gamificationDailyStreak');
+        const weeklyStreak = section.querySelector('#gamificationWeeklyStreak');
+        const progressFill = section.querySelector('#gamificationProgressFill');
+        const progressText = section.querySelector('#gamificationProgressText');
+
+        if (totalPoints) totalPoints.textContent = summary.totalPoints.toLocaleString();
+        if (currentLevel) currentLevel.textContent = summary.currentLevel;
+        if (dailyStreak) dailyStreak.textContent = summary.dailyStreak;
+        if (weeklyStreak) weeklyStreak.textContent = summary.weeklyStreak;
+
+        if (summary.pointsToNextLevel > 0) {
+            const currentLevel = this.gamification.getCurrentLevel();
+            const progress = ((summary.totalPoints - currentLevel.min) / (currentLevel.max - currentLevel.min + 1)) * 100;
+            if (progressFill) progressFill.style.width = `${Math.min(progress, 100)}%`;
+            if (progressText) progressText.textContent = `${summary.pointsToNextLevel} to next level`;
+        } else {
+            if (progressFill) progressFill.style.width = '100%';
+            if (progressText) progressText.textContent = 'Max level reached!';
+        }
+    }
+
+    updateGamificationSessions(section, sessions) {
+        const sessionsList = section.querySelector('#gamificationSessionsList');
+        if (!sessionsList) return;
+
+        if (sessions.length === 0) {
+            sessionsList.innerHTML = '<div class="session-item">No recent sessions with gamification data</div>';
+            return;
+        }
+
+        sessionsList.innerHTML = sessions.map(session => `
+            <div class="session-item">
+                <div class="session-header">
+                    <span>${new Date(session.timestamp).toLocaleDateString()}</span>
+                    <span class="session-points">${session.sessionPoints > 0 ? '+' : ''}${session.sessionPoints} pts</span>
+                </div>
+                <div class="session-details">
+                    <div>Attempts: ${session.attempts}</div>
+                    <div>Overrides: ${session.overrides}</div>
+                    <div>Paused: ${session.wasPaused ? 'Yes' : 'No'}</div>
+                    <div>Stopped: ${session.stoppedEarly ? 'Yes' : 'No'}</div>
+                </div>
+            </div>
+        `).join('');
+    }
+
+    updateGamificationBadges(section, badges) {
+        const badgesGrid = section.querySelector('#gamificationBadgesGrid');
+        if (!badgesGrid) return;
+
+        if (badges.length === 0) {
+            badgesGrid.innerHTML = '<div class="badge-item">No badges earned yet</div>';
+            return;
+        }
+
+        badgesGrid.innerHTML = badges.map(badge => `
+            <div class="badge-item">
+                <div class="badge-name">${badge.name}</div>
+                <div class="badge-description">${badge.description}</div>
+            </div>
+        `).join('');
     }
 
     async exportReport(type) {
@@ -979,6 +1321,125 @@ class DistractionKillerReports {
                 document.head.removeChild(style);
             }
         }, 4000);
+    }
+
+    async updateGamificationSection() {
+        const gamificationContent = document.getElementById('gamificationContent');
+        if (!gamificationContent) return;
+
+        try {
+            if (!this.gamification) {
+                gamificationContent.innerHTML = `
+                    <div class="gamification-loading">
+                        <p>Loading your progress...</p>
+                    </div>
+                `;
+                return;
+            }
+
+            const summary = this.gamification.getGamificationSummary();
+            const reportData = this.gamification.getGamificationReportData();
+
+            gamificationContent.innerHTML = `
+                <div class="gamification-stats">
+                    <div class="gamification-stat-card">
+                        <div class="stat-icon">🏆</div>
+                        <div class="stat-content">
+                            <div class="stat-value">${summary.totalPoints.toLocaleString()}</div>
+                            <div class="stat-label">Total Points</div>
+                        </div>
+                    </div>
+                    <div class="gamification-stat-card">
+                        <div class="stat-icon">📈</div>
+                        <div class="stat-content">
+                            <div class="stat-value">${summary.currentLevel}</div>
+                            <div class="stat-label">Current Level</div>
+                        </div>
+                    </div>
+                    <div class="gamification-stat-card">
+                        <div class="stat-icon">🔥</div>
+                        <div class="stat-content">
+                            <div class="stat-value">${summary.dailyStreak}</div>
+                            <div class="stat-label">Day Streak</div>
+                        </div>
+                    </div>
+                    <div class="gamification-stat-card">
+                        <div class="stat-icon">📊</div>
+                        <div class="stat-content">
+                            <div class="stat-value">${summary.pointsToday}</div>
+                            <div class="stat-label">Points Today</div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="gamification-progress">
+                    <div class="progress-header">
+                        <h4>Progress to Next Level</h4>
+                        <span class="progress-text">${summary.pointsToNextLevel} points to go</span>
+                    </div>
+                    <div class="progress-bar-container">
+                        <div class="progress-bar">
+                            <div class="progress-bar-fill" style="width: ${this.calculateProgressPercentage(summary)}%"></div>
+                        </div>
+                    </div>
+                </div>
+
+                ${summary.earnedBadges.length > 0 ? `
+                    <div class="gamification-badges">
+                        <h4>🏆 Earned Badges</h4>
+                        <div class="badges-list">
+                            ${summary.earnedBadges.map(badge => `
+                                <div class="badge-item">
+                                    <div class="badge-icon">🏆</div>
+                                    <div class="badge-info">
+                                        <div class="badge-name">${badge.name}</div>
+                                        <div class="badge-description">${badge.description}</div>
+                                    </div>
+                                </div>
+                            `).join('')}
+                        </div>
+                    </div>
+                ` : ''}
+
+                ${reportData.recentSessions.length > 0 ? `
+                    <div class="gamification-sessions">
+                        <h4>📋 Recent Session Performance</h4>
+                        <div class="sessions-list">
+                            ${reportData.recentSessions.slice(0, 5).map(session => `
+                                <div class="session-gamification-item">
+                                    <div class="session-date">${new Date(session.timestamp).toLocaleDateString()}</div>
+                                    <div class="session-points ${session.sessionPoints > 0 ? 'positive' : 'negative'}">
+                                        ${session.sessionPoints > 0 ? '+' : ''}${session.sessionPoints} pts
+                                    </div>
+                                    <div class="session-details">
+                                        ${session.attempts > 0 ? `${session.attempts} blocked` : ''}
+                                        ${session.overrides > 0 ? `${session.overrides} overrides` : ''}
+                                        ${session.wasPaused ? 'Paused' : ''}
+                                        ${session.stoppedEarly ? 'Stopped early' : 'Completed'}
+                                    </div>
+                                </div>
+                            `).join('')}
+                        </div>
+                    </div>
+                ` : ''}
+            `;
+        } catch (error) {
+            console.error('Error updating gamification section:', error);
+            gamificationContent.innerHTML = `
+                <div class="gamification-error">
+                    <p>Unable to load progress data. Please try refreshing the page.</p>
+                </div>
+            `;
+        }
+    }
+
+    calculateProgressPercentage(summary) {
+        if (summary.pointsToNextLevel <= 0) return 100;
+        
+        const currentLevel = this.gamification.getCurrentLevel();
+        const levelRange = currentLevel.max - currentLevel.min + 1;
+        const progressInLevel = summary.totalPoints - currentLevel.min;
+        return Math.min((progressInLevel / levelRange) * 100, 100);
     }
 }
 

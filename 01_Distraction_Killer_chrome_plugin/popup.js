@@ -167,6 +167,8 @@ class DistractionKillerPopup {
             this.goalDisplay.textContent = this.currentSession.goal;
             this.updateTimerDisplay();
             this.updateStats();
+            // Update status to active when showing active session
+            this.updateStatus('active');
         }
     }
 
@@ -280,6 +282,17 @@ class DistractionKillerPopup {
                 this.currentSession.pauseStartTime = Date.now();
                 this.pauseSession.innerHTML = '<span class="btn-icon">▶️</span>Resume';
                 clearInterval(this.timerInterval);
+                
+                // Track gamification event for pause (only first pause in session gets points)
+                const hasPausedBefore = this.currentSession.hasPausedBefore || false;
+                if (!hasPausedBefore) {
+                    chrome.runtime.sendMessage({
+                        action: 'trackGamificationEvent',
+                        eventType: 'pause_chosen',
+                        data: { pauseMinutes: 5 } // Default pause duration
+                    });
+                    this.currentSession.hasPausedBefore = true;
+                }
             } else {
                 if (this.currentSession.pauseStartTime) {
                     this.currentSession.pausedTime += Date.now() - this.currentSession.pauseStartTime;
@@ -326,6 +339,13 @@ class DistractionKillerPopup {
                 sessionHistory: this.sessionHistory
             });
 
+            // Track gamification event for session abort
+            chrome.runtime.sendMessage({
+                action: 'trackGamificationEvent',
+                eventType: 'session_abort',
+                data: { reason: 'user_stopped' }
+            });
+
             chrome.runtime.sendMessage({
                 action: 'stopSession'
             });
@@ -368,6 +388,13 @@ class DistractionKillerPopup {
             clearInterval(this.timerInterval);
             this.showSessionComplete();
             this.updateStatus('inactive');
+            
+            // Show gamification session summary
+            if (window.gamificationUI) {
+                setTimeout(() => {
+                    window.gamificationUI.showSessionSummary(this.currentSession);
+                }, 1000);
+            }
             
             // DO NOT show completion notification in popup - let background script handle it as system notification
         } catch (error) {

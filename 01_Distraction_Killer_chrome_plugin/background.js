@@ -1,15 +1,75 @@
 // DistractionKiller Background Script
+
+// Include gamification service
+importScripts('gamification-service.js');
+
 class DistractionKillerBackground {
     constructor() {
         this.currentSession = null;
         this.userSettings = null;
         this.blockedSites = this.initializeBlockedSites();
+        this.pornBlocklist = null; // Will be loaded from JSON file
         this.milestoneThresholds = [0.25, 0.5, 0.75]; // 25%, 50%, 75%
         this.achievedMilestones = new Set();
+        this.gamification = this.initializeGamification();
         this.setupMessageListener();
         this.setupNavigationListener();
         this.loadSessionData();
         this.loadUserSettings();
+        this.loadPornBlocklist();
+    }
+
+    initializeGamification() {
+        // Create a simple gamification object that works in service worker
+        const service = new GamificationService();
+        return {
+            trackEvent: async (eventType, sessionId, data = {}) => {
+                try {
+                    const result = await service.trackEvent(eventType, sessionId, data);
+                    // Show notification if there's a message
+                    if (result.message) {
+                        this.showGamificationNotification(result.message);
+                    }
+                    return result;
+                } catch (error) {
+                    console.error('Error tracking gamification event:', error);
+                    return { pointsToAdd: 0, message: '' };
+                }
+            },
+            getGamificationSummary: async () => await service.getGamificationSummary(),
+            getGamificationReportData: async () => await service.getGamificationReportData()
+        };
+    }
+
+    showGamificationNotification(message) {
+        try {
+            chrome.notifications.create({
+                type: 'basic',
+                iconUrl: 'icons/icon48.png',
+                title: 'Distraction Killer',
+                message: message
+            });
+        } catch (error) {
+            console.error('Error showing gamification notification:', error);
+        }
+    }
+
+    async trackGamificationEvent(eventType, data = {}) {
+        if (!this.gamification || !this.currentSession) {
+            console.log('Gamification or session not available, skipping event tracking');
+            return;
+        }
+
+        try {
+            const sessionId = this.currentSession.id;
+            if (typeof this.gamification.trackEvent === 'function') {
+                await this.gamification.trackEvent(eventType, sessionId, data);
+            } else {
+                console.log('Gamification trackEvent method not available');
+            }
+        } catch (error) {
+            console.error('Error tracking gamification event:', error);
+        }
     }
 
     initializeBlockedSites() {
@@ -118,6 +178,8 @@ class DistractionKillerBackground {
     }
 
     checkTemporaryAccess(url, hostname, fullUrl, accessData) {
+        console.log('Checking temporary access for:', url, 'with access data:', accessData);
+        
         // Check exact URL match
         if (accessData.url === url) {
             console.log('✅ Exact URL match');
@@ -143,13 +205,22 @@ class DistractionKillerBackground {
 
         // Check keyword match - if access was granted for a keyword, allow any URL containing that keyword
         if (accessData.keyword) {
-            if (fullUrl.includes(accessData.keyword.toLowerCase()) || 
-                hostname.includes(accessData.keyword.toLowerCase())) {
-                console.log('✅ Keyword match for:', accessData.keyword);
+            const keyword = accessData.keyword.toLowerCase();
+            console.log('Checking keyword match for:', keyword, 'in URL:', fullUrl);
+            
+            if (fullUrl.includes(keyword) || hostname.includes(keyword)) {
+                console.log('✅ Keyword match for:', keyword);
+                return true;
+            }
+            
+            // Also check if the keyword matches the domain (e.g., "facebook" matches "facebook.com")
+            if (hostname.includes(keyword) || keyword.includes(hostname.split('.')[0])) {
+                console.log('✅ Domain-keyword match for:', keyword);
                 return true;
             }
         }
 
+        console.log('❌ No temporary access match found');
         return false;
     }
 
@@ -169,46 +240,64 @@ class DistractionKillerBackground {
 
     setupMessageListener() {
         chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
-            switch (request.action) {
-                case 'startSession':
-                    this.startSession(this.convertAchievedMilestonesToSet(request.sessionData));
-                    break;
-                case 'stopSession':
-                    this.stopSession();
-                    break;
-                case 'updateSession':
-                    this.updateSession(this.convertAchievedMilestonesToSet(request.sessionData));
-                    break;
-                case 'completeSession':
-                    this.completeSession(this.convertAchievedMilestonesToSet(request.sessionData));
-                    break;
-                case 'checkBlockedSite':
-                    // Handle async isSiteBlocked
-                    this.isSiteBlocked(request.url).then(isBlocked => {
+            // Handle async operations properly
+            const handleAsync = async () => {
+                switch (request.action) {
+                    case 'startSession':
+                        await this.startSession(this.convertAchievedMilestonesToSet(request.sessionData));
+                        break;
+                    case 'stopSession':
+                        await this.stopSession();
+                        break;
+                    case 'updateSession':
+                        await this.updateSession(this.convertAchievedMilestonesToSet(request.sessionData));
+                        break;
+                    case 'completeSession':
+                        await this.completeSession(this.convertAchievedMilestonesToSet(request.sessionData));
+                        break;
+                    case 'checkBlockedSite':
+                        // Handle async isSiteBlocked
+                        const isBlocked = await this.isSiteBlocked(request.url);
+                        const category = await this.getBlockedCategory(request.url);
                         sendResponse({ 
                             isBlocked, 
-                            category: this.getBlockedCategory(request.url) 
+                            category: category 
                         });
-                    });
-                    return true; // Keep message channel open for async response
-                case 'getSessionData':
-                    sendResponse({ currentSession: this.currentSession });
-                    break;
-                case 'settingsUpdated':
-                    this.userSettings = request.settings;
-                    console.log('Settings updated in background:', this.userSettings);
-                    console.log('Social media enabled:', this.userSettings?.siteCategories?.socialMedia);
-                    // Reload settings to ensure they're properly applied
-                    this.loadUserSettings();
-                    break;
-                case 'checkMilestone':
-                    this.checkMilestone(this.convertAchievedMilestonesToSet(request.sessionData));
-                    break;
-                case 'grantTemporaryAccess':
-                    // Handle temporary access grant
-                    console.log('Temporary access granted:', request.accessData);
-                    break;
-            }
+                        return;
+                    case 'getSessionData':
+                        sendResponse({ currentSession: this.currentSession });
+                        break;
+                    case 'settingsUpdated':
+                        this.userSettings = request.settings;
+                        console.log('Settings updated in background:', this.userSettings);
+                        console.log('Social media enabled:', this.userSettings?.siteCategories?.socialMedia);
+                        // Reload settings to ensure they're properly applied
+                        await this.loadUserSettings();
+                        break;
+                    case 'checkMilestone':
+                        this.checkMilestone(this.convertAchievedMilestonesToSet(request.sessionData));
+                        break;
+                    case 'grantTemporaryAccess':
+                        // Handle temporary access grant
+                        console.log('Temporary access granted:', request.accessData);
+                        break;
+                    case 'trackGamificationEvent':
+                        await this.trackGamificationEvent(request.eventType, request.data);
+                        break;
+                    case 'getPornBlocklistStats':
+                        const stats = await this.getPornBlocklistStats();
+                        sendResponse(stats);
+                        return;
+                }
+            };
+
+            // Execute async handler
+            handleAsync().catch(error => {
+                console.error('Error handling message:', error);
+            });
+
+            // Return true for async operations that need sendResponse
+            return request.action === 'checkBlockedSite';
         });
     }
 
@@ -290,6 +379,102 @@ class DistractionKillerBackground {
         }
     }
 
+    async loadPornBlocklist() {
+        try {
+            // Check if we have a flag indicating the external list is available
+            const cached = await chrome.storage.local.get(['pornBlocklistAvailable']);
+            
+            if (cached.pornBlocklistAvailable) {
+                console.log('External porn blocklist is available, will load on-demand');
+                this.pornBlocklist = null; // Will be loaded when needed
+                return;
+            }
+
+            console.log('Loading porn blocklist from file...');
+            const response = await fetch(chrome.runtime.getURL('porn_blocklist.json'));
+            if (response.ok) {
+                const data = await response.json();
+                this.pornBlocklist = data.domains;
+                console.log(`Porn blocklist loaded: ${this.pornBlocklist.length} domains`);
+                
+                // Only store a flag that the list is available, not the actual data
+                await chrome.storage.local.set({ 
+                    pornBlocklistAvailable: true,
+                    pornBlocklistCount: this.pornBlocklist.length
+                });
+            } else {
+                console.error('Failed to load porn blocklist:', response.status);
+                // Fallback to basic list
+                this.pornBlocklist = this.blockedSites.porn;
+                console.log(`Using fallback porn blocklist: ${this.pornBlocklist.length} domains`);
+            }
+        } catch (error) {
+            console.error('Error loading porn blocklist:', error);
+            // Fallback to basic list
+            this.pornBlocklist = this.blockedSites.porn;
+            console.log(`Using fallback porn blocklist: ${this.pornBlocklist.length} domains`);
+        }
+    }
+
+    async loadPornBlocklistOnDemand() {
+        if (this.pornBlocklist) {
+            return this.pornBlocklist; // Already loaded
+        }
+
+        try {
+            console.log('Loading porn blocklist on-demand...');
+            const response = await fetch(chrome.runtime.getURL('porn_blocklist.json'));
+            if (response.ok) {
+                const data = await response.json();
+                this.pornBlocklist = data.domains;
+                console.log(`Porn blocklist loaded on-demand: ${this.pornBlocklist.length} domains`);
+                return this.pornBlocklist;
+            } else {
+                console.error('Failed to load porn blocklist on-demand:', response.status);
+                return this.blockedSites.porn;
+            }
+        } catch (error) {
+            console.error('Error loading porn blocklist on-demand:', error);
+            return this.blockedSites.porn;
+        }
+    }
+
+    // Method to check if porn blocklist is ready
+    isPornBlocklistReady() {
+        return this.pornBlocklist && this.pornBlocklist.length > 0;
+    }
+
+    // Method to get porn blocklist stats
+    async getPornBlocklistStats() {
+        try {
+            const cached = await chrome.storage.local.get(['pornBlocklistAvailable', 'pornBlocklistCount']);
+            
+            if (cached.pornBlocklistAvailable) {
+                return {
+                    loaded: true,
+                    count: cached.pornBlocklistCount || 'Unknown',
+                    source: 'external',
+                    status: 'Available for on-demand loading'
+                };
+            } else {
+                return {
+                    loaded: false,
+                    count: this.blockedSites.porn.length,
+                    source: 'fallback',
+                    status: 'Using basic fallback list'
+                };
+            }
+        } catch (error) {
+            console.error('Error getting porn blocklist stats:', error);
+            return {
+                loaded: false,
+                count: this.blockedSites.porn.length,
+                source: 'fallback',
+                status: 'Error loading stats'
+            };
+        }
+    }
+
     async startSession(sessionData) {
         this.currentSession = sessionData;
         this.achievedMilestones.clear(); // Reset milestones for new session
@@ -328,6 +513,21 @@ class DistractionKillerBackground {
     }
 
     async completeSession(sessionData) {
+        // Track gamification event for session completion
+        if (this.gamification) {
+            const durationMinutes = Math.floor(sessionData.duration / 60000);
+            const hadBlockedAttempts = (sessionData.blockedAttempts || 0) > 0;
+            const hadOverrides = (sessionData.overrides || 0) > 0;
+            const wasPaused = (sessionData.pausedTime || 0) > 0;
+            
+            await this.trackGamificationEvent('session_complete', {
+                durationMinutes,
+                hadBlockedAttempts,
+                hadOverrides,
+                wasPaused
+            });
+        }
+
         // Show completion notification if enabled
         if (this.userSettings?.notifications?.sessionEnd) {
             console.log('Showing completion notification...');
@@ -530,11 +730,21 @@ class DistractionKillerBackground {
                     console.log('No user settings or siteCategories found, using default blocking');
                 }
                 
-                for (const domain of this.blockedSites[category]) {
+                // Use external porn blocklist for porn category
+                let domainsToCheck = this.blockedSites[category];
+                if (category === 'porn') {
+                    // Load porn blocklist on-demand to avoid storage quota issues
+                    domainsToCheck = await this.loadPornBlocklistOnDemand();
+                    console.log(`Using external porn blocklist with ${domainsToCheck.length} domains`);
+                }
+                
+                for (const domain of domainsToCheck) {
                     if (hostname === domain || hostname.endsWith('.' + domain)) {
                         console.log(`Blocking ${url} - matched domain ${domain} in category ${category}`);
                         // Store blocking reason for temporary access
                         this.storeBlockingReason(url, 'domain', domain, category);
+                        // Track gamification event
+                        this.trackGamificationEvent('blocked_attempt', { url, category, domain });
                         return true;
                     }
                 }
@@ -547,6 +757,8 @@ class DistractionKillerBackground {
                         console.log(`Blocking ${url} - matched custom site ${customSite}`);
                         // Store blocking reason for temporary access
                         this.storeBlockingReason(url, 'domain', customSite, 'custom');
+                        // Track gamification event
+                        this.trackGamificationEvent('blocked_attempt', { url, category: 'custom', domain: customSite });
                         return true;
                     }
                 }
@@ -574,6 +786,8 @@ class DistractionKillerBackground {
                         console.log(`Blocking ${url} - matched keyword "${keyword}" in category ${category}`);
                         // Store blocking reason for temporary access
                         this.storeBlockingReason(url, 'keyword', keyword, category);
+                        // Track gamification event
+                        this.trackGamificationEvent('blocked_attempt', { url, category, keyword });
                         return true;
                     }
                 }
@@ -586,6 +800,8 @@ class DistractionKillerBackground {
                         console.log(`Blocking ${url} - matched custom keyword "${keyword}"`);
                         // Store blocking reason for temporary access
                         this.storeBlockingReason(url, 'keyword', keyword, 'custom');
+                        // Track gamification event
+                        this.trackGamificationEvent('blocked_attempt', { url, category: 'custom', keyword });
                         return true;
                     }
                 }
@@ -611,7 +827,7 @@ class DistractionKillerBackground {
         return categoryMap[category] || category;
     }
 
-    getBlockedCategory(url) {
+    async getBlockedCategory(url) {
         try {
             const urlObj = new URL(url);
             const hostname = urlObj.hostname.toLowerCase();
@@ -623,7 +839,14 @@ class DistractionKillerBackground {
             for (const category in this.blockedSites) {
                 if (category === 'keywords') continue;
                 
-                for (const domain of this.blockedSites[category]) {
+                // Use external porn blocklist for porn category
+                let domainsToCheck = this.blockedSites[category];
+                if (category === 'porn') {
+                    // Load porn blocklist on-demand to avoid storage quota issues
+                    domainsToCheck = await this.loadPornBlocklistOnDemand();
+                }
+                
+                for (const domain of domainsToCheck) {
                     if (hostname === domain || hostname.endsWith('.' + domain)) {
                         return category;
                     }

@@ -1,0 +1,183 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Porn Blocklist Test</title>
+    <style>
+        body { 
+            font-family: Arial, sans-serif; 
+            margin: 20px; 
+            background: #f5f5f5;
+        }
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            background: white;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        button { 
+            padding: 10px 15px; 
+            margin: 5px; 
+            cursor: pointer; 
+            background: #007bff;
+            color: white;
+            border: none;
+            border-radius: 4px;
+        }
+        button:hover {
+            background: #0056b3;
+        }
+        #output { 
+            border: 1px solid #ccc; 
+            padding: 15px; 
+            margin-top: 20px; 
+            min-height: 200px; 
+            background: #f9f9f9; 
+            white-space: pre-wrap; 
+            font-family: monospace; 
+            border-radius: 4px;
+        }
+        .stats {
+            background: #e7f3ff;
+            padding: 15px;
+            border-radius: 4px;
+            margin-bottom: 20px;
+        }
+        .test-urls {
+            background: #fff3cd;
+            padding: 15px;
+            border-radius: 4px;
+            margin-bottom: 20px;
+        }
+        .url-test {
+            margin: 5px 0;
+            padding: 8px;
+            background: white;
+            border-radius: 4px;
+            border: 1px solid #ddd;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🔒 Porn Blocklist Test</h1>
+        <p>This page tests the integration of the external porn blocklist with 497,936 domains.</p>
+        
+        <div class="stats">
+            <h3>📊 Blocklist Statistics</h3>
+            <div id="stats">Loading...</div>
+        </div>
+
+        <div class="test-urls">
+            <h3>🧪 Test URLs</h3>
+            <p>Click these buttons to test if domains are being blocked:</p>
+            <div class="url-test">
+                <button onclick="testUrl('https://pornhub.com')">Test pornhub.com</button>
+                <button onclick="testUrl('https://xvideos.com')">Test xvideos.com</button>
+                <button onclick="testUrl('https://xhamster.com')">Test xhamster.com</button>
+            </div>
+            <div class="url-test">
+                <button onclick="testUrl('https://facebook.com')">Test facebook.com (should be blocked if social media enabled)</button>
+                <button onclick="testUrl('https://youtube.com')">Test youtube.com (should be blocked if entertainment enabled)</button>
+            </div>
+            <div class="url-test">
+                <button onclick="testUrl('https://google.com')">Test google.com (should be allowed)</button>
+                <button onclick="testUrl('https://github.com')">Test github.com (should be allowed)</button>
+            </div>
+        </div>
+
+        <div>
+            <button onclick="runTests()">🔄 Run All Tests</button>
+            <button onclick="clearOutput()">🗑️ Clear Output</button>
+            <button onclick="checkBlocklistStatus()">📋 Check Blocklist Status</button>
+        </div>
+
+        <div id="output">Test page loaded. Click buttons above to test the porn blocklist integration.</div>
+    </div>
+
+    <script>
+        const outputDiv = document.getElementById('output');
+        const statsDiv = document.getElementById('stats');
+        
+        const log = (message) => {
+            outputDiv.textContent += message + '\n';
+            outputDiv.scrollTop = outputDiv.scrollHeight;
+            console.log(message);
+        };
+
+        const updateStats = (stats) => {
+            statsDiv.innerHTML = `
+                <strong>Status:</strong> ${stats.loaded ? '✅ Loaded' : '❌ Not Loaded'}<br>
+                <strong>Domain Count:</strong> ${stats.count.toLocaleString()}<br>
+                <strong>Source:</strong> ${stats.source}<br>
+                <strong>Timestamp:</strong> ${new Date().toLocaleString()}
+            `;
+        };
+
+        async function checkBlocklistStatus() {
+            try {
+                log('--- Checking Porn Blocklist Status ---');
+                const response = await chrome.runtime.sendMessage({ action: 'getPornBlocklistStats' });
+                log(`Blocklist Status: ${JSON.stringify(response, null, 2)}`);
+                updateStats(response);
+            } catch (e) {
+                log(`❌ Error checking blocklist status: ${e.message}`);
+            }
+        }
+
+        async function testUrl(url) {
+            try {
+                log(`\n--- Testing URL: ${url} ---`);
+                const response = await chrome.runtime.sendMessage({ 
+                    action: 'checkBlockedSite', 
+                    url: url 
+                });
+                log(`Result: ${response.isBlocked ? '🚫 BLOCKED' : '✅ ALLOWED'}`);
+                log(`Category: ${response.category || 'unknown'}`);
+            } catch (e) {
+                log(`❌ Error testing URL ${url}: ${e.message}`);
+            }
+        }
+
+        async function runTests() {
+            log('--- Running Comprehensive Porn Blocklist Tests ---');
+            
+            // Check blocklist status first
+            await checkBlocklistStatus();
+            
+            // Test known porn domains
+            const testUrls = [
+                'https://pornhub.com',
+                'https://xvideos.com', 
+                'https://xhamster.com',
+                'https://redtube.com',
+                'https://youporn.com',
+                'https://facebook.com', // Should be blocked if social media enabled
+                'https://youtube.com',  // Should be blocked if entertainment enabled
+                'https://google.com',   // Should be allowed
+                'https://github.com'    // Should be allowed
+            ];
+
+            for (const url of testUrls) {
+                await testUrl(url);
+                await new Promise(resolve => setTimeout(resolve, 100)); // Small delay
+            }
+            
+            log('\n--- Tests Complete ---');
+        }
+
+        function clearOutput() {
+            outputDiv.textContent = '';
+        }
+
+        // Initialize on page load
+        document.addEventListener('DOMContentLoaded', () => {
+            log('Porn Blocklist Test Page Loaded');
+            checkBlocklistStatus();
+        });
+    </script>
+</body>
+</html>

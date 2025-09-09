@@ -514,3 +514,307 @@ body {
     font-size: 14px;
     color: #718096;
 }
+
+/* Gamification Section Styles */
+.gamification-section {
+    background: #f8f9fa;
+    border-radius: 12px;
+    padding: 24px;
+    margin: 20px 0;
+    border: 1px solid #e2e8f0;
+}
+
+.gamification-section h3 {
+    font-size: 24px;
+    font-weight: 700;
+    color: #2d3748;
+    margin-bottom: 20px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.gamification-stats {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 16px;
+    margin-bottom: 24px;
+}
+
+.gamification-stat-card {
+    background: white;
+    border-radius: 8px;
+    padding: 20px;
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+    border: 1px solid #e2e8f0;
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.gamification-stat-card:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.15);
+}
+
+.stat-icon {
+    font-size: 32px;
+    width: 50px;
+    height: 50px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    border-radius: 50%;
+    color: white;
+}
+
+.stat-content {
+    flex: 1;
+}
+
+.stat-value {
+    font-size: 24px;
+    font-weight: 700;
+    color: #2d3748;
+    line-height: 1.2;
+    margin-bottom: 4px;
+}
+
+.stat-label {
+    font-size: 14px;
+    color: #718096;
+    font-weight: 500;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.gamification-progress {
+    background: white;
+    border-radius: 8px;
+    padding: 20px;
+    margin-bottom: 24px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+    border: 1px solid #e2e8f0;
+}
+
+.progress-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 16px;
+}
+
+.progress-header h4 {
+    font-size: 18px;
+    font-weight: 600;
+    color: #2d3748;
+    margin: 0;
+}
+
+.progress-text {
+    font-size: 14px;
+    color: #718096;
+    font-weight: 500;
+}
+
+.progress-bar-container {
+    width: 100%;
+}
+
+.progress-bar {
+    width: 100%;
+    height: 12px;
+    background: #e2e8f0;
+    border-radius: 6px;
+    overflow: hidden;
+}
+
+.progress-bar-fill {
+    height: 100%;
+    background: linear-gradient(90deg, #667eea 0%, #764ba2 100%);
+    border-radius: 6px;
+    transition: width 0.3s ease;
+}
+
+.gamification-badges {
+    background: white;
+    border-radius: 8px;
+    padding: 20px;
+    margin-bottom: 24px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+    border: 1px solid #e2e8f0;
+}
+
+.gamification-badges h4 {
+    font-size: 18px;
+    font-weight: 600;
+    color: #2d3748;
+    margin-bottom: 16px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.badges-list {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+    gap: 12px;
+}
+
+.badge-item {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 12px;
+    background: #f8f9fa;
+    border-radius: 6px;
+    border: 1px solid #e2e8f0;
+}
+
+.badge-icon {
+    font-size: 24px;
+    width: 40px;
+    height: 40px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: linear-gradient(135deg, #fbbf24 0%, #f59e0b 100%);
+    border-radius: 50%;
+    color: white;
+}
+
+.badge-info {
+    flex: 1;
+}
+
+.badge-name {
+    font-size: 16px;
+    font-weight: 600;
+    color: #2d3748;
+    margin-bottom: 2px;
+}
+
+.badge-description {
+    font-size: 14px;
+    color: #718096;
+}
+
+.gamification-sessions {
+    background: white;
+    border-radius: 8px;
+    padding: 20px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+    border: 1px solid #e2e8f0;
+}
+
+.gamification-sessions h4 {
+    font-size: 18px;
+    font-weight: 600;
+    color: #2d3748;
+    margin-bottom: 16px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.sessions-list {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
+
+.session-gamification-item {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 12px 16px;
+    background: #f8f9fa;
+    border-radius: 6px;
+    border: 1px solid #e2e8f0;
+}
+
+.session-date {
+    font-size: 14px;
+    color: #718096;
+    font-weight: 500;
+}
+
+.session-points {
+    font-size: 16px;
+    font-weight: 700;
+    padding: 4px 8px;
+    border-radius: 4px;
+}
+
+.session-points.positive {
+    color: #38a169;
+    background: #f0fff4;
+}
+
+.session-points.negative {
+    color: #e53e3e;
+    background: #fff5f5;
+}
+
+.session-details {
+    font-size: 12px;
+    color: #718096;
+    text-align: right;
+    max-width: 200px;
+}
+
+.gamification-loading,
+.gamification-error {
+    text-align: center;
+    padding: 40px 20px;
+    color: #718096;
+}
+
+.gamification-error {
+    color: #e53e3e;
+}
+
+/* Dark theme support */
+[data-theme="dark"] .gamification-section {
+    background: #2d3748;
+    border-color: #4a5568;
+}
+
+[data-theme="dark"] .gamification-section h3 {
+    color: #f7fafc;
+}
+
+[data-theme="dark"] .gamification-stat-card,
+[data-theme="dark"] .gamification-progress,
+[data-theme="dark"] .gamification-badges,
+[data-theme="dark"] .gamification-sessions {
+    background: #4a5568;
+    border-color: #718096;
+}
+
+[data-theme="dark"] .stat-value,
+[data-theme="dark"] .progress-header h4,
+[data-theme="dark"] .gamification-badges h4,
+[data-theme="dark"] .gamification-sessions h4 {
+    color: #f7fafc;
+}
+
+[data-theme="dark"] .stat-label,
+[data-theme="dark"] .progress-text,
+[data-theme="dark"] .badge-description,
+[data-theme="dark"] .session-date,
+[data-theme="dark"] .session-details {
+    color: #a0aec0;
+}
+
+[data-theme="dark"] .badge-item,
+[data-theme="dark"] .session-gamification-item {
+    background: #2d3748;
+    border-color: #4a5568;
+}
+
+[data-theme="dark"] .badge-name {
+    color: #f7fafc;
+}

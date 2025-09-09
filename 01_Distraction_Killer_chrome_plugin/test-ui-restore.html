@@ -1,0 +1,150 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>UI Restore Test</title>
+    <style>
+        body { 
+            font-family: Arial, sans-serif; 
+            margin: 20px; 
+            background: #f5f5f5;
+        }
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            background: white;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        button { 
+            padding: 10px 15px; 
+            margin: 5px; 
+            cursor: pointer; 
+            background: #007bff;
+            color: white;
+            border: none;
+            border-radius: 4px;
+        }
+        button:hover {
+            background: #0056b3;
+        }
+        #output { 
+            border: 1px solid #ccc; 
+            padding: 15px; 
+            margin-top: 20px; 
+            min-height: 200px; 
+            background: #f9f9f9; 
+            white-space: pre-wrap; 
+            font-family: monospace; 
+            border-radius: 4px;
+        }
+        .success {
+            color: #28a745;
+            font-weight: bold;
+        }
+        .error {
+            color: #dc3545;
+            font-weight: bold;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🎨 UI Restore Test</h1>
+        <p>This page tests that the original clean UI layout has been restored.</p>
+        
+        <div>
+            <button onclick="testUILayout()">🧪 Test UI Layout</button>
+            <button onclick="testGamificationCard()">🎯 Test Gamification Card</button>
+            <button onclick="clearOutput()">🗑️ Clear Output</button>
+        </div>
+
+        <div id="output">UI Restore Test Page Loaded. Click buttons above to test the UI restoration.</div>
+    </div>
+
+    <script>
+        const outputDiv = document.getElementById('output');
+        
+        const log = (message, type = 'info') => {
+            const timestamp = new Date().toLocaleTimeString();
+            const prefix = type === 'success' ? '✅' : type === 'error' ? '❌' : 'ℹ️';
+            outputDiv.textContent += `[${timestamp}] ${prefix} ${message}\n`;
+            outputDiv.scrollTop = outputDiv.scrollHeight;
+            console.log(message);
+        };
+
+        function testUILayout() {
+            log('--- Testing UI Layout ---');
+            
+            try {
+                // Test if the popup has the correct structure
+                const popupContainer = document.querySelector('.container');
+                const header = document.querySelector('.header');
+                const mainContent = document.querySelector('.main-content');
+                const footer = document.querySelector('.footer');
+                
+                if (popupContainer && header && mainContent && footer) {
+                    log('Original UI structure found', 'success');
+                    log('✓ Header with logo and status indicator');
+                    log('✓ Main content area');
+                    log('✓ Footer with navigation');
+                } else {
+                    log('UI structure not found or modified', 'error');
+                }
+                
+                // Check for gamification card
+                const gamificationCard = document.getElementById('gamificationCard');
+                if (gamificationCard) {
+                    log('Gamification card found in popup (should not be there)', 'error');
+                } else {
+                    log('No gamification card in popup (correct)', 'success');
+                }
+                
+            } catch (e) {
+                log(`UI layout test error: ${e.message}`, 'error');
+            }
+        }
+
+        function testGamificationCard() {
+            log('--- Testing Gamification Card Behavior ---');
+            
+            try {
+                // Test if gamification UI is loaded but not showing card in popup
+                if (window.gamificationUI) {
+                    log('Gamification UI loaded', 'success');
+                    
+                    // Test updateDisplay method
+                    window.gamificationUI.updateDisplay();
+                    
+                    // Check if card was created
+                    const gamificationCard = document.getElementById('gamificationCard');
+                    if (gamificationCard) {
+                        log('Gamification card created (should not be in popup)', 'error');
+                    } else {
+                        log('Gamification card not created in popup (correct behavior)', 'success');
+                    }
+                } else {
+                    log('Gamification UI not loaded', 'error');
+                }
+            } catch (e) {
+                log(`Gamification card test error: ${e.message}`, 'error');
+            }
+        }
+
+        function clearOutput() {
+            outputDiv.textContent = '';
+        }
+
+        // Initialize on page load
+        document.addEventListener('DOMContentLoaded', () => {
+            log('UI Restore Test Page Loaded');
+            log('Testing fixes for:');
+            log('1. Restored original clean popup layout');
+            log('2. Removed gamification card from popup');
+            log('3. Maintained gamification functionality in reports');
+        });
+    </script>
+</body>
+</html>

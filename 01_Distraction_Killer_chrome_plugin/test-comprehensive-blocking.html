@@ -1,0 +1,386 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Comprehensive Blocking Test</title>
+    <style>
+        body { 
+            font-family: Arial, sans-serif; 
+            margin: 20px; 
+            background: #f5f5f5;
+        }
+        .container {
+            max-width: 1000px;
+            margin: 0 auto;
+            background: white;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        button { 
+            padding: 10px 15px; 
+            margin: 5px; 
+            cursor: pointer; 
+            background: #007bff;
+            color: white;
+            border: none;
+            border-radius: 4px;
+        }
+        button:hover {
+            background: #0056b3;
+        }
+        #output { 
+            border: 1px solid #ccc; 
+            padding: 15px; 
+            margin-top: 20px; 
+            min-height: 300px; 
+            background: #f9f9f9; 
+            white-space: pre-wrap; 
+            font-family: monospace; 
+            border-radius: 4px;
+        }
+        .success {
+            color: #28a745;
+            font-weight: bold;
+        }
+        .error {
+            color: #dc3545;
+            font-weight: bold;
+        }
+        .test-section {
+            background: #f8f9fa;
+            padding: 15px;
+            margin: 10px 0;
+            border-radius: 6px;
+            border-left: 4px solid #007bff;
+        }
+        .test-results {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+            margin-top: 20px;
+        }
+        .result-column {
+            background: #f8f9fa;
+            padding: 15px;
+            border-radius: 6px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🔍 Comprehensive Blocking Test</h1>
+        <p>This page tests both domain and keyword blocking, plus temporary access functionality.</p>
+        
+        <div class="test-section">
+            <h3>🧪 Test All Blocking Types</h3>
+            <button onclick="runComprehensiveTest()">Run Complete Test</button>
+            <button onclick="testKeywordBlocking()">Test Keywords Only</button>
+            <button onclick="testDomainBlocking()">Test Domains Only</button>
+            <button onclick="testTemporaryAccess()">Test Temporary Access</button>
+        </div>
+
+        <div class="test-section">
+            <h3>🔧 Test Specific Scenarios</h3>
+            <button onclick="testSocialMedia()">Test Social Media</button>
+            <button onclick="testEcommerce()">Test E-commerce</button>
+            <button onclick="testNews()">Test News & Media</button>
+            <button onclick="testEntertainment()">Test Entertainment</button>
+        </div>
+
+        <div>
+            <button onclick="clearOutput()">🗑️ Clear Output</button>
+        </div>
+
+        <div class="test-results">
+            <div class="result-column">
+                <h4>✅ Should Be BLOCKED</h4>
+                <div id="blockedResults"></div>
+            </div>
+            <div class="result-column">
+                <h4>✅ Should Be ALLOWED</h4>
+                <div id="allowedResults"></div>
+            </div>
+        </div>
+
+        <div id="output">Comprehensive Blocking Test Page Loaded. Click buttons above to test blocking functionality.</div>
+    </div>
+
+    <script>
+        const outputDiv = document.getElementById('output');
+        const blockedResultsDiv = document.getElementById('blockedResults');
+        const allowedResultsDiv = document.getElementById('allowedResults');
+        
+        const log = (message, type = 'info') => {
+            const timestamp = new Date().toLocaleTimeString();
+            const prefix = type === 'success' ? '✅' : type === 'error' ? '❌' : 'ℹ️';
+            outputDiv.textContent += `[${timestamp}] ${prefix} ${message}\n`;
+            outputDiv.scrollTop = outputDiv.scrollHeight;
+            console.log(message);
+        };
+
+        const addResult = (url, status, expected, category, container) => {
+            const div = document.createElement('div');
+            div.style.padding = '8px';
+            div.style.margin = '4px 0';
+            div.style.borderRadius = '4px';
+            div.style.fontSize = '12px';
+            
+            if (status === expected) {
+                div.style.background = '#d4edda';
+                div.style.color = '#155724';
+            } else {
+                div.style.background = '#f8d7da';
+                div.style.color = '#721c24';
+            }
+            
+            div.innerHTML = `
+                <strong>${url}</strong><br>
+                <span>${status} (expected ${expected})</span><br>
+                <span>Category: ${category}</span>
+            `;
+            container.appendChild(div);
+        };
+
+        async function runComprehensiveTest() {
+            log('--- Running Comprehensive Blocking Test ---');
+            blockedResultsDiv.innerHTML = '';
+            allowedResultsDiv.innerHTML = '';
+            
+            const testCases = [
+                // Social Media - Should be BLOCKED
+                { url: 'https://www.facebook.com', expected: 'BLOCKED', category: 'social' },
+                { url: 'https://www.instagram.com', expected: 'BLOCKED', category: 'social' },
+                { url: 'https://www.twitter.com', expected: 'BLOCKED', category: 'social' },
+                { url: 'https://example.com/facebook', expected: 'BLOCKED', category: 'social' },
+                { url: 'https://example.com/instagram', expected: 'BLOCKED', category: 'social' },
+                { url: 'https://example.com/twitter', expected: 'BLOCKED', category: 'social' },
+                
+                // E-commerce - Should be BLOCKED
+                { url: 'https://www.amazon.com', expected: 'BLOCKED', category: 'ecommerce' },
+                { url: 'https://www.ebay.com', expected: 'BLOCKED', category: 'ecommerce' },
+                { url: 'https://example.com/amazon', expected: 'BLOCKED', category: 'ecommerce' },
+                { url: 'https://example.com/shop', expected: 'BLOCKED', category: 'ecommerce' },
+                
+                // News - Should be BLOCKED
+                { url: 'https://www.cnn.com', expected: 'BLOCKED', category: 'news' },
+                { url: 'https://www.bbc.com', expected: 'BLOCKED', category: 'news' },
+                { url: 'https://example.com/cnn', expected: 'BLOCKED', category: 'news' },
+                { url: 'https://example.com/news', expected: 'BLOCKED', category: 'news' },
+                
+                // Entertainment - Should be BLOCKED
+                { url: 'https://www.youtube.com', expected: 'BLOCKED', category: 'entertainment' },
+                { url: 'https://www.netflix.com', expected: 'BLOCKED', category: 'entertainment' },
+                { url: 'https://example.com/youtube', expected: 'BLOCKED', category: 'entertainment' },
+                
+                // Adult Content - Should be BLOCKED
+                { url: 'https://www.pornhub.com', expected: 'BLOCKED', category: 'porn' },
+                { url: 'https://www.xvideos.com', expected: 'BLOCKED', category: 'porn' },
+                { url: 'https://example.com/porn', expected: 'BLOCKED', category: 'porn' },
+                
+                // Should be ALLOWED
+                { url: 'https://www.google.com', expected: 'ALLOWED', category: 'search' },
+                { url: 'https://www.github.com', expected: 'ALLOWED', category: 'development' },
+                { url: 'https://www.stackoverflow.com', expected: 'ALLOWED', category: 'development' },
+                { url: 'https://www.wikipedia.org', expected: 'ALLOWED', category: 'reference' },
+                { url: 'https://example.com/work', expected: 'ALLOWED', category: 'work' },
+                { url: 'https://example.com/project', expected: 'ALLOWED', category: 'work' }
+            ];
+
+            for (const testCase of testCases) {
+                try {
+                    const response = await chrome.runtime.sendMessage({ 
+                        action: 'checkBlockedSite', 
+                        url: testCase.url 
+                    });
+                    const actual = response.isBlocked ? 'BLOCKED' : 'ALLOWED';
+                    const category = response.category || 'unknown';
+                    
+                    if (actual === testCase.expected) {
+                        log(`${testCase.url}: ${actual} (${category}) - CORRECT`, 'success');
+                    } else {
+                        log(`${testCase.url}: ${actual} (expected ${testCase.expected}) - WRONG`, 'error');
+                    }
+                    
+                    // Add to results display
+                    if (testCase.expected === 'BLOCKED') {
+                        addResult(testCase.url, actual, testCase.expected, category, blockedResultsDiv);
+                    } else {
+                        addResult(testCase.url, actual, testCase.expected, category, allowedResultsDiv);
+                    }
+                    
+                } catch (e) {
+                    log(`Error testing ${testCase.url}: ${e.message}`, 'error');
+                }
+            }
+        }
+
+        async function testKeywordBlocking() {
+            log('--- Testing Keyword Blocking ---');
+            
+            const keywordTests = [
+                'https://example.com/facebook',
+                'https://example.com/instagram', 
+                'https://example.com/twitter',
+                'https://example.com/amazon',
+                'https://example.com/shop',
+                'https://example.com/cnn',
+                'https://example.com/news',
+                'https://example.com/youtube',
+                'https://example.com/porn',
+                'https://example.com/xxx'
+            ];
+
+            for (const url of keywordTests) {
+                try {
+                    const response = await chrome.runtime.sendMessage({ 
+                        action: 'checkBlockedSite', 
+                        url: url 
+                    });
+                    const status = response.isBlocked ? 'BLOCKED' : 'ALLOWED';
+                    const category = response.category || 'unknown';
+                    log(`${url}: ${status} (${category})`);
+                } catch (e) {
+                    log(`Error testing ${url}: ${e.message}`, 'error');
+                }
+            }
+        }
+
+        async function testDomainBlocking() {
+            log('--- Testing Domain Blocking ---');
+            
+            const domainTests = [
+                'https://www.facebook.com',
+                'https://www.instagram.com',
+                'https://www.twitter.com',
+                'https://www.amazon.com',
+                'https://www.cnn.com',
+                'https://www.youtube.com',
+                'https://www.pornhub.com'
+            ];
+
+            for (const url of domainTests) {
+                try {
+                    const response = await chrome.runtime.sendMessage({ 
+                        action: 'checkBlockedSite', 
+                        url: url 
+                    });
+                    const status = response.isBlocked ? 'BLOCKED' : 'ALLOWED';
+                    const category = response.category || 'unknown';
+                    log(`${url}: ${status} (${category})`);
+                } catch (e) {
+                    log(`Error testing ${url}: ${e.message}`, 'error');
+                }
+            }
+        }
+
+        async function testTemporaryAccess() {
+            log('--- Testing Temporary Access ---');
+            
+            try {
+                // Check if we have a session
+                const sessionResponse = await chrome.runtime.sendMessage({ action: 'getSessionData' });
+                if (!sessionResponse.currentSession) {
+                    log('No active session. Please start a session first.', 'error');
+                    return;
+                }
+
+                // Test granting access for a keyword
+                const accessData = {
+                    url: 'https://example.com/facebook',
+                    domain: 'example.com',
+                    keyword: 'facebook',
+                    sessionId: sessionResponse.currentSession.id,
+                    granted: true,
+                    endTime: Date.now() + 5 * 60 * 1000 // 5 minutes
+                };
+                
+                await chrome.storage.local.set({ temporaryAccess: accessData });
+                log('Temporary access granted for facebook keyword', 'success');
+                
+                // Test if access works for various URLs with facebook
+                const testUrls = [
+                    'https://example.com/facebook',
+                    'https://www.facebook.com',
+                    'https://subdomain.facebook.com',
+                    'https://example.com/facebook/page',
+                    'https://other.com/facebook'
+                ];
+                
+                for (const url of testUrls) {
+                    const response = await chrome.runtime.sendMessage({ 
+                        action: 'checkBlockedSite', 
+                        url: url 
+                    });
+                    const status = response.isBlocked ? 'BLOCKED' : 'ALLOWED';
+                    log(`${url}: ${status} (should be ALLOWED due to keyword access)`);
+                }
+                
+            } catch (e) {
+                log(`Temporary access test error: ${e.message}`, 'error');
+            }
+        }
+
+        async function testSocialMedia() {
+            log('--- Testing Social Media Blocking ---');
+            await testCategory(['facebook', 'instagram', 'twitter', 'linkedin'], 'social');
+        }
+
+        async function testEcommerce() {
+            log('--- Testing E-commerce Blocking ---');
+            await testCategory(['amazon', 'ebay', 'shop', 'buy'], 'ecommerce');
+        }
+
+        async function testNews() {
+            log('--- Testing News & Media Blocking ---');
+            await testCategory(['cnn', 'bbc', 'news', 'times'], 'news');
+        }
+
+        async function testEntertainment() {
+            log('--- Testing Entertainment Blocking ---');
+            await testCategory(['youtube', 'netflix', 'hulu', 'spotify'], 'entertainment');
+        }
+
+        async function testCategory(keywords, category) {
+            for (const keyword of keywords) {
+                const urls = [
+                    `https://www.${keyword}.com`,
+                    `https://example.com/${keyword}`,
+                    `https://subdomain.${keyword}.com`
+                ];
+                
+                for (const url of urls) {
+                    try {
+                        const response = await chrome.runtime.sendMessage({ 
+                            action: 'checkBlockedSite', 
+                            url: url 
+                    });
+                        const status = response.isBlocked ? 'BLOCKED' : 'ALLOWED';
+                        const detectedCategory = response.category || 'unknown';
+                        log(`${url}: ${status} (${detectedCategory})`);
+                    } catch (e) {
+                        log(`Error testing ${url}: ${e.message}`, 'error');
+                    }
+                }
+            }
+        }
+
+        function clearOutput() {
+            outputDiv.textContent = '';
+            blockedResultsDiv.innerHTML = '';
+            allowedResultsDiv.innerHTML = '';
+        }
+
+        // Initialize on page load
+        document.addEventListener('DOMContentLoaded', () => {
+            log('Comprehensive Blocking Test Page Loaded');
+            log('This test will verify:');
+            log('1. Domain blocking works correctly');
+            log('2. Keyword blocking works correctly');
+            log('3. Temporary access grants work for both domains and keywords');
+            log('4. Associated sites are accessible when keyword access is granted');
+        });
+    </script>
+</body>
+</html>
