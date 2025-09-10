@@ -115,7 +115,21 @@ class DistractionKillerPopup {
      */
     async loadSessionData() {
         try {
-            const response = await chrome.runtime.sendMessage({ action: 'getSessionData' });
+            // Add retry logic for better reliability
+            let retries = 3;
+            let response;
+            
+            while (retries > 0) {
+                try {
+                    response = await chrome.runtime.sendMessage({ action: 'getSessionData' });
+                    break;
+                } catch (error) {
+                    retries--;
+                    if (retries === 0) throw error;
+                    await new Promise(resolve => setTimeout(resolve, 50));
+                }
+            }
+            
             this.currentSession = response.currentSession;
             
             // Load session history
@@ -124,10 +138,15 @@ class DistractionKillerPopup {
 
             // Convert achievedMilestones to Set if needed
             if (this.currentSession?.achievedMilestones && Array.isArray(this.currentSession.achievedMilestones)) {
-                    this.currentSession.achievedMilestones = new Set(this.currentSession.achievedMilestones);
+                this.currentSession.achievedMilestones = new Set(this.currentSession.achievedMilestones);
             }
+            
+            // Debug log to check session state
+            console.log('Loaded session data:', this.currentSession);
+            
         } catch (error) {
             console.error('Error loading session data:', error);
+            this.currentSession = null;
         }
     }
 
@@ -135,14 +154,17 @@ class DistractionKillerPopup {
      * Update the display based on current session state
      */
     updateDisplay() {
-        if (this.currentSession?.isActive) {
-            this.showActiveSession();
-            this.startTimer();
-        } else if (this.currentSession?.completed) {
-            this.showSessionComplete();
-        } else {
-            this.showSessionSetup();
-        }
+        // Add a small delay to ensure background sync is complete
+        setTimeout(() => {
+            if (this.currentSession?.isActive && !this.currentSession?.completed) {
+                this.showActiveSession();
+                this.startTimer();
+            } else if (this.currentSession?.completed) {
+                this.showSessionComplete();
+            } else {
+                this.showSessionSetup();
+            }
+        }, 100); // Small delay to ensure data is synchronized
     }
 
     /**

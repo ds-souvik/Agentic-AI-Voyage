@@ -342,16 +342,25 @@ class DistractionKillerBackground {
      */
     async completeSession(sessionData) {
         try {
-            const finalSessionData = sessionData || this.currentSession;
-            if (!finalSessionData) return;
-
-            finalSessionData.isActive = false;
-            finalSessionData.completed = true;
-            finalSessionData.endTime = Date.now();
+            console.log('Completing session:', sessionData);
             
-            // Calculate final duration and other completion data
-            const finalDuration = finalSessionData.endTime - finalSessionData.startTime;
-            const durationMinutes = Math.floor(finalDuration / 60000);
+            // Calculate final duration
+            const finalDuration = sessionData.endTime - sessionData.startTime;
+            const durationMinutes = Math.floor(finalDuration / (1000 * 60));
+            
+            // Ensure all session data is preserved
+            const finalSessionData = {
+                ...this.currentSession,  // Get current session data from background
+                ...sessionData,          // Merge with provided data
+                completed: true,
+                isActive: false,
+                duration: finalDuration,
+                // Ensure blocked attempts are preserved
+                blockedAttempts: this.currentSession?.blockedAttempts || sessionData.blockedAttempts || 0,
+                hadBlockedAttempts: this.currentSession?.hadBlockedAttempts || sessionData.hadBlockedAttempts || false
+            };
+            
+            // Continue with existing gamification and history saving logic...
             
             // Track gamification event
             await this.trackGamificationEvent('session_complete', {
@@ -388,8 +397,15 @@ class DistractionKillerBackground {
      */
     async updateSession(sessionData) {
         try {
-            this.currentSession = sessionData;
-            await chrome.storage.local.set({ currentSession: sessionData });
+            this.currentSession = {
+                ...this.currentSession,
+                ...sessionData
+            };
+            
+            // Save to storage
+            await chrome.storage.local.set({ currentSession: this.currentSession });
+            console.log('Session updated:', this.currentSession);
+            
         } catch (error) {
             console.error('Error updating session:', error);
         }
