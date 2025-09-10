@@ -505,3 +505,31 @@ body {
         border-radius: 0;
     }
 }
+
+/* Custom Start Session Button - matches inline styles exactly */
+.start-session-btn {
+    background: #667eea;
+    color: #fff;
+    font-size: 1.25rem;
+    font-weight: 700;
+    font-family: 'Segoe UI', 'Arial', sans-serif;
+    padding: 16px 36px;
+    border: none;
+    border-radius: 10px;
+    box-shadow: 0 2px 8px rgba(102, 126, 234, 0.15);
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    transition: background 0.2s, transform 0.2s;
+}
+
+.start-session-btn:hover {
+    background: #5a67d8;
+    transform: translateY(-2px);
+}
+
+.start-session-btn:focus {
+    background: #667eea;
+    transform: none;
+}

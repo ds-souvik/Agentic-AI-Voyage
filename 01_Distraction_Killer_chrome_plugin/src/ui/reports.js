@@ -137,14 +137,23 @@ class DistractionKillerReports {
     }
 
     async updateSessionsList(sessions) {
+        // Add null checks for sessionsList and sessionsEmpty
         if (sessions.length === 0) {
-            this.sessionsList.style.display = 'none';
-            this.sessionsEmpty.style.display = 'block';
+            if (this.sessionsList) {
+                this.sessionsList.style.display = 'none';
+            }
+            if (this.sessionsEmpty) {
+                this.sessionsEmpty.style.display = 'block';
+            }
             return;
         }
 
-        this.sessionsList.style.display = 'block';
-        this.sessionsEmpty.style.display = 'none';
+        if (this.sessionsList) {
+            this.sessionsList.style.display = 'block';
+        }
+        if (this.sessionsEmpty) {
+            this.sessionsEmpty.style.display = 'none';
+        }
 
         const sortedSessions = [...sessions].sort((a, b) => b.startTime - a.startTime);
 
@@ -282,8 +291,8 @@ class DistractionKillerReports {
 
         if (recentSessions.length === 0) {
             this.recentSessionsList.innerHTML = '<div class="no-sessions">No recent sessions</div>';
-            return;
-        }
+                return;
+            }
 
         this.recentSessionsList.innerHTML = recentSessions.slice(0, 5).map(session => {
             const startTime = new Date(session.startTime);
@@ -305,29 +314,29 @@ class DistractionKillerReports {
 
             return `
                 <div class="session-card">
-                    <div class="session-header">
+                                        <div class="session-header">
                         <div class="session-date-time">${startTime.toLocaleDateString()} - ${startTime.toLocaleTimeString()}</div>
                         <div class="session-score ${scoreClass}">${score > 0 ? '+' : ''}${score} pts</div>
-                    </div>
+                                            </div>
                     <div class="session-content">
                         <div class="session-row">
                             <span class="session-label">Focus Goal:</span>
                             <span class="session-value">${session.goal || 'Deep Work Session'}</span>
-                        </div>
+                                        </div>
                         <div class="session-row">
                             <span class="session-label">Blocked Sites:</span>
                             <span class="session-value">${blockedSites}</span>
-                        </div>
+                                            </div>
                         <div class="session-row">
                             <span class="session-label">Time:</span>
                             <span class="session-value">${durationMinutes}m / ${plannedDuration}m</span>
-                        </div>
+                                            </div>
                         <div class="session-row">
                             <span class="session-label">Focus Score:</span>
                             <span class="session-value focus-score">${focusScore}%</span>
-                        </div>
-                    </div>
-                </div>
+                                        </div>
+                                    </div>
+                            </div>
             `;
         }).join('');
     }
