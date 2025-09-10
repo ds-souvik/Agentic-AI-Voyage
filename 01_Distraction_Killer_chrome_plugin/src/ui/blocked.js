@@ -243,7 +243,7 @@ class DistractionKillerBlocked {
                 domain: domain,
                 baseDomain: this.getBaseDomain(domain), // Store base domain for better matching
                 sessionId: this.currentSession.id, // Tie access to current session
-                duration: duration * 60 * 1000, // Convert to milliseconds
+                minutes: duration, // Send duration in minutes as expected by background script
                 startTime: Date.now(),
                 endTime: Date.now() + (duration * 60 * 1000),
                 granted: true
@@ -267,9 +267,12 @@ class DistractionKillerBlocked {
                 });
             }
 
-            await chrome.storage.local.set({ temporaryAccess: accessData });
+            // Remove this line - don't store directly
+            // await chrome.storage.local.set({ temporaryAccess: accessData });
 
-            // Notify background script
+            console.log('🎯 DEBUG: Blocked page sending grant access with:', JSON.stringify(accessData, null, 2));
+            
+            // Notify background script - this will handle the storage properly
             chrome.runtime.sendMessage({
                 action: 'grantTemporaryAccess',
                 accessData: accessData

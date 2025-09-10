@@ -394,6 +394,12 @@ class DistractionKillerPopup {
      */
     updateTimerDisplay() {
         if (!this.currentSession) return;
+        
+        // If session is not active (stopped early), don't update timer
+        if (!this.currentSession.isActive) {
+            console.log('🔧 DEBUG: Timer stopped - session not active');
+            return;
+        }
 
         const now = Date.now();
         let remainingTime;
@@ -405,6 +411,7 @@ class DistractionKillerPopup {
         }
 
         if (remainingTime <= 0) {
+            console.log('🔧 DEBUG: Timer completed - calling completeSession');
             this.completeSession();
             return;
         }

@@ -100,7 +100,21 @@ class DistractionKillerBackground {
                     break;
 
                 case 'checkBlockedSite':
+                    // Check for temporary access first
+                    const hasTemporaryAccess = await this.checkTemporaryAccess(request.url);
+                    if (hasTemporaryAccess) {
+                        console.log('🔍 DEBUG: Content script - allowing due to temporary access:', request.url);
+                        sendResponse({
+                            isBlocked: false,
+                            category: null,
+                            matchType: null,
+                            matchValue: null
+                        });
+                        break;
+                    }
+                    
                     const blockResult = await this.blocklistManager.shouldBlockUrl(request.url, this.userSettings);
+                    console.log('🔍 DEBUG: Content script - block check result:', blockResult);
                     sendResponse({
                         isBlocked: blockResult.shouldBlock,
                         category: blockResult.category || null,
@@ -167,10 +181,12 @@ class DistractionKillerBackground {
      */
     async handleNavigation(url, tabId) {
         try {
+            console.log('🌐 DEBUG: Navigation attempt to:', url);
+            
             // Check for temporary access first
             const hasTemporaryAccess = await this.checkTemporaryAccess(url);
             if (hasTemporaryAccess) {
-                console.log('Allowing navigation due to temporary access:', url);
+                console.log('✅ DEBUG: Allowing navigation due to temporary access:', url);
                 return;
             }
 
@@ -312,16 +328,16 @@ class DistractionKillerBackground {
             this.currentSession.endTime = Date.now();
             this.currentSession.stoppedEarly = true;
             
-            // Track gamification event
+            // Track gamification event (this handles session storage internally)
             await this.trackGamificationEvent('session_abort', {
+                ...this.currentSession, // Pass complete session data
                 sessionId: this.currentSession.id,
                 duration: this.currentSession.endTime - this.currentSession.startTime,
                 durationMinutes: Math.floor((this.currentSession.endTime - this.currentSession.startTime) / 60000),
                 stoppedEarly: true
             });
             
-            // Save to session history
-            await this.saveSessionToHistory(this.currentSession);
+            // Note: Session storage is handled by gamification service, no duplicate storage needed
             
             // Clear current session
             this.currentSession = null;
@@ -344,6 +360,9 @@ class DistractionKillerBackground {
         try {
             console.log('Completing session:', sessionData);
             
+            // Clear the session completion alarm to prevent double completion
+            chrome.alarms.clear('sessionComplete');
+            
             // Calculate final duration
             const finalDuration = sessionData.endTime - sessionData.startTime;
             const durationMinutes = Math.floor(finalDuration / (1000 * 60));
@@ -362,8 +381,9 @@ class DistractionKillerBackground {
             
             // Continue with existing gamification and history saving logic...
             
-            // Track gamification event
+            // Track gamification event (this handles session storage internally)
             await this.trackGamificationEvent('session_complete', {
+                ...finalSessionData, // Pass complete session data
                 sessionId: finalSessionData.id,
                 duration: finalDuration,
                 durationMinutes: durationMinutes,
@@ -375,8 +395,7 @@ class DistractionKillerBackground {
                 endTime: finalSessionData.endTime
             });
             
-            // Save to session history
-            await this.saveSessionToHistory(finalSessionData);
+            // Note: Session storage is handled by gamification service, no duplicate storage needed
             
             // Clear current session
             this.currentSession = null;
@@ -414,29 +433,8 @@ class DistractionKillerBackground {
     /**
      * Save session to history
      */
-    async saveSessionToHistory(sessionData) {
-        try {
-            const result = await chrome.storage.local.get(['sessionHistory']);
-            const sessionHistory = result.sessionHistory || [];
-            
-            // Check if session already exists to avoid duplicates
-            const existingIndex = sessionHistory.findIndex(s => s.id === sessionData.id);
-            if (existingIndex !== -1) {
-                sessionHistory[existingIndex] = sessionData;
-            } else {
-                sessionHistory.unshift(sessionData);
-            }
-            
-            // Keep only last 100 sessions
-            if (sessionHistory.length > 100) {
-                sessionHistory.splice(100);
-            }
-            
-            await chrome.storage.local.set({ sessionHistory });
-        } catch (error) {
-            console.error('Error saving session to history:', error);
-        }
-    }
+    // Note: saveSessionToHistory method removed - session storage is now handled 
+    // entirely by the gamification service to eliminate dual storage systems
 
     /**
      * Track a gamification event
@@ -469,6 +467,8 @@ class DistractionKillerBackground {
      */
     async grantTemporaryAccess(accessData) {
         try {
+            console.log('🎯 DEBUG: Grant access called with data:', JSON.stringify(accessData, null, 2));
+            
             const temporaryAccess = {
                 url: accessData.url,
                 domain: accessData.domain,
@@ -478,6 +478,10 @@ class DistractionKillerBackground {
                 granted: true
             };
             
+            console.log('🎯 DEBUG: Creating temporary access:', JSON.stringify(temporaryAccess, null, 2));
+            console.log('🎯 DEBUG: Minutes provided:', accessData.minutes);
+            console.log('🎯 DEBUG: Calculated endTime:', new Date(temporaryAccess.endTime).toISOString());
+            
             await chrome.storage.local.set({ temporaryAccess });
             
             // Track as override event
@@ -486,7 +490,7 @@ class DistractionKillerBackground {
                 minutes: accessData.minutes
             });
             
-            console.log('Temporary access granted:', temporaryAccess);
+            console.log('✅ DEBUG: Temporary access granted and stored');
         } catch (error) {
             console.error('Error granting temporary access:', error);
         }
@@ -500,8 +504,8 @@ class DistractionKillerBackground {
             const result = await chrome.storage.local.get(['temporaryAccess']);
             const temporaryAccess = result.temporaryAccess;
             
-            console.log('Checking temporary access for:', url);
-            console.log('Temporary access data:', temporaryAccess);
+            console.log('🔍 DEBUG: Checking temporary access for:', url);
+            console.log('🔍 DEBUG: Temporary access data:', JSON.stringify(temporaryAccess, null, 2));
             
             if (!temporaryAccess?.granted) {
                 console.log('No temporary access granted');
@@ -511,8 +515,14 @@ class DistractionKillerBackground {
             const now = Date.now();
             
             // Check if access is still valid
+            console.log('🔍 DEBUG: Current session ID:', this.currentSession?.id);
+            console.log('🔍 DEBUG: Access session ID:', temporaryAccess.sessionId);
+            console.log('🔍 DEBUG: Current time:', now);
+            console.log('🔍 DEBUG: Access end time:', temporaryAccess.endTime);
+            console.log('🔍 DEBUG: Time remaining:', temporaryAccess.endTime - now, 'ms');
+            
             if (temporaryAccess.sessionId !== this.currentSession?.id || now >= temporaryAccess.endTime) {
-                console.log('Temporary access expired or wrong session');
+                console.log('🚫 DEBUG: Temporary access expired or wrong session');
                 await chrome.storage.local.remove(['temporaryAccess']);
                 return false;
             }

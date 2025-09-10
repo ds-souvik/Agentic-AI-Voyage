@@ -165,41 +165,43 @@ class DistractionKillerReports {
             })
         );
 
-        this.sessionsList.innerHTML = sessionsWithScores.map(session => {
-            const startTime = new Date(session.startTime);
-            // Calculate additional session details with proper null checks
-            const duration = (session.endTime && session.startTime) ? 
-                session.endTime - session.startTime : 
-                (session.duration || 0);
-            
-            const durationMinutes = Math.floor(Math.abs(duration) / (1000 * 60));
-            const plannedDuration = session.duration ? Math.floor(session.duration / (1000 * 60)) : durationMinutes;
-            const blockedCount = session.blockedAttempts || 0;
-            const focusScore = Math.max(0, 100 - (blockedCount * 5));
+        // Add null check before setting innerHTML
+        if (this.sessionsList) {
+            this.sessionsList.innerHTML = sessionsWithScores.map(session => {
+                const startTime = new Date(session.startTime);
+                // Calculate additional session details with proper null checks
+                const duration = (session.endTime && session.startTime) ? 
+                    session.endTime - session.startTime : 
+                    (session.duration || 0);
+                
+                const durationMinutes = Math.floor(Math.abs(duration) / (1000 * 60));
+                const plannedDuration = session.duration ? Math.floor(session.duration / (1000 * 60)) : durationMinutes;
+                const blockedCount = session.blockedAttempts || 0;
+                const focusScore = Math.max(0, 100 - (blockedCount * 5));
 
-            // Format blocked sites list (simplified for now)
-            const blockedSites = blockedCount > 0 ? `Blocked ${blockedCount} sites` : 'No distractions';
-            
-            const status = session.completed ? 'Completed' : session.stoppedEarly ? 'Stopped Early' : 'Incomplete';
-            const statusClass = session.completed ? 'success' : session.stoppedEarly ? 'warning' : 'info';
-            
-            const sessionScore = session.sessionScore || 0;
-            const scoreClass = sessionScore >= 0 ? 'positive' : 'negative';
-            
-            return `
+                // Format blocked sites list (simplified for now)
+                const blockedSites = blockedCount > 0 ? `Blocked ${blockedCount} sites` : 'No distractions';
+                
+                const status = session.completed ? 'Completed' : session.stoppedEarly ? 'Stopped Early' : 'Incomplete';
+                const statusClass = session.completed ? 'success' : session.stoppedEarly ? 'warning' : 'info';
+                
+                const sessionScore = session.sessionScore || 0;
+                const scoreClass = sessionScore >= 0 ? 'positive' : 'negative';
+                
+                return `
             <div class="session-item">
                 <div class="session-header">
-                        <div class="session-time-info">
-                            <div class="session-date">${startTime.toLocaleDateString()}</div>
-                            <div class="session-time">${startTime.toLocaleTimeString()}</div>
+                            <div class="session-time-info">
+                                <div class="session-date">${startTime.toLocaleDateString()}</div>
+                                <div class="session-time">${startTime.toLocaleTimeString()}</div>
                 </div>
-                        <div class="session-status ${statusClass}">${status}</div>
+                            <div class="session-status ${statusClass}">${status}</div>
                 </div>
-                    
+                        
                     <div class="session-goal">
                         <strong>Goal:</strong> ${session.goal || 'Deep Work Session'}
             </div>
-                    
+                        
                     <div class="session-details-grid">
                         <div class="detail-item">
                             <div class="detail-icon">🎯</div>
@@ -226,8 +228,9 @@ class DistractionKillerReports {
         </div>
         </div>
     </div>
-            `;
-        }).join('');
+                `;
+            }).join('');
+        }
     }
 
     /**
@@ -270,6 +273,12 @@ class DistractionKillerReports {
             const summary = await this.gamificationService.getGamificationSummary();
             const reportData = await this.gamificationService.getGamificationReportData();
 
+            console.log('📊 DEBUG: Updating UI display with:', {
+                totalPoints: summary.totalPoints,
+                dailyPoints: summary.dailyPoints,
+                source: 'gamificationSummary'
+            });
+            
             this.totalPoints.textContent = summary.totalPoints.toLocaleString();
             this.pointsToday.textContent = summary.dailyPoints.toLocaleString();
             this.currentLevel.textContent = summary.currentLevel;
@@ -298,6 +307,12 @@ class DistractionKillerReports {
             const startTime = new Date(session.startTime);
             const score = session.score || 0;
             const scoreClass = score >= 0 ? 'positive-score' : 'negative-score';
+            
+            console.log('📊 DEBUG: Session score display:', {
+                sessionId: session.sessionId,
+                score: score,
+                source: 'session.score from recentSessions'
+            });
             
             // FIXED: Calculate duration properly with null checks
             const duration = (session.endTime && session.startTime) ? 
