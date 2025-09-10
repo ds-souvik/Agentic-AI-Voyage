@@ -1261,3 +1261,130 @@ body {
 [data-theme="dark"] .detail-value {
     color: #e2e8f0;
 }
+
+/* Detailed Session Cards for Recent Sessions */
+.session-card {
+    background: white;
+    border-radius: 12px;
+    border: 1px solid #e2e8f0;
+    margin-bottom: 16px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.session-card:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.15);
+}
+
+.session-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 16px 20px 12px 20px;
+    border-bottom: 1px solid #f1f5f9;
+    background: linear-gradient(135deg, #f8fafc 0%, #f1f5f9 100%);
+    border-radius: 12px 12px 0 0;
+}
+
+.session-date-time {
+    font-size: 14px;
+    color: #64748b;
+    font-weight: 500;
+}
+
+.session-score {
+    font-size: 16px;
+    font-weight: 700;
+    padding: 4px 12px;
+    border-radius: 20px;
+    background: #f1f5f9;
+}
+
+.session-score.positive-score {
+    color: #059669;
+    background: #d1fae5;
+}
+
+.session-score.negative-score {
+    color: #dc2626;
+    background: #fee2e2;
+}
+
+.session-content {
+    padding: 16px 20px 20px 20px;
+}
+
+.session-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 8px;
+    padding: 4px 0;
+}
+
+.session-row:last-child {
+    margin-bottom: 0;
+}
+
+.session-label {
+    font-size: 13px;
+    color: #64748b;
+    font-weight: 500;
+    min-width: 100px;
+}
+
+.session-value {
+    font-size: 13px;
+    color: #1e293b;
+    font-weight: 600;
+    text-align: right;
+    flex: 1;
+    margin-left: 12px;
+}
+
+.session-value.focus-score {
+    color: #059669;
+    font-weight: 700;
+}
+
+/* Dark theme support for session cards */
+[data-theme="dark"] .session-card {
+    background: #1a202c;
+    border-color: #4a5568;
+}
+
+[data-theme="dark"] .session-header {
+    background: linear-gradient(135deg, #2d3748 0%, #4a5568 100%);
+    border-color: #4a5568;
+}
+
+[data-theme="dark"] .session-date-time {
+    color: #a0aec0;
+}
+
+[data-theme="dark"] .session-score {
+    background: #4a5568;
+}
+
+[data-theme="dark"] .session-score.positive-score {
+    background: #065f46;
+    color: #6ee7b7;
+}
+
+[data-theme="dark"] .session-score.negative-score {
+    background: #7f1d1d;
+    color: #fca5a5;
+}
+
+[data-theme="dark"] .session-label {
+    color: #a0aec0;
+}
+
+[data-theme="dark"] .session-value {
+    color: #e2e8f0;
+}
+
+[data-theme="dark"] .session-value.focus-score {
+    color: #6ee7b7;
+}

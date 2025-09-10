@@ -276,23 +276,50 @@ class DistractionKillerReports {
 
         if (recentSessions.length === 0) {
             this.recentSessionsList.innerHTML = '<div class="no-sessions">No recent sessions</div>';
-                return;
-            }
+            return;
+        }
 
         this.recentSessionsList.innerHTML = recentSessions.slice(0, 5).map(session => {
             const startTime = new Date(session.startTime);
             const score = session.score || 0;
             const scoreClass = score >= 0 ? 'positive-score' : 'negative-score';
+            
+            // Calculate additional session details
+            const duration = session.endTime - session.startTime;
+            const durationMinutes = Math.floor(duration / (1000 * 60));
+            const plannedDuration = session.duration ? Math.floor(session.duration / (1000 * 60)) : durationMinutes;
+            const blockedCount = session.blockedAttempts || 0;
+            const focusScore = Math.max(0, 100 - (blockedCount * 5));
+            
+            // Format blocked sites list (simplified for now)
+            const blockedSites = blockedCount > 0 ? `${blockedCount} sites blocked` : 'No distractions';
 
             return `
-                <div class="recent-session-item">
-                    <div class="session-time">${startTime.toLocaleDateString()}</div>
-                                        <div class="session-details">
-                        <span class="session-goal">${session.goal || 'Deep Work'}</span>
-                        <span class="session-score ${scoreClass}">${score > 0 ? '+' : ''}${score}</span>
-                                            </div>
-                                            </div>
-        `;
+                <div class="session-card">
+                    <div class="session-header">
+                        <div class="session-date-time">${startTime.toLocaleDateString()} - ${startTime.toLocaleTimeString()}</div>
+                        <div class="session-score ${scoreClass}">${score > 0 ? '+' : ''}${score} pts</div>
+                    </div>
+                    <div class="session-content">
+                        <div class="session-row">
+                            <span class="session-label">Focus Goal:</span>
+                            <span class="session-value">${session.goal || 'Deep Work Session'}</span>
+                        </div>
+                        <div class="session-row">
+                            <span class="session-label">Blocked Sites:</span>
+                            <span class="session-value">${blockedSites}</span>
+                        </div>
+                        <div class="session-row">
+                            <span class="session-label">Time:</span>
+                            <span class="session-value">${durationMinutes}m / ${plannedDuration}m</span>
+                        </div>
+                        <div class="session-row">
+                            <span class="session-label">Focus Score:</span>
+                            <span class="session-value focus-score">${focusScore}%</span>
+                        </div>
+                    </div>
+                </div>
+            `;
         }).join('');
     }
 
