@@ -1,0 +1,139 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Your Deep Work Report - Distraction Killer</title>
+    <link rel="stylesheet" href="styles/themes.css">
+    <link rel="stylesheet" href="styles/reports.css">
+</head>
+<body>
+    <div class="reports-container">
+        <!-- Header -->
+        <header class="reports-header">
+            <div class="header-content">
+                <div class="logo">
+                    <div class="logo-icon">📊</div>
+                    <h1>Your Deep Work Report</h1>
+                </div>
+                <button class="back-btn" id="backToPopup">
+                    <span class="btn-icon">⬅️</span>
+                    Back to Extension
+                </button>
+            </div>
+        </header>
+
+        <!-- Main Content -->
+        <main class="reports-content">
+            <!-- Summary Cards -->
+            <div class="summary-section">
+                <div class="summary-cards">
+                    <div class="summary-card">
+                        <div class="card-icon">⏱️</div>
+                        <div class="card-content">
+                            <h3 id="totalFocusTime">0h 0m</h3>
+                            <p>Total Focus Time</p>
+                        </div>
+                    </div>
+                    <div class="summary-card">
+                        <div class="card-icon">🎯</div>
+                        <div class="card-content">
+                            <h3 id="totalSessions">0</h3>
+                            <p>Sessions Completed</p>
+                        </div>
+                    </div>
+                    <div class="summary-card">
+                        <div class="card-icon">🚫</div>
+                        <div class="card-content">
+                            <h3 id="totalBlocked">0</h3>
+                            <p>Distractions Blocked</p>
+                        </div>
+                    </div>
+                    <div class="summary-card">
+                        <div class="card-icon">📈</div>
+                        <div class="card-content">
+                            <h3 id="averageScore">0%</h3>
+                            <p>Average Focus Score</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Time Period Selector -->
+            <div class="period-selector">
+                <h2>Select Time Period</h2>
+                <div class="period-buttons">
+                    <button class="period-btn active" data-period="today">Today</button>
+                    <button class="period-btn" data-period="week">This Week</button>
+                    <button class="period-btn" data-period="month">This Month</button>
+                    <button class="period-btn" data-period="all">All Time</button>
+                </div>
+            </div>
+
+            <!-- Charts Section -->
+            <div class="charts-section">
+                <div class="chart-container">
+                    <h3>Focus Time Trend</h3>
+                    <div class="chart" id="focusTimeChart">
+                        <canvas id="focusChart" width="400" height="200"></canvas>
+                    </div>
+                </div>
+                
+                <div class="chart-container">
+                    <h3>Distractions Blocked</h3>
+                    <div class="chart" id="blockedChart">
+                        <canvas id="blockedChartCanvas" width="400" height="200"></canvas>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Session History -->
+            <div class="history-section">
+                <h3>Recent Sessions</h3>
+                <div class="session-list" id="sessionList">
+                    <!-- Sessions will be populated here -->
+                </div>
+            </div>
+
+            <!-- Export Section -->
+            <div class="export-section">
+                <h3>Export Reports</h3>
+            <div class="export-buttons">
+                <button class="export-btn" id="exportDaily">
+                    <span class="btn-icon">📄</span>
+                    Export Daily Report (CSV + HTML)
+                </button>
+                <button class="export-btn" id="exportWeekly">
+                    <span class="btn-icon">📊</span>
+                    Export Weekly Report (CSV + HTML)
+                </button>
+                <button class="export-btn" id="exportAll">
+                    <span class="btn-icon">💾</span>
+                    Export Complete Report (CSV + HTML)
+                </button>
+            </div>
+            </div>
+
+            <!-- Gamification Section -->
+            <div class="gamification-section">
+                <h3>🎯 Your Progress</h3>
+                <div class="gamification-content" id="gamificationContent">
+                    <!-- Gamification data will be populated here -->
+                </div>
+            </div>
+
+            <!-- Insights Section -->
+            <div class="insights-section">
+                <h3>Focus Insights</h3>
+                <div class="insights-list" id="insightsList">
+                    <!-- Insights will be populated here -->
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <script src="../core/gamification.js"></script>
+    <script src="theme-manager.js"></script>
+    <script src="reports.js"></script>
+</body>
+</html>

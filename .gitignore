@@ -1,4 +1,97 @@
-.vscode
+# ===== INTELLECTUAL PROPERTY PROTECTION =====
+# Protect blocklists (your competitive advantage)
+Block_list/
+01_Distraction_Killer_chrome_plugin/Block_list/
+
+# Protect scoring mechanism and gamification logic
+scoring.md
+01_Distraction_Killer_chrome_plugin/src/core/gamification.js
+01_Distraction_Killer_chrome_plugin/context.md
+
+# Protect custom blocklist configurations
+**/custom_domains.json
+**/custom_keywords.json
+
+# ===== DEVELOPMENT ENVIRONMENT =====
+# IDE and editor configurations
 .vscode/
-.git
+.vscode
+.idea/
+*.swp
+*.swo
+*~
+.DS_Store
+Thumbs.db
+
+# ===== NODE.JS / NPM (if you add build tools later) =====
+node_modules/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+package-lock.json
+
+# ===== TEMPORARY FILES =====
+# Temporary files
+*.tmp
+*.temp
+.cache/
+.parcel-cache/
+
+# Log files
+*.log
+logs/
+
+# ===== CHROME EXTENSION SPECIFIC =====
+# Extension packaging
+*.crx
+*.pem
+*.zip
+dist/
+build/
+
+# ===== BACKUP FILES =====
+# Backup files
+*.bak
+*.backup
+*_backup
+*_old
+
+# ===== TESTING AND DEVELOPMENT =====
+# Test files (already cleaned up but future-proofing)
+test-*.html
+**/test-*.html
+
+# Debug files
+debug.log
+console.log
+
+# ===== SENSITIVE DATA =====
+# Any API keys or sensitive configs (future-proofing)
+.env
+.env.local
+.env.production
+secrets.json
+config.private.json
+
+# ===== SYSTEM FILES =====
+# macOS
+.DS_Store
+.AppleDouble
+.LSOverride
 Icon
+
+# Windows
+Thumbs.db
+ehthumbs.db
+Desktop.ini
+$RECYCLE.BIN/
+
+# Linux
+*~
+.nfs*
+
+# ===== DOCUMENTATION DRAFTS =====
+# Keep only final documentation
+**/drafts/
+NOTES.md
+TODO.md

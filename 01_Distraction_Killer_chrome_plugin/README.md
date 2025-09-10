@@ -1,165 +1,209 @@
-# Distraction Killer - Deep Focus Assistant
+# 🎯 Distraction Killer - Deep Focus Assistant
 
-A sophisticated Chrome extension designed to help you maintain deep focus during work sessions by blocking distracting websites and providing intelligent friction mechanisms.
+A professional Chrome extension designed to help users maintain deep focus during work sessions by intelligently blocking distracting websites and providing gamified productivity tracking.
 
-## 🎯 Features
+## 🌟 Features
 
 ### Core Functionality
-- **Smart Deep Work Scheduling** - Schedule focus sessions from 25 minutes to 2+ hours
-- **Intelligent Website Blocking** - Blocks 200+ distracting sites across 4 categories:
-  - Social Media (Facebook, Instagram, Twitter, TikTok, etc.)
-  - E-commerce (Amazon, Flipkart, eBay, etc.)
-  - News Sites (CNN, BBC, NY Times, etc.)
-  - Adult Content (Porn sites with keyword detection)
-- **Friction-Based Access Control** - Type a motivational paragraph to access blocked sites
-- **Real-time Session Timer** - Visual countdown with progress circle
-- **Professional Reports** - Daily, weekly, and comprehensive analytics
-- **Focus Insights** - Personalized recommendations based on your data
+- **Deep Work Sessions**: Schedule focused work sessions with customizable durations (25min to 8+ hours)
+- **Smart Website Blocking**: Blocks social media, entertainment, shopping, news, and adult content during active sessions
+- **Friction-Based Access**: Users can override blocks through typing challenges to reduce impulsive browsing
+- **Session Management**: Start, pause, resume, and stop sessions with full control
 
-### Advanced Features
-- **Temporary Access** - Grant 5, 15, or 30-minute access to blocked sites
-- **Session Pause/Resume** - Flexible session management
-- **Focus Score Tracking** - Monitor your distraction resistance
-- **Data Export** - Download reports in JSON format
-- **Responsive Design** - Works on all screen sizes
-- **Sophisticated UI/UX** - Modern, clean, and motivating interface
+### Gamification System
+- **Point-Based Scoring**: Earn points for completed sessions, lose points for distractions
+- **Level Progression**: 20 achievement levels from "Seedling Focus" to "Legend of Mastery"
+- **Streak Bonuses**: Daily and weekly streaks multiply your session rewards
+- **Smart Penalties**: Balanced penalty system that encourages focus without being punitive
 
-## 🚀 Installation
+### Comprehensive Reporting
+- **Session Analytics**: Detailed statistics on focus time, blocked attempts, and productivity scores
+- **Progress Tracking**: Visual progress indicators for points, levels, and streaks
+- **Export Options**: CSV and HTML reports for daily, weekly, and complete history
+- **Trend Analysis**: Track improvement over time with comprehensive metrics
 
-1. Download or clone this repository
+## 📁 Project Structure
+
+```
+01_Distraction_Killer_chrome_plugin/
+├── manifest.json                    # Extension configuration
+├── context.md                      # Project requirements and specifications
+├── README.md                       # This file
+│
+├── src/                            # Source code directory
+│   ├── core/                       # Core business logic
+│   │   ├── gamification.js         # Scoring, levels, streaks management
+│   │   └── blocklist-manager.js    # Website blocking logic
+│   │
+│   ├── background/                 # Background service worker
+│   │   └── service-worker.js       # Main background script
+│   │
+│   ├── content/                    # Content scripts
+│   │   └── content-script.js       # Injected page monitoring
+│   │
+│   └── ui/                         # User interface components
+│       ├── popup.html              # Extension popup interface
+│       ├── popup.js                # Popup functionality
+│       ├── reports.html            # Reports page
+│       ├── reports.js              # Reports functionality
+│       ├── settings.html           # Settings page
+│       ├── settings.js             # Settings functionality
+│       ├── blocked.html            # Blocked page with friction
+│       ├── blocked.js              # Blocked page functionality
+│       ├── theme-manager.js        # Theme management
+│       └── styles/                 # CSS stylesheets
+│           ├── popup.css
+│           ├── reports.css
+│           ├── settings.css
+│           ├── blocked.css
+│           └── themes.css
+│
+├── Block_list/                     # Protected blocklist data
+│   ├── social_blocklist.json       # Social media sites & keywords
+│   ├── entertainment_blocklist.json # Streaming & entertainment
+│   ├── shopping_blocklist.json     # E-commerce & shopping
+│   ├── news_blocklist.json         # News & media sites
+│   └── porn_blocklist.json         # Adult content (comprehensive)
+│
+└── assets/                         # Static assets
+    └── icons/                      # Extension icons
+        ├── icon16.png
+        ├── icon32.png
+        ├── icon48.png
+        └── icon128.png
+```
+
+## 🎮 Gamification System
+
+### Scoring Rules
+- **Session Completion**: +20 points (requires 25+ minutes, no blocked attempts)
+- **Blocked Attempts**: -5 points each
+- **Overrides**: -10 points each  
+- **Early Stop**: -15 points
+- **Pause Rewards**: +2 (5min) or +3 (10min) pause
+- **Pause Penalty**: -5 points if session was paused and completed
+- **Streak Bonus**: +1 to +7 points based on daily streak
+- **Session Cap**: Maximum 25 points per session
+
+### Achievement Levels
+1. **Seedling Focus** (0-49 points)
+2. **Attention Apprentice** (50-149 points)
+3. **Ritual Novice** (150-299 points)
+4. **Task Tamer** (300-499 points)
+5. **Flow Initiate** (500-749 points)
+6. **Focus Artisan** (750-999 points)
+7. **Rhythm Keeper** (1000-1299 points)
+8. **Clarity Crafter** (1300-1599 points)
+9. **Momentum Maker** (1600-1999 points)
+10. **Deep Diver** (2000-2499 points)
+11. **Time Alchemist** (2500-2999 points)
+12. **Discipline Architect** (3000-3599 points)
+13. **Zen Practitioner** (3600-4199 points)
+14. **Flow Architect** (4200-4999 points)
+15. **Habit Vanguard** (5000-5999 points)
+16. **Cognitive Commander** (6000-7499 points)
+17. **Habit Sage** (7500-8999 points)
+18. **Master of Momentum** (9000-10999 points)
+19. **Deep Work Luminary** (11000-12999 points)
+20. **Legend of Mastery** (13000+ points)
+
+## 🛡️ Blocked Content Categories
+
+### Intelligent Blocking System
+The extension uses comprehensive, regularly updated blocklists stored in separate JSON files to protect intellectual property while maintaining effectiveness:
+
+- **Social Media**: Facebook, Instagram, Twitter, TikTok, LinkedIn, Discord, etc.
+- **Entertainment**: YouTube, Netflix, Spotify, Twitch, streaming platforms, etc.
+- **Shopping**: Amazon, eBay, retail sites, deal aggregators, etc.
+- **News & Media**: CNN, BBC, news sites, blogs, media outlets, etc.
+- **Adult Content**: Comprehensive database of adult websites and keywords
+
+### Smart Temporary Access
+- Users can grant temporary access (5-30 minutes) to blocked sites
+- Requires typing a friction paragraph to reduce impulsive decisions
+- Access expires automatically or when session ends
+- All overrides are logged and penalized in scoring
+
+## 🚀 Installation & Setup
+
+### For Users
+1. Download the extension package
 2. Open Chrome and navigate to `chrome://extensions/`
 3. Enable "Developer mode" in the top right
-4. Click "Load unpacked" and select the extension folder
-5. The Distraction Killer icon should appear in your browser toolbar
+4. Click "Load unpacked" and select the extension directory
+5. Pin the extension to your toolbar for easy access
 
-## 📖 How to Use
+### For Developers
+1. Clone or download the project
+2. Ensure all files maintain the directory structure shown above
+3. Load the extension in Chrome developer mode
+4. Check the console for any loading errors
+5. Test functionality with the built-in test categories
 
-### Starting a Deep Work Session
-1. Click the Distraction Killer icon in your browser toolbar
-2. Select your desired focus duration (25 min to custom)
-3. Optionally enter a focus goal
-4. Click "Start Deep Work"
+## 🔧 Configuration
 
-### When You Try to Access Blocked Sites
-1. You'll be redirected to a beautiful blocked page
-2. See your remaining focus time
-3. Choose to either:
-   - Go back and continue working
-   - Request temporary access (requires typing challenge)
-   - Stop the session entirely
+### User Settings
+- **Category Toggles**: Enable/disable specific blocking categories
+- **Custom Sites**: Add personal distracting websites
+- **Custom Keywords**: Add personal distracting search terms
+- **Friction Settings**: Customize typing challenge requirements
+- **Theme Options**: Light/dark mode support
 
-### Viewing Your Progress
-1. Click the Distraction Killer icon
-2. Click "📊 Reports" to view detailed analytics
-3. Export your data for external analysis
+### Developer Configuration
+- **Minimum Session**: Configurable minimum session length (default: 25 minutes)
+- **Score Caps**: Adjustable point caps and bonuses
+- **Blocklist Updates**: Easy integration of new blocking categories
+- **API Extensions**: Modular design for additional features
 
-## 🛠️ Technical Details
+## 📊 Technical Architecture
 
-### Architecture
-- **Manifest V3** - Latest Chrome extension standard
-- **Service Worker** - Background script for continuous monitoring
-- **Content Scripts** - Page-level blocking and redirection
-- **Chrome Storage API** - Persistent data storage
-- **Modern JavaScript** - ES6+ with classes and async/await
+### Chrome Extension APIs Used
+- **Manifest V3**: Modern service worker architecture
+- **Storage API**: Local data persistence
+- **WebNavigation API**: Real-time page blocking
+- **Notifications API**: User feedback and alerts
+- **Alarms API**: Session timing and scheduling
+- **Downloads API**: Report export functionality
 
-### File Structure
-```
-distraction-killer/
-├── manifest.json          # Extension configuration
-├── popup.html             # Main extension popup
-├── popup.js               # Popup functionality
-├── popup.css              # Popup styling
-├── background.js          # Service worker
-├── content.js             # Content script
-├── blocked.html           # Blocked page
-├── blocked.js             # Blocked page logic
-├── blocked.css            # Blocked page styling
-├── reports.html           # Reports page
-├── reports.js             # Reports functionality
-├── reports.css            # Reports styling
-├── icons/                 # Extension icons
-└── README.md              # This file
-```
-
-### Blocked Websites
-The extension maintains comprehensive lists of distracting websites:
-- **67 Adult Content Sites** - Major pornographic websites
-- **26 Social Media Platforms** - Facebook, Instagram, Twitter, etc.
-- **30 E-commerce Sites** - Amazon, Flipkart, eBay, etc.
-- **33 News Websites** - CNN, BBC, NY Times, etc.
-- **Keyword Detection** - Additional blocking based on URL content
-
-## 🎨 Design Philosophy
-
-### User Experience
-- **Motivational Design** - Encouraging rather than punitive
-- **Friction, Not Blocking** - Allows access with thoughtful barriers
-- **Progress Visualization** - Clear feedback on focus achievements
-- **Professional Aesthetics** - Clean, modern interface
-
-### Psychology
-- **Self-Awareness** - Makes you think about your choices
-- **Goal Alignment** - Reminds you of your focus objectives
-- **Habit Building** - Encourages consistent deep work practice
-- **Data-Driven Insights** - Helps you understand your patterns
-
-## 🔧 Customization
-
-### Adding Custom Blocked Sites
-Edit the `blockedSites` object in `background.js` to add your own distracting websites.
-
-### Modifying Friction Text
-Change the motivational paragraph in `blocked.js` to customize the typing challenge.
-
-### Styling
-All CSS files use CSS custom properties for easy theming. Modify the color variables to match your preferences.
-
-## 📊 Privacy & Data
-
-- **Local Storage Only** - All data stays on your device
-- **No External Servers** - No data is sent to external services
-- **Export Control** - You own and control your data
-- **Transparent Code** - Open source for full transparency
-
-## 🐛 Troubleshooting
-
-### Extension Not Working
-1. Ensure you're using Chrome (not Chromium)
-2. Check that Developer Mode is enabled
-3. Reload the extension after making changes
-4. Check the browser console for errors
-
-### Sites Not Being Blocked
-1. Verify the site is in the blocked list
-2. Check if the URL contains blocked keywords
-3. Ensure the session is active
-4. Try refreshing the page
-
-### Timer Issues
-1. Check your system clock
-2. Ensure the extension has proper permissions
-3. Try restarting the browser
+### Key Components
+- **Service Worker**: Background processing and session management
+- **Content Scripts**: Page-level monitoring and blocking
+- **Popup Interface**: Quick session controls and status
+- **Reports System**: Comprehensive analytics and export
+- **Gamification Engine**: Scoring, levels, and progress tracking
 
 ## 🤝 Contributing
 
-This is a learning project for the Extensive Agentic AI V2 course. Feel free to:
-- Report bugs or issues
-- Suggest new features
-- Improve the code
-- Enhance the design
+### Code Standards
+- **ES6+ JavaScript**: Modern syntax and features
+- **Modular Architecture**: Clear separation of concerns
+- **Comprehensive Commenting**: Self-documenting code
+- **Error Handling**: Graceful failure and recovery
+- **Performance Optimized**: Minimal resource usage
 
-## 📝 License
+### Development Guidelines
+1. Follow the established directory structure
+2. Maintain consistent code formatting
+3. Add descriptive comments for complex logic
+4. Test thoroughly across different scenarios
+5. Update documentation for new features
 
-This project is created for educational purposes as part of The School of AI's Extensive Agentic AI V2 program.
+## 📄 License
 
-## 🙏 Acknowledgments
+This project is proprietary software. The blocklist data and core algorithms are intellectual property and should not be redistributed without permission.
 
-- **The School of AI** - For the excellent course and guidance
-- **Chrome Extension Documentation** - For comprehensive API reference
-- **Modern Web Standards** - For making this possible
+## 🆘 Support
+
+For issues, feature requests, or technical support:
+1. Check the browser console for error messages
+2. Verify all files are properly loaded
+3. Test with different websites and session configurations
+4. Review the context.md file for detailed specifications
 
 ---
 
-**Built with ❤️ for productivity and focus**
+**Version**: 1.0.0  
+**Compatible with**: Chrome 88+ (Manifest V3)  
+**Last Updated**: December 2024
 
-*DistractionKiller - Because your goals matter more than your distractions.*
+Built with ❤️ for focused productivity and deep work excellence.

@@ -1,295 +1,93 @@
-Context: I have enrolled in a program called Extensive Agentic AI V2 by The School of AI. Today was day 1 of the course. Homework given is to build a chrome plugin which will be useful to me and others as well. The person with the best and most useful idea with excellent and professional execution will be rewarded the most points. I've come up with the below chrome plugin idea: Distraction Killer: I want to make a chrome plugin that will help me focus while I’m working by blocking all the distracting websites. 1. I want to be able to schedule a deep work focus time and during that time, the plugin should disable all the social media websites, porn websites, e-commerce websites and news website. These sites will be auto decoded by the plugin. 2. Whenever I try to open such distracting websites, I shouldn’t be allowed to access them and redirect to a page mentioning a webpage with an image, a timer showing how much time is left before the deep work session ends and text of my choice. 3. Along with that I should also be given a choice to access the page if I still want to go ahead and access it but as a friction I will have to type a paragraph that will shame me to do so. 4. The UI/ UX of the plugin and the redirected page once I click on distracting website should be sophisticated. 5. It should have an option for me to download the deep work report of the day and deep work report of the week. I know very basics of python and SQL coding. I want to use a coding platform like cursor to help me do this. Before beginning with the code, I want to make a plan. Can you help me come up with the plan and teach me the basics of what I need to know before I continue. Also tell me what are the functions that I can further add from the plugin or need to drop from the plugin.
+# 1. Context: 
+I've come up with the below chrome plugin idea: Distraction Killer. 
 
-ChatGPT gave a detailed answer.
+## 1.(A) Basic Idea of the plugin: 
+I want to make a chrome plugin that will help the user focus while the user is doing Deep Work(working or studying) by blocking all the distracting websites. 
 
-Context: As per your suggestion, I’ve worked on the Phase 0 - thinking & design and Phase 1 - MVP of the chrome plugin. Name of the plugin: DistractionKiller
+    1. The user should be able to schedule a deep work focus time. When the session begins, the plugin should disable all: 
+      - social media websites 
+      - porn websites 
+      - e-commerce websites 
+      - news website 
+      - entertainment and streaming websites  
+      
+      I've given the websites and keywords for each category
+  
+    2. While the session is on if the user tries to search a blocked keyword or access a block website, the user shouldn’t be allowed to access it and redirect the user to a page that asks the user to Stay Focused, Achieve more have an image depicting that, a timer showing how much time is left before the deep work session ends.
 
-1. Exact user flow: 
-    * User sits to work on the desk.
-    * User schedules “Deep Work Time”
-    * As soon as the scheduled time starts, the Auto block activates.
-    * While working if user has the urge to access any blocked website in another tab, the Plugin blocks it. Then the user is redirected to a web page that has an image I’ve designed with a quote.
-        - After getting blocked to use the blocked website and seeing the redirected webpage, the user will either close that website altogether or he might still want to access the blocked website. If the user wants to access the blocked website, there’ll be a friction. He will have to choose the time from drop down of 5, 15 or 30 minutes and then will have to read a paragraph on the screen and write it on a textbox on the screen. The user can’t copy/ paste that paragraph. This is the paragraph “I’m about to waste precious time on this site instead of working toward my goals. Every minute spent here is a minute I could’ve used to learn something new, finish a task, or make progress on what truly matters. I know I’m capable of better choices—why am I letting distractions win?” After writing this paragraph, the user will click on access website button to go to the blocked website.
-    * While working if user has the urge to unblock the blocker altogether, he will have to stop the “Deep Work Time”. 
-        - If the user clicks on that button, user will be redirected to a page that shows the remaining time to finish the “Deep Work Time”. If the user still chooses to stop the “Deep Work Time”, he will have to read a paragraph on the screen and write it on a textbox on the screen. The user can’t copy/ paste that paragraph. This is the paragraph “I’m about to waste precious time on this site instead of working toward my goals. Every minute spent here is a minute I could’ve used to learn something new, finish a task, or make progress on what truly matters. I know I’m capable of better choices—why am I letting distractions win?”
-    *  The user can also extract the daily Depp Work Report and Weekly Deep Work Report.
+    3. Along with that the user should also be given a choice to access the page if the user still want to go ahead and access it but as a friction the user will have to type a paragraph that will shame them to do so- Like a Friction text. 
 
-2. Blocked websites: I want to have a list of exhaustive distracting websites that can be blocked. Which websites to block?
-    * Hardcoded list of porn, social media, e-commerce and news websites: 
-{
-"porn": [
-    "pornhub.com",
-    "xvideos.com",
-    "xhamster.com",
-    "xnxx.com",
-    "redtube.com",
-    "youporn.com",
-    "tube8.com",
-    "porn.com",
-    "xvideos2.com",
-    "spankbang.com",
-    "sex.com",
-    "beeg.com",
-    "youporn.xxx",
-    "xtube.com",
-    "youjizz.com",
-    "pornhd.com",
-    "zoosexmovies.com",
-    "tnaflix.com",
-    "keezmovies.com",
-    "hclips.com",
-    "hentaihaven.com",
-    "porndig.com",
-    "4tube.com",
-    "fapdu.com",
-    "empflix.com",
-    "hentaicafe.com",
-    "hentaibooks.com",
-    "hentaiperks.com",
-    "porn05.com",
-    "tushy.com",
-    "bangbros.com",
-    "lewdplace.com",
-    "nuvid.com",
-    "redporn.me",
-    "xxx.com",
-    "hdporn.com",
-    "pornmd.com",
-    "eporner.com",
-    "xhamster2.com",
-    "hentairules.com",
-    "pornhd88.com",
-    "pornrabbit.com",
-    "porn4k.com",
-    "youjizz.xxx",
-    "sexvid.xxx",
-    "hclips.xxx",
-    "xtube.xxx"
-  ],
-  "social": [
-    "facebook.com",
-    "instagram.com",
-    "twitter.com",
-    "x.com",
-    "tiktok.com",
-    "snapchat.com",
-    "pinterest.com",
-    "reddit.com",
-    "tumblr.com",
-    "discord.com",
-    "twitch.tv",
-    "linkedin.com",
-    "wechat.com",
-    "weibo.com",
-    "vk.com",
-    "ok.ru",
-    "telegram.org",
-    "quora.com",
-    "clubhouse.com",
-    "mastodon.social",
-    "threads.net",
-    "truthsocial.com",
-    "kooapp.com",
-    "sharechat.com",
-    "mojapp.in",
-    "hike.in"
-  ],
-  "ecommerce": [
-    "amazon.com",
-    "amazon.in",
-    "flipkart.com",
-    "ebay.com",
-    "aliexpress.com",
-    "walmart.com",
-    "target.com",
-    "bestbuy.com",
-    "costco.com",
-    "homedepot.com",
-    "etsy.com",
-    "rakuten.com",
-    "jd.com",
-    "shopify.com",
-    "myntra.com",
-    "ajio.com",
-    "nykaa.com",
-    "snapdeal.com",
-    "paytmmall.com",
-    "bigbasket.com",
-    "grofers.com",
-    "zomato.com",
-    "swiggy.com",
-    "olx.in",
-    "meesho.com",
-    "pepperfry.com",
-    "firstcry.com",
-    "bookmyshow.com",
-    "bewakoof.com",
-    "tatacliq.com"
-  ],
-  "news": [
-    "cnn.com",
-    "bbc.com",
-    "nytimes.com",
-    "theguardian.com",
-    "washingtonpost.com",
-    "reuters.com",
-    "aljazeera.com",
-    "foxnews.com",
-    "nbcnews.com",
-    "cbsnews.com",
-    "abcnews.go.com",
-    "sky.com",
-    "huffpost.com",
-    "forbes.com",
-    "bloomberg.com",
-    "economist.com",
-    "indiatoday.in",
-    "ndtv.com",
-    "timesofindia.indiatimes.com",
-    "thehindu.com",
-    "hindustantimes.com",
-    "livemint.com",
-    "business-standard.com",
-    "moneycontrol.com",
-    "financialexpress.com",
-    "scroll.in",
-    "thewire.in",
-    "opindia.com",
-    "news18.com",
-    "deccanherald.com",
-    "newindianexpress.com",
-    "tribuneindia.com",
-    "firstpost.com"
-  ]
-}
+    4. The UI/ UX of the plugin and the redirected page once the user clicks on distracting website should be sophisticated. 
 
-    * I also want to increase the scope by adding keywords that can identify porn, social media, e-commerce and news website. Keywords:
-{
-  "keywords": {
-    "porn": [
-      "porn",
-      "xxx",
-      "sex",
-      "adult",
-      "hentai",
-      "cam",
-      "escort",
-      "fuck",
-      "nude",
-      "erotic",
-      "fetish",
-      "onlyfans",
-      "bdsm",
-      "anal",
-      "orgy",
-      "milf",
-      "teen",
-      "hardcore",
-      "xhamster",
-      "xnxx",
-      "spank",
-      "redtube",
-      "youporn",
-      "xvideos",
-      "tnaflix",
-      "fap",
-      "amateur"
-    ],
-    "social": [
-      "facebook",
-      "instagram",
-      "twitter",
-      "x.com",
-      "snapchat",
-      "tiktok",
-      "reddit",
-      "pinterest",
-      "linkedin",
-      "tumblr",
-      "discord",
-      "twitch",
-      "telegram",
-      "whatsapp",
-      "wechat",
-      "weibo",
-      "vk",
-      "ok.ru",
-      "clubhouse",
-      "mastodon",
-      "threads",
-      "kooapp",
-      "sharechat",
-      "moj"
-    ],
-    "ecommerce": [
-      "amazon",
-      "flipkart",
-      "ebay",
-      "walmart",
-      "aliexpress",
-      "ajio",
-      "myntra",
-      "nykaa",
-      "snapdeal",
-      "paytmmall",
-      "bigbasket",
-      "grofers",
-      "meesho",
-      "tatacliq",
-      "pepperfry",
-      "firstcry",
-      "shopclues",
-      "zomato",
-      "swiggy",
-      "olx",
-      "bookmyshow",
-      "bewakoof",
-      "shop",
-      "buy",
-      "cart",
-      "sale",
-      "deal",
-      "discount",
-      "offer",
-      "checkout"
-    ],
-    "news": [
-      "news",
-      "cnn",
-      "bbc",
-      "nytimes",
-      "guardian",
-      "reuters",
-      "aljazeera",
-      "foxnews",
-      "nbcnews",
-      "cbsnews",
-      "abcnews",
-      "huffpost",
-      "forbes",
-      "bloomberg",
-      "economist",
-      "indiatoday",
-      "ndtv",
-      "timesofindia",
-      "thehindu",
-      "hindustantimes",
-      "livemint",
-      "business-standard",
-      "moneycontrol",
-      "financialexpress",
-      "scroll",
-      "thewire",
-      "opindia",
-      "news18",
-      "deccanherald",
-      "newindianexpress",
-      "tribuneindia",
-      "firstpost",
-      "press",
-      "journal",
-      "times",
-      "daily"
-    ]
-  }
-}
+    5. It should have an option for the user to download the deep work report of the day, deep work report of the week and complete report of the user. 
+
+The points mentioned above was the basic idea of the plugin. The product can have much more features than it.
+
+# 2. Thinking & design and MVP of the chrome plugin. 
+
+## Name of the plugin: Distraction Killer
+
+## 2.(A) Exact user flow: 
+    1. User sits to work on the desk.
+    2. User schedules “Deep Work Time”
+    3. As soon as the scheduled time starts, the Auto block activates.
+    4. While working if user has the urge to access any blocked website in another tab, the Plugin blocks it. Then the user is redirected to a web page that has an image I’ve designed with a quote.
+      - After getting blocked to use the blocked website and seeing the redirected webpage, the user will either close that website altogether or he might still want to access the blocked website. 
+      - If the user wants to access the blocked website, there’ll be a friction. He will have to choose the time from drop down of 5, 15 or 30 minutes and then will have to read a paragraph on the screen and write it on a textbox on the screen. The user can’t copy/ paste that paragraph. This is the paragraph “I’m about to waste precious time on this site instead of working toward my goals. Every minute spent here is a minute I could’ve used to learn something new, finish a task, or make progress on what truly matters. I know I’m capable of better choices—why am I letting distractions win?” After writing this paragraph, the user will click on access website button to go to the blocked website.
+    5. While working if user has the urge to unblock the blocker altogether, he will have to stop the “Deep Work Time”. 
+      - If the user clicks on that button, user will be redirected to a page that shows the remaining time to finish the “Deep Work Time”. 
+      - If the user still chooses to stop the “Deep Work Time”, he will have to read a paragraph on the screen and write it on a textbox on the screen. The user can’t copy/ paste that paragraph. This is the paragraph “I’m about to waste precious time on this site instead of working toward my goals. Every minute spent here is a minute I could’ve used to learn something new, finish a task, or make progress on what truly matters. I know I’m capable of better choices—why am I letting distractions win?”
+    6. The user can also extract the daily Deep Work Report, Weekly Deep Work Report and complete report.
+
+# 3. Blocked websites: The exhaustive list of distracting websites and keywords that needs to be blocked can be found in the below files as per the category:
+    1. Porn websites: porn_blocklist.json
+    2. Social Media websites: social_blocklist.json
+    3. Shopping and e-commerce websites: shopping_blocklist.json
+    4. News & Media websites: news_blocklist.json
+    5. Entertainment websites: entertainment_blocklist.json
+
+
+# 4. Scoring mechanism:
+The Distraction Killer extension uses a **gamified scoring system** to encourage deep work and discourage distractions. Each action during a session adds or subtracts points, shaping both the **session score** and the user's **overall progress**.
+
+## 4.(A) Core Rules
+    1. **Minimum session length**: 25 minutes for a valid completion.
+    2. **Maximum points per session**: +25 (hard cap).
+    3. **Daily streak bonus**: up to +7 points based on how many days in a row you’ve completed at least one valid session.
+
+## 4.(B) Events & Their Impact
+    1. **Blocked Attempt** → *–5 points per attempt*  
+    2. **Override (friction bypass)** → *–10 points each*  
+    3. **Pause Chosen** → *+2 (5 min)* or *+3 (10 min)*  
+    4. At completion, *–5 penalty* if paused.  
+    5. **Session Completion** → *+20 base points*  
+      - streak bonus (up to +7, capped at 25 total)  
+    6. Session Abort** → *–15 points*  
+
+## 4.(C) How Streaks Work
+    1. A **daily streak** increases by +1 for every consecutive day you complete at least **one valid session**.  
+    2. If you miss a day, the streak resets to 0.  
+    3. Streak bonuses are applied to **each valid session’s score**:
+    4. Streak:
+      - Day 1 streak → +1
+      - Day 2 streak → +2
+      - …
+      - Day 7+ streak → +7 (maximum)
+    5. The streak bonus is applied **before the session cap**. If a streak would push the session score above 25, the score is capped at 25.
+
+
+# 5. How Total Points Are Calculated
+    1. **Session points** = sum of base score + event modifiers (penalties/bonuses), capped at 25.  
+    2. **Daily cumulative points** = sum of all session points in that day.  
+    3. **Weekly cumulative points** = sum of all session points across days of the week from Monday till Sunday of the week.
+    4. **Weekly cumulative points** = sum of all session points till date.
+This makes **consistency more valuable than raw streaks**: completing sessions daily keeps your streak alive, which in turn boosts every valid session’s score.
+
+## 5.(A) Why This Matters
+- Perfect sessions with streaks are rewarded but capped, so they don’t inflate endlessly.  
+- Streaks matter most in **non-perfect sessions** (helping recover lost points).  
+- Total points show **long-term progress** by combining consistency (streaks) and focus quality (fewer distractions).
+
+# 6. Requirements of the Plugin and the code:
+    1. The plugin ui should be clean, professional and feel premium. The work flow of the plugin should be seamless since this is a productivity app for the user to do Deep Work.
+    2. The code base for this plugin should be modular, clean and readable and should follow al the industry standards that resembles a production level code.

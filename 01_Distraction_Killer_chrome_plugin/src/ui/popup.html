@@ -1,0 +1,156 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Distraction Killer - Deep Focus Assistant</title>
+    <link rel="stylesheet" href="styles/popup.css">
+</head>
+<body>
+    <div class="container">
+        <!-- Header -->
+        <header class="header">
+            <div class="logo">
+                <div class="logo-icon">🎯</div>
+                <h1>Distraction Killer</h1>
+            </div>
+            <div class="status-indicator" id="statusIndicator">
+                <span class="status-dot"></span>
+                <span class="status-text">Inactive</span>
+            </div>
+        </header>
+
+        <!-- Main Content -->
+        <main class="main-content">
+            <!-- Session Setup -->
+            <div class="session-setup" id="sessionSetup">
+                <h2>Start Deep Work Session</h2>
+                <div class="form-group">
+                    <label for="sessionDuration">Focus Duration</label>
+                    <select id="sessionDuration" class="duration-select">
+                        <option value="25">25 minutes (Pomodoro)</option>
+                        <option value="45">45 minutes</option>
+                        <option value="60">1 hour</option>
+                        <option value="90">1.5 hours</option>
+                        <option value="120">2 hours</option>
+                        <option value="custom">Custom</option>
+                    </select>
+                </div>
+                
+                <div class="form-group custom-duration" id="customDuration" style="display: none;">
+                    <label for="customMinutes">Custom Duration (minutes)</label>
+                    <input type="number" id="customMinutes" min="5" max="480" placeholder="Enter minutes">
+                </div>
+
+                <div class="form-group">
+                    <label for="focusGoal">Focus Goal (optional)</label>
+                    <input type="text" id="focusGoal" placeholder="What are you working on?">
+                </div>
+
+                <button class="primary-btn" id="startSession">🚀 Start Deep Work</button>
+            </div>
+
+            <!-- Active Session -->
+            <div class="active-session" id="activeSession" style="display: none;">
+                <div class="session-header">
+                    <h2>Deep Work in Progress</h2>
+                    <p class="goal-display" id="goalDisplay">Working on important tasks</p>
+                </div>
+
+                <div class="timer-section">
+                    <div class="timer-circle">
+                        <svg class="timer-svg" width="120" height="120">
+                            <circle cx="60" cy="60" r="45" stroke="#e2e8f0" stroke-width="8" fill="transparent"/>
+                            <circle cx="60" cy="60" r="45" stroke="#3182ce" stroke-width="8" fill="transparent"
+                                    stroke-dasharray="283" stroke-dashoffset="283" id="timerProgress" class="timer-progress"/>
+                        </svg>
+                        <div class="timer-text">
+                            <span class="time-remaining" id="timeRemaining">25:00</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="session-stats">
+                    <div class="stat-item">
+                        <span class="stat-value" id="blockedAttempts">0</span>
+                        <span class="stat-label">Blocked</span>
+                    </div>
+                    <div class="stat-item">
+                        <span class="stat-value" id="focusScore">100%</span>
+                        <span class="stat-label">Focus</span>
+                    </div>
+                </div>
+
+                <div class="session-controls">
+                    <button class="secondary-btn" id="pauseSession">⏸️ Pause</button>
+                    <button class="danger-btn" id="stopSession">⏹️ Stop</button>
+                </div>
+            </div>
+
+            <!-- Session Complete -->
+            <div class="session-complete" id="sessionComplete" style="display: none;">
+                <div class="completion-header">
+                    <h2>🎉 Great Work!</h2>
+                    <p>You've completed your deep work session</p>
+                </div>
+
+                <div class="completion-stats">
+                    <div class="stat-item">
+                        <span class="stat-value" id="totalTime">25:00</span>
+                        <span class="stat-label">Total Time</span>
+                    </div>
+                    <div class="stat-item">
+                        <span class="stat-value" id="blockedTotal">0</span>
+                        <span class="stat-label">Distractions Blocked</span>
+                    </div>
+                </div>
+
+                <div class="completion-controls">
+                    <button class="primary-btn" id="startNewSession">🔄 Start New Session</button>
+                    <button class="secondary-btn" id="viewReport">📊 View Report</button>
+                </div>
+            </div>
+
+            <!-- Gamification Progress -->
+            <div class="gamification-section" id="gamificationSection">
+                <h3>🎯 Your Progress</h3>
+                <div class="progress-stats">
+                    <div class="progress-item">
+                        <span class="progress-label">Total Points</span>
+                        <span class="progress-value" id="totalPoints">0</span>
+                    </div>
+                    <div class="progress-item">
+                        <span class="progress-label">Points Today</span>
+                        <span class="progress-value" id="pointsToday">0</span>
+                    </div>
+                    <div class="progress-item">
+                        <span class="progress-label">Current Level</span>
+                        <span class="progress-value" id="currentLevel">Seedling Focus</span>
+                    </div>
+                    <div class="progress-item">
+                        <span class="progress-label">Progress to Next Level</span>
+                        <span class="progress-value" id="progressToNext">50 points to go</span>
+                    </div>
+                    <div class="progress-item">
+                        <span class="progress-label">Daily Streak</span>
+                        <span class="progress-value" id="dailyStreak">0 days</span>
+                    </div>
+                </div>
+            </div>
+        </main>
+
+        <!-- Footer -->
+        <footer class="footer">
+            <div class="footer-buttons">
+                <button class="footer-btn" id="viewReports">📊 Reports</button>
+                <button class="footer-btn" id="settings">⚙️ Settings</button>
+                <button class="footer-btn" id="help">❓ Help</button>
+            </div>
+        </footer>
+    </div>
+
+    <script src="../core/gamification.js"></script>
+    <script src="theme-manager.js"></script>
+    <script src="popup.js"></script>
+</body>
+</html>
