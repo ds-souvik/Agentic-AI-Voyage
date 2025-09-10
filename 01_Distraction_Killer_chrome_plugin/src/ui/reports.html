@@ -10,125 +10,171 @@
 <body>
     <div class="reports-container">
         <!-- Header -->
-        <header class="reports-header">
-            <div class="header-content">
-                <div class="logo">
-                    <div class="logo-icon">📊</div>
-                    <h1>Your Deep Work Report</h1>
+        <header class="reports-header" style="padding-top: 12px; padding-bottom: 12px;">
+            <div class="header-content" style="display: flex; flex-direction: row; align-items: center; justify-content: center; position: relative; min-height: 56px;">
+                <div class="logo" style="margin: 0 auto; display: flex; flex-direction: row; align-items: center; justify-content: center; text-align: center;">
+                    <span class="logo-icon" style="font-size: 1.7rem; line-height: 1; margin-right: 10px; display: inline-flex; align-items: center;">📊</span>
+                    <span style="font-size: 1.35rem; margin: 0; line-height: 1.2; display: inline-flex; align-items: center;">Your Deep Work Report</span>
                 </div>
-                <button class="back-btn" id="backToPopup">
-                    <span class="btn-icon">⬅️</span>
-                    Back to Extension
-                </button>
+                <div style="position: absolute; right: 32px;">
+                    <button class="back-btn" id="backToPopup" style="padding: 6px 14px; font-size: 1rem;">
+                        <span class="btn-icon">⬅️</span>
+                        <span>Back</span>
+                    </button>
+                </div>
             </div>
         </header>
 
         <!-- Main Content -->
-        <main class="reports-content">
+        <main class="reports-main">
+            <!-- Period Selection -->
+            <section class="period-selection">
+                <div class="section-container">
+                    <h2>Select Time Period</h2>
+                    <div class="period-buttons">
+                        <button class="period-btn active" data-period="today" id="todayBtn">Today</button>
+                        <button class="period-btn" data-period="week" id="weekBtn">This Week</button>
+                        <button class="period-btn" data-period="complete" id="completeBtn">All Time</button>
+                    </div>
+                </div>
+            </section>
+
             <!-- Summary Cards -->
-            <div class="summary-section">
-                <div class="summary-cards">
-                    <div class="summary-card">
-                        <div class="card-icon">⏱️</div>
-                        <div class="card-content">
-                            <h3 id="totalFocusTime">0h 0m</h3>
-                            <p>Total Focus Time</p>
+            <section class="summary-section">
+                <div class="section-container">
+                    <h2>Summary</h2>
+                    <div class="summary-cards">
+                        <div class="summary-card">
+                            <div class="card-icon">📝</div>
+                            <div class="card-content">
+                                <div class="card-value" id="totalSessions">0</div>
+                                <div class="card-label">Total Sessions</div>
+                            </div>
+                        </div>
+                        <div class="summary-card">
+                            <div class="card-icon">⏱️</div>
+                            <div class="card-content">
+                                <div class="card-value" id="totalTime">0h 0m</div>
+                                <div class="card-label">Total Time</div>
+                            </div>
+                        </div>
+                        <div class="summary-card">
+                            <div class="card-icon">📊</div>
+                            <div class="card-content">
+                                <div class="card-value" id="avgSession">0m</div>
+                                <div class="card-label">Avg Session</div>
+                            </div>
+                        </div>
+                        <div class="summary-card">
+                            <div class="card-icon">🎯</div>
+                            <div class="card-content">
+                                <div class="card-value" id="focusScore">100%</div>
+                                <div class="card-label">Focus Score</div>
+                            </div>
+                        </div>
+                        <div class="summary-card">
+                            <div class="card-icon">🏆</div>
+                            <div class="card-content">
+                                <div class="card-value" id="cumulativeScore">0</div>
+                                <div class="card-label">Cumulative Score</div>
+                            </div>
                         </div>
                     </div>
-                    <div class="summary-card">
-                        <div class="card-icon">🎯</div>
-                        <div class="card-content">
-                            <h3 id="totalSessions">0</h3>
-                            <p>Sessions Completed</p>
-                        </div>
-                    </div>
-                    <div class="summary-card">
-                        <div class="card-icon">🚫</div>
-                        <div class="card-content">
-                            <h3 id="totalBlocked">0</h3>
-                            <p>Distractions Blocked</p>
-                        </div>
-                    </div>
-                    <div class="summary-card">
-                        <div class="card-icon">📈</div>
-                        <div class="card-content">
-                            <h3 id="averageScore">0%</h3>
-                            <p>Average Focus Score</p>
-                        </div>
-                    </div>
                 </div>
-            </div>
+            </section>
 
-            <!-- Time Period Selector -->
-            <div class="period-selector">
-                <h2>Select Time Period</h2>
-                <div class="period-buttons">
-                    <button class="period-btn active" data-period="today">Today</button>
-                    <button class="period-btn" data-period="week">This Week</button>
-                    <button class="period-btn" data-period="month">This Month</button>
-                    <button class="period-btn" data-period="all">All Time</button>
-                </div>
-            </div>
-
-            <!-- Charts Section -->
-            <div class="charts-section">
-                <div class="chart-container">
-                    <h3>Focus Time Trend</h3>
-                    <div class="chart" id="focusTimeChart">
-                        <canvas id="focusChart" width="400" height="200"></canvas>
+            <!-- Session List -->
+            <section class="sessions-section">
+                <div class="section-container">
+                    <h2>Recent Sessions</h2>
+                    <div class="sessions-list" id="sessionsList">
+                        <!-- Sessions will be populated here -->
+                    </div>
+                    <div class="sessions-empty" id="sessionsEmpty" style="display: none;">
+                        <div class="empty-icon">📝</div>
+                        <h3>No Sessions Found</h3>
+                        <p>Start your first deep work session to see your progress here.</p>
                     </div>
                 </div>
-                
-                <div class="chart-container">
-                    <h3>Distractions Blocked</h3>
-                    <div class="chart" id="blockedChart">
-                        <canvas id="blockedChartCanvas" width="400" height="200"></canvas>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Session History -->
-            <div class="history-section">
-                <h3>Recent Sessions</h3>
-                <div class="session-list" id="sessionList">
-                    <!-- Sessions will be populated here -->
-                </div>
-            </div>
-
-            <!-- Export Section -->
-            <div class="export-section">
-                <h3>Export Reports</h3>
-            <div class="export-buttons">
-                <button class="export-btn" id="exportDaily">
-                    <span class="btn-icon">📄</span>
-                    Export Daily Report (CSV + HTML)
-                </button>
-                <button class="export-btn" id="exportWeekly">
-                    <span class="btn-icon">📊</span>
-                    Export Weekly Report (CSV + HTML)
-                </button>
-                <button class="export-btn" id="exportAll">
-                    <span class="btn-icon">💾</span>
-                    Export Complete Report (CSV + HTML)
-                </button>
-            </div>
-            </div>
+            </section>
 
             <!-- Gamification Section -->
-            <div class="gamification-section">
-                <h3>🎯 Your Progress</h3>
-                <div class="gamification-content" id="gamificationContent">
-                    <!-- Gamification data will be populated here -->
-                </div>
-            </div>
+            <section class="gamification-section">
+                <div class="section-container">
+                    <h2>🎯 Your Progress</h2>
+                    
+                    <!-- Progress Stats -->
+                    <div class="progress-stats">
+                        <div class="progress-card">
+                            <div class="progress-icon">🎖️</div>
+                            <div class="progress-content">
+                                <div class="progress-value" id="totalPoints">0</div>
+                                <div class="progress-label">Total Points</div>
+                            </div>
+                        </div>
+                        <div class="progress-card">
+                            <div class="progress-icon">📅</div>
+                            <div class="progress-content">
+                                <div class="progress-value" id="pointsToday">0</div>
+                                <div class="progress-label">Points Today</div>
+                            </div>
+                        </div>
+                        <div class="progress-card">
+                            <div class="progress-icon">🏅</div>
+                            <div class="progress-content">
+                                <div class="progress-value" id="currentLevel">Seedling Focus</div>
+                                <div class="progress-label">Current Level</div>
+                            </div>
+                        </div>
+                        <div class="progress-card">
+                            <div class="progress-icon">📈</div>
+                            <div class="progress-content">
+                                <div class="progress-value" id="progressToNext">50 points to go</div>
+                                <div class="progress-label">Progress to Next</div>
+                            </div>
+                        </div>
+                        <div class="progress-card">
+                            <div class="progress-icon">🔥</div>
+                            <div class="progress-content">
+                                <div class="progress-value" id="dailyStreak">0 days</div>
+                                <div class="progress-label">Daily Streak</div>
+                            </div>
+                        </div>
+                        <div class="progress-card">
+                            <div class="progress-icon">🗓️</div>
+                            <div class="progress-content">
+                                <div class="progress-value" id="weeklyStreak">0 weeks</div>
+                                <div class="progress-label">Weekly Streak</div>
+                            </div>
+                        </div>
+                    </div>
 
-            <!-- Insights Section -->
-            <div class="insights-section">
-                <h3>Focus Insights</h3>
-                <div class="insights-list" id="insightsList">
-                    <!-- Insights will be populated here -->
+                    <!-- Recent Sessions in Gamification -->
+                    <div class="recent-sessions">
+                        <h3>Recent Sessions</h3>
+                        <div class="recent-sessions-list" id="recentSessionsList">
+                            <!-- Recent sessions will be populated here -->
+                        </div>
+                    </div>
                 </div>
-            </div>
+            </section>
+
+            <!-- Export Section -->
+            <section class="export-section">
+                <div class="section-container">
+                    <h2>Export Reports</h2>
+                    <div class="export-buttons">
+                        <button class="export-btn" id="exportCSV">
+                            <span class="btn-icon">📄</span>
+                            <span>Export CSV</span>
+                        </button>
+                        <button class="export-btn" id="exportHTML">
+                            <span class="btn-icon">🌐</span>
+                            <span>Export HTML</span>
+                        </button>
+                    </div>
+                </div>
+            </section>
         </main>
     </div>
 

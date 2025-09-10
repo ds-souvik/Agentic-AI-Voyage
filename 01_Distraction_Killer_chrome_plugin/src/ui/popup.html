@@ -47,7 +47,31 @@
                     <input type="text" id="focusGoal" placeholder="What are you working on?">
                 </div>
 
-                <button class="primary-btn" id="startSession">🚀 Start Deep Work</button>
+                <div style="display: flex; justify-content: center; margin-top: 20px;">
+                    <button 
+                        id="startSession"
+                        style="
+                            background: #667eea;
+                            color: #fff;
+                            font-size: 1.25rem;
+                            font-weight: 700;
+                            font-family: 'Segoe UI', 'Arial', sans-serif;
+                            padding: 16px 36px;
+                            border: none;
+                            border-radius: 10px;
+                            box-shadow: 0 2px 8px rgba(102, 126, 234, 0.15);
+                            cursor: pointer;
+                            display: flex;
+                            align-items: center;
+                            gap: 10px;
+                            transition: background 0.2s, transform 0.2s;
+                        "
+                        onmouseover="this.style.background='#5a67d8'; this.style.transform='translateY(-2px)';"
+                        onmouseout="this.style.background='#667eea'; this.style.transform='none';"
+                    >
+                        🚀 Start Deep Work
+                    </button>
+                </div>
             </div>
 
             <!-- Active Session -->
@@ -57,33 +81,33 @@
                     <p class="goal-display" id="goalDisplay">Working on important tasks</p>
                 </div>
 
-                <div class="timer-section">
+                <div class="timer-section" style="display: flex; flex-direction: column; align-items: center; justify-content: center;">
                     <div class="timer-circle">
                         <svg class="timer-svg" width="120" height="120">
                             <circle cx="60" cy="60" r="45" stroke="#e2e8f0" stroke-width="8" fill="transparent"/>
                             <circle cx="60" cy="60" r="45" stroke="#3182ce" stroke-width="8" fill="transparent"
                                     stroke-dasharray="283" stroke-dashoffset="283" id="timerProgress" class="timer-progress"/>
                         </svg>
-                        <div class="timer-text">
+                        <div class="timer-text" style="text-align: center;">
                             <span class="time-remaining" id="timeRemaining">25:00</span>
                         </div>
                     </div>
                 </div>
 
                 <div class="session-stats">
-                    <div class="stat-item">
+                    <div class="stat">
                         <span class="stat-value" id="blockedAttempts">0</span>
                         <span class="stat-label">Blocked</span>
                     </div>
-                    <div class="stat-item">
+                    <div class="stat">
                         <span class="stat-value" id="focusScore">100%</span>
                         <span class="stat-label">Focus</span>
                     </div>
                 </div>
 
-                <div class="session-controls">
-                    <button class="secondary-btn" id="pauseSession">⏸️ Pause</button>
-                    <button class="danger-btn" id="stopSession">⏹️ Stop</button>
+                <div class="session-actions">
+                    <button class="action-btn secondary" id="pauseSession">⏸️ Pause</button>
+                    <button class="action-btn danger" id="stopSession">⏹️ Stop</button>
                 </div>
             </div>
 
@@ -105,35 +129,20 @@
                     </div>
                 </div>
 
-                <div class="completion-controls">
-                    <button class="primary-btn" id="startNewSession">🔄 Start New Session</button>
-                    <button class="secondary-btn" id="viewReport">📊 View Report</button>
+                <div class="session-actions" style="margin-top: 24px;">
+                    <button class="action-btn primary" id="startNewSession">🔄 Start New Session</button>
+                    <button class="action-btn secondary" id="viewReport">📊 View Report</button>
                 </div>
             </div>
 
             <!-- Gamification Progress -->
-            <div class="gamification-section" id="gamificationSection">
-                <h3>🎯 Your Progress</h3>
-                <div class="progress-stats">
-                    <div class="progress-item">
-                        <span class="progress-label">Total Points</span>
-                        <span class="progress-value" id="totalPoints">0</span>
-                    </div>
-                    <div class="progress-item">
-                        <span class="progress-label">Points Today</span>
-                        <span class="progress-value" id="pointsToday">0</span>
-                    </div>
-                    <div class="progress-item">
-                        <span class="progress-label">Current Level</span>
-                        <span class="progress-value" id="currentLevel">Seedling Focus</span>
-                    </div>
-                    <div class="progress-item">
-                        <span class="progress-label">Progress to Next Level</span>
-                        <span class="progress-value" id="progressToNext">50 points to go</span>
-                    </div>
-                    <div class="progress-item">
-                        <span class="progress-label">Daily Streak</span>
-                        <span class="progress-value" id="dailyStreak">0 days</span>
+            <div class="gamification-section" id="gamificationSection" style="margin-top: 24px;">
+                <h2 style="font-family: 'Inter', 'Segoe UI', Arial, sans-serif; font-size: 1.3rem; font-weight: 600; margin-bottom: 12px; text-align: center;">
+                    🎯 Your Progress
+                </h2>
+                <div class="progress-stats" style="justify-content: center; display: flex;">
+                    <div class="progress-item" style="text-align: center;">
+                        <span class="progress-value" id="totalPoints" style="font-size: 2rem; font-weight: 700;">0</span>
                     </div>
                 </div>
             </div>

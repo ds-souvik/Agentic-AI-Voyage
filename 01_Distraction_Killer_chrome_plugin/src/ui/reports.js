@@ -41,10 +41,10 @@ class DistractionKillerReports {
 
     setupEventListeners() {
         this.periodButtons.forEach(btn => {
-            btn.addEventListener('click', (e) => {
+            btn.addEventListener('click', async (e) => {
                 this.currentPeriod = e.target.dataset.period;
                 this.updatePeriodButtons();
-                this.updateDisplay();
+                await this.updateDisplay();
             });
         });
 
@@ -57,7 +57,7 @@ class DistractionKillerReports {
         try {
             await this.loadSessionHistory();
             await this.updateGamificationDisplay();
-            this.updateDisplay();
+            await this.updateDisplay();
         } catch (error) {
             console.error('Error loading data:', error);
         }
@@ -73,10 +73,10 @@ class DistractionKillerReports {
         }
     }
 
-    updateDisplay() {
+    async updateDisplay() {
         const filteredSessions = this.getFilteredSessions();
         this.updateSummaryCards(filteredSessions);
-        this.updateSessionsList(filteredSessions);
+        await this.updateSessionsList(filteredSessions);
     }
 
     getFilteredSessions() {
@@ -125,26 +125,10 @@ class DistractionKillerReports {
     async updateCumulativeScore() {
         try {
             const summary = await this.gamificationService.getGamificationSummary();
-            let score = 0;
-
-            switch (this.currentPeriod) {
-                case 'today':
-                    score = summary.dailyPoints || 0;
-                    break;
-                case 'week':
-                    const result = await chrome.storage.local.get(['gamificationData']);
-                    const gamificationData = result.gamificationData || {};
-                    const weekStart = this.getWeekStartString();
-                    score = gamificationData.weeklyPoints?.[weekStart] || 0;
-                    break;
-                case 'complete':
-                default:
-                    score = summary.totalPoints || 0;
-                    break;
-            }
+            const score = this.getFilteredGamificationData(summary);
 
             this.cumulativeScore.textContent = score;
-            this.cumulativeScore.className = `stat-value ${score >= 0 ? 'positive' : 'negative'}`;
+            this.cumulativeScore.className = `card-value ${score >= 0 ? 'positive' : 'negative'}`;
             
         } catch (error) {
             console.error('Error updating cumulative score:', error);
@@ -152,7 +136,7 @@ class DistractionKillerReports {
         }
     }
 
-    updateSessionsList(sessions) {
+    async updateSessionsList(sessions) {
         if (sessions.length === 0) {
             this.sessionsList.style.display = 'none';
             this.sessionsEmpty.style.display = 'block';
@@ -164,67 +148,106 @@ class DistractionKillerReports {
 
         const sortedSessions = [...sessions].sort((a, b) => b.startTime - a.startTime);
 
-        this.sessionsList.innerHTML = sortedSessions.map(session => {
+        // Get all session scores asynchronously
+        const sessionsWithScores = await Promise.all(
+            sortedSessions.map(async (session) => {
+                const sessionScore = await this.getSessionScore(session);
+                return { ...session, sessionScore };
+            })
+        );
+
+        this.sessionsList.innerHTML = sessionsWithScores.map(session => {
             const startTime = new Date(session.startTime);
             const duration = session.endTime - session.startTime;
             const durationMinutes = Math.floor(duration / (1000 * 60));
+            const plannedDuration = session.duration ? Math.floor(session.duration / (1000 * 60)) : durationMinutes;
             const status = session.completed ? 'Completed' : session.stoppedEarly ? 'Stopped Early' : 'Incomplete';
             const statusClass = session.completed ? 'success' : session.stoppedEarly ? 'warning' : 'info';
             
-            const sessionScore = this.getSessionScore(session);
+            const sessionScore = session.sessionScore || 0;
             const scoreClass = sessionScore >= 0 ? 'positive' : 'negative';
+            
+            // Calculate focus score percentage
+            const blockedCount = session.blockedAttempts || 0;
+            const focusScore = Math.max(0, 100 - (blockedCount * 5));
 
             return `
-                <div class="session-item">
-                    <div class="session-info">
-                        <div class="session-time">
-                            <strong>${startTime.toLocaleDateString()}</strong>
-                            <span>${startTime.toLocaleTimeString()}</span>
-                    </div>
-                        <div class="session-details">
-                            <div class="session-goal">${session.goal || 'Deep Work Session'}</div>
-                    <div class="session-stats">
-                                <span class="stat-item">Duration: ${durationMinutes}m</span>
-                                <span class="stat-item">Status: <span class="status ${statusClass}">${status}</span></span>
-                                <span class="stat-item">Blocked: ${session.blockedAttempts || 0}</span>
-                                <span class="stat-item session-score-item">Score: <span class="stat-value ${scoreClass}">${sessionScore > 0 ? '+' : ''}${sessionScore}</span></span>
-                        </div>
-                        </div>
-                    </div>
+            <div class="session-item">
+                <div class="session-header">
+                        <div class="session-time-info">
+                            <div class="session-date">${startTime.toLocaleDateString()}</div>
+                            <div class="session-time">${startTime.toLocaleTimeString()}</div>
                 </div>
+                        <div class="session-status ${statusClass}">${status}</div>
+                </div>
+                    
+                    <div class="session-goal">
+                        <strong>Goal:</strong> ${session.goal || 'Deep Work Session'}
+            </div>
+                    
+                    <div class="session-details-grid">
+                        <div class="detail-item">
+                            <div class="detail-icon">🎯</div>
+                            <div class="detail-value">${focusScore}%</div>
+                            <div class="detail-label">Focus Score</div>
+        </div>
+
+                        <div class="detail-item">
+                            <div class="detail-icon">🚫</div>
+                            <div class="detail-value">${blockedCount}</div>
+                            <div class="detail-label">Blocked Sites</div>
+        </div>
+
+                        <div class="detail-item">
+                            <div class="detail-icon">⏱️</div>
+                            <div class="detail-value">${durationMinutes}m / ${plannedDuration}m</div>
+                            <div class="detail-label">Time Spent / Scheduled</div>
+        </div>
+
+                        <div class="detail-item">
+                            <div class="detail-icon">🏆</div>
+                            <div class="detail-value ${scoreClass}">${sessionScore > 0 ? '+' : ''}${sessionScore}</div>
+                            <div class="detail-label">Session Score</div>
+        </div>
+        </div>
+    </div>
             `;
         }).join('');
     }
 
-    getSessionScore(session) {
-                if (session.completed) {
-            let score = 20;
+    /**
+     * Get session score from gamification service session history
+     * This ensures we use the same scoring logic as the gamification system
+     */
+    async getSessionScore(session) {
+        try {
+            // Get the session score from gamification data
+            const result = await chrome.storage.local.get(['gamificationData']);
+            const gamificationData = result.gamificationData;
             
-            if (session.blockedAttempts) {
-                score -= session.blockedAttempts * 5;
-            }
-            if (session.hadOverrides) {
-                score -= 10;
-            }
-            if (session.wasPaused) {
-                score -= 5;
-            }
-            
-            return Math.max(-15, Math.min(25, score));
-        } else if (session.stoppedEarly) {
-            let score = -15;
-            
-            if (session.blockedAttempts) {
-                score -= session.blockedAttempts * 5;
-            }
-            if (session.hadOverrides) {
-                score -= 10;
+            if (gamificationData && gamificationData.sessionHistory) {
+                // Find matching session in gamification history
+                const gamificationSession = gamificationData.sessionHistory.find(
+                    gSession => gSession.sessionId === session.id || 
+                    Math.abs(gSession.startTime - session.startTime) < 5000 // Within 5 seconds
+                );
+                
+                if (gamificationSession) {
+                    // Try finalScore first, then score (for backward compatibility)
+                    const score = gamificationSession.finalScore ?? gamificationSession.score;
+                    if (typeof score === 'number') {
+                        return score;
+                    }
+                }
             }
             
-            return score;
+            // Fallback: if no gamification score found, return 0
+            console.warn('No gamification score found for session:', session.id);
+            return 0;
+        } catch (error) {
+            console.error('Error getting session score:', error);
+            return 0;
         }
-        
-        return 0;
     }
 
     async updateGamificationDisplay() {
@@ -253,8 +276,8 @@ class DistractionKillerReports {
 
         if (recentSessions.length === 0) {
             this.recentSessionsList.innerHTML = '<div class="no-sessions">No recent sessions</div>';
-            return;
-        }
+                return;
+            }
 
         this.recentSessionsList.innerHTML = recentSessions.slice(0, 5).map(session => {
             const startTime = new Date(session.startTime);
@@ -264,11 +287,11 @@ class DistractionKillerReports {
             return `
                 <div class="recent-session-item">
                     <div class="session-time">${startTime.toLocaleDateString()}</div>
-                    <div class="session-details">
+                                        <div class="session-details">
                         <span class="session-goal">${session.goal || 'Deep Work'}</span>
                         <span class="session-score ${scoreClass}">${score > 0 ? '+' : ''}${score}</span>
-            </div>
-            </div>
+                                            </div>
+                                            </div>
         `;
         }).join('');
     }
@@ -277,6 +300,38 @@ class DistractionKillerReports {
         this.periodButtons.forEach(btn => {
             btn.classList.toggle('active', btn.dataset.period === this.currentPeriod);
         });
+    }
+
+    /**
+     * Get data for specific time period 
+     */
+    getFilteredGamificationData(summary) {
+        let filteredPoints = 0;
+            
+            switch (this.currentPeriod) {
+                case 'today':
+                    filteredPoints = summary.dailyPoints || 0;
+                    break;
+                case 'week':
+                    // Use the week's total from gamification data
+        const today = new Date();
+        const weekStart = new Date(today);
+                    weekStart.setDate(today.getDate() - today.getDay()); // Start of week (Sunday)
+                    weekStart.setHours(0, 0, 0, 0);
+                    
+                    // Calculate the week start string like the gamification service does
+                    const weekStartString = weekStart.toISOString().split('T')[0];
+                    
+                    // Get week points from summary data (this should come from gamification service)
+                    filteredPoints = summary.weeklyPoints || 0;
+                    break;
+                case 'complete':
+                default:
+                filteredPoints = summary.totalPoints || 0;
+                    break;
+            }
+            
+        return filteredPoints;
     }
 
     async exportReport(format) {
@@ -359,7 +414,7 @@ class DistractionKillerReports {
         <p>Period: ${this.currentPeriod.charAt(0).toUpperCase() + this.currentPeriod.slice(1)}</p>
         <p>Generated on: ${new Date().toLocaleString()}</p>
         </div>
-
+        
     <div class="summary">
         <h3>Summary</h3>
         <div class="stats-grid">
@@ -375,40 +430,40 @@ class DistractionKillerReports {
     <div class="sessions">
         <h3>Sessions</h3>
         <table>
-                <thead>
-                    <tr>
-                        <th>Date</th>
+            <thead>
+                <tr>
+                    <th>Date</th>
                     <th>Time</th>
-                        <th>Goal</th>
+                    <th>Goal</th>
                     <th>Duration</th>
                         <th>Status</th>
-                        <th>Blocked</th>
+                    <th>Blocked</th>
                     <th>Score</th>
-                    </tr>
-                </thead>
-                <tbody>
+                </tr>
+            </thead>
+            <tbody>
                 ${data.sessions.map(session => {
                     const startTime = new Date(session.startTime);
                     const duration = Math.floor((session.endTime - session.startTime) / (1000 * 60));
                     const status = session.completed ? 'Completed' : session.stoppedEarly ? 'Stopped Early' : 'Incomplete';
                     const score = this.getSessionScore(session);
                     const scoreClass = score >= 0 ? 'positive-score' : 'negative-score';
-
-                        return `
-                            <tr>
+                    
+                    return `
+                        <tr>
                             <td>${startTime.toLocaleDateString()}</td>
                             <td>${startTime.toLocaleTimeString()}</td>
                             <td>${session.goal || 'Deep Work Session'}</td>
                             <td>${duration}m</td>
                             <td>${status}</td>
-                                <td>${session.blockedAttempts || 0}</td>
+                            <td>${session.blockedAttempts || 0}</td>
                             <td class="${scoreClass}">${score > 0 ? '+' : ''}${score}</td>
-                            </tr>
-                        `;
-                    }).join('')}
-                </tbody>
-            </table>
-        </div>
+                        </tr>
+                    `;
+                }).join('')}
+            </tbody>
+        </table>
+    </div>
 </body>
 </html>`;
 
@@ -438,16 +493,28 @@ class DistractionKillerReports {
     }
 
     downloadFile(content, filename, mimeType) {
-        const blob = new Blob([content], { type: mimeType });
+        try {
+            const blob = new Blob([content], { type: mimeType });
         const url = URL.createObjectURL(blob);
-        
-        chrome.downloads.download({
-            url: url,
-            filename: filename,
-            saveAs: false
-        }, () => {
+            
+            chrome.downloads.download({
+                url: url,
+                filename: filename,
+                saveAs: true
+            }, (downloadId) => {
+                if (chrome.runtime.lastError) {
+                    console.error('Download failed:', chrome.runtime.lastError);
+                    this.showNotification('Failed to download report', 'error');
+                } else {
+                    console.log('Download started with ID:', downloadId);
+                    this.showNotification('Report download started', 'success');
+                }
         URL.revokeObjectURL(url);
-        });
+            });
+        } catch (error) {
+            console.error('Error creating download:', error);
+            this.showNotification('Failed to create download', 'error');
+        }
     }
 
     showNotification(message, type = 'info') {
@@ -455,14 +522,14 @@ class DistractionKillerReports {
         notification.className = `notification ${type}`;
         notification.textContent = message;
         notification.style.cssText = `
-                position: fixed;
-                top: 20px;
-                right: 20px;
+            position: fixed;
+            top: 20px;
+            right: 20px;
             padding: 12px 20px;
             background: ${type === 'success' ? '#38a169' : type === 'error' ? '#e53e3e' : '#3182ce'};
-                color: white;
+            color: white;
             border-radius: 4px;
-                z-index: 1000;
+            z-index: 1000;
             font-weight: 500;
         `;
         
@@ -470,7 +537,7 @@ class DistractionKillerReports {
         
         setTimeout(() => {
             if (document.body.contains(notification)) {
-                document.body.removeChild(notification);
+            document.body.removeChild(notification);
             }
         }, 3000);
     }

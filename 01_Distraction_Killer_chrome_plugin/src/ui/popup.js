@@ -60,7 +60,7 @@ class DistractionKillerPopup {
         this.progressToNext = document.getElementById('progressToNext');
         this.dailyStreak = document.getElementById('dailyStreak');
 
-        // Footer buttons
+        // Action buttons
         this.viewReports = document.getElementById('viewReports');
         this.settings = document.getElementById('settings');
         this.help = document.getElementById('help');
@@ -422,16 +422,32 @@ class DistractionKillerPopup {
     async updateGamificationDisplay() {
         try {
             const summary = await this.gamificationService.getGamificationSummary();
+            console.log('Gamification summary:', summary);
             
-            this.totalPoints.textContent = summary.totalPoints.toLocaleString();
-            this.pointsToday.textContent = summary.dailyPoints.toLocaleString();
-            this.currentLevel.textContent = summary.currentLevel;
-            this.progressToNext.textContent = summary.pointsToNextLevel > 0 
-                ? `${summary.pointsToNextLevel} points to go` 
-                : 'Max level reached!';
-            this.dailyStreak.textContent = `${summary.dailyStreak} days`;
+            // Ensure elements exist before updating
+            if (this.totalPoints) this.totalPoints.textContent = summary.totalPoints.toLocaleString();
+            if (this.pointsToday) this.pointsToday.textContent = summary.dailyPoints.toLocaleString();
+            if (this.currentLevel) this.currentLevel.textContent = summary.currentLevel;
+            if (this.progressToNext) {
+                this.progressToNext.textContent = summary.pointsToNextLevel > 0 
+                    ? `${summary.pointsToNextLevel} points to go` 
+                    : 'Max level reached!';
+            }
+            if (this.dailyStreak) this.dailyStreak.textContent = `${summary.dailyStreak} days`;
+            
+            // Show the gamification section
+            const gamificationSection = document.getElementById('gamificationSection');
+            if (gamificationSection) {
+                gamificationSection.style.display = 'block';
+            }
         } catch (error) {
             console.error('Error updating gamification display:', error);
+            // Show default values on error
+            if (this.totalPoints) this.totalPoints.textContent = '0';
+            if (this.pointsToday) this.pointsToday.textContent = '0';
+            if (this.currentLevel) this.currentLevel.textContent = 'Seedling Focus';
+            if (this.progressToNext) this.progressToNext.textContent = '50 points to go';
+            if (this.dailyStreak) this.dailyStreak.textContent = '0 days';
         }
     }
 

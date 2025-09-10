@@ -484,12 +484,19 @@ class DistractionKillerBackground {
             const result = await chrome.storage.local.get(['temporaryAccess']);
             const temporaryAccess = result.temporaryAccess;
             
-            if (!temporaryAccess?.granted) return false;
+            console.log('Checking temporary access for:', url);
+            console.log('Temporary access data:', temporaryAccess);
+            
+            if (!temporaryAccess?.granted) {
+                console.log('No temporary access granted');
+                return false;
+            }
             
             const now = Date.now();
             
             // Check if access is still valid
             if (temporaryAccess.sessionId !== this.currentSession?.id || now >= temporaryAccess.endTime) {
+                console.log('Temporary access expired or wrong session');
                 await chrome.storage.local.remove(['temporaryAccess']);
                 return false;
             }
@@ -498,10 +505,33 @@ class DistractionKillerBackground {
             const urlObj = new URL(url);
             const hostname = urlObj.hostname.toLowerCase();
             
-            if (temporaryAccess.url && url === temporaryAccess.url) return true;
-            if (temporaryAccess.domain && (hostname === temporaryAccess.domain || hostname.endsWith('.' + temporaryAccess.domain))) return true;
-            if (temporaryAccess.keyword && url.toLowerCase().includes(temporaryAccess.keyword.toLowerCase())) return true;
+            console.log('Checking URL match for hostname:', hostname);
             
+            // Exact URL match
+            if (temporaryAccess.url && url === temporaryAccess.url) {
+                console.log('✅ Exact URL match');
+                return true;
+            }
+            
+            // Domain match - check both exact and subdomain matches
+            if (temporaryAccess.domain) {
+                const accessDomain = temporaryAccess.domain.toLowerCase();
+                if (hostname === accessDomain || hostname.endsWith('.' + accessDomain) || accessDomain.endsWith('.' + hostname)) {
+                    console.log('✅ Domain match:', accessDomain);
+                    return true;
+                }
+            }
+            
+            // Keyword match
+            if (temporaryAccess.keyword) {
+                const keyword = temporaryAccess.keyword.toLowerCase();
+                if (url.toLowerCase().includes(keyword) || hostname.includes(keyword)) {
+                    console.log('✅ Keyword match:', keyword);
+                    return true;
+                }
+            }
+            
+            console.log('❌ No temporary access match found');
             return false;
         } catch (error) {
             console.error('Error checking temporary access:', error);
@@ -536,7 +566,7 @@ class DistractionKillerBackground {
      */
     redirectToBlockedPage(url, tabId) {
         try {
-            const blockedPageUrl = chrome.runtime.getURL('blocked.html') + '?blocked=' + encodeURIComponent(url);
+            const blockedPageUrl = chrome.runtime.getURL('src/ui/blocked.html') + '?blocked=' + encodeURIComponent(url);
             chrome.tabs.update(tabId, { url: blockedPageUrl });
         } catch (error) {
             console.error('Error redirecting to blocked page:', error);
