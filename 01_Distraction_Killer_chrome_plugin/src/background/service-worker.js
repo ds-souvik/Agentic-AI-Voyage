@@ -133,6 +133,13 @@ class DistractionKillerBackground {
                     sendResponse({ success: true });
                     break;
 
+                case 'settingsUpdated':
+                    console.log('🔄 Settings updated, reloading...');
+                    await this.loadUserSettings();
+                    console.log('✅ Settings reloaded:', this.userSettings);
+                    sendResponse({ success: true });
+                    break;
+
                 case 'getBlocklistStats':
                     const stats = this.blocklistManager.getBlocklistStats();
                     sendResponse(stats);
