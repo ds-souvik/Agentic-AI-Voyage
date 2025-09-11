@@ -332,7 +332,8 @@ class DistractionKillerBackground {
             await this.trackGamificationEvent('session_abort', {
                 ...this.currentSession, // Pass complete session data
                 sessionId: this.currentSession.id,
-                duration: this.currentSession.endTime - this.currentSession.startTime,
+                duration: this.currentSession.endTime - this.currentSession.startTime, // Actual time spent
+                plannedDuration: this.currentSession.plannedDuration, // Preserve original scheduled duration
                 durationMinutes: Math.floor((this.currentSession.endTime - this.currentSession.startTime) / 60000),
                 stoppedEarly: true
             });
@@ -373,7 +374,8 @@ class DistractionKillerBackground {
                 ...sessionData,          // Merge with provided data
                 completed: true,
                 isActive: false,
-                duration: finalDuration,
+                duration: finalDuration, // Actual duration (how long it ran)
+                plannedDuration: this.currentSession?.plannedDuration || sessionData.plannedDuration, // Preserve original scheduled duration
                 // Ensure blocked attempts are preserved
                 blockedAttempts: this.currentSession?.blockedAttempts || sessionData.blockedAttempts || 0,
                 hadBlockedAttempts: this.currentSession?.hadBlockedAttempts || sessionData.hadBlockedAttempts || false

@@ -132,6 +132,19 @@ class DistractionKillerPopup {
             
             this.currentSession = response.currentSession;
             
+            // If we got null session data but there might be an active session, retry once
+            if (!this.currentSession && response.currentSession === null) {
+                console.log('🔄 No session data received, retrying...');
+                await new Promise(resolve => setTimeout(resolve, 100)); // Brief delay
+                try {
+                    const retryResponse = await chrome.runtime.sendMessage({ action: 'getSessionData' });
+                    this.currentSession = retryResponse.currentSession;
+                    console.log('🔄 Retry result:', this.currentSession);
+                } catch (retryError) {
+                    console.log('🔄 Retry failed, using null session');
+                }
+            }
+
             // Load session history
             const result = await chrome.storage.local.get(['sessionHistory']);
             this.sessionHistory = result.sessionHistory || [];
@@ -233,6 +246,7 @@ class DistractionKillerPopup {
             id: Date.now().toString(),
             startTime: Date.now(),
                 duration: duration * 60 * 1000,
+                plannedDuration: duration * 60 * 1000, // Store original scheduled duration
             endTime: Date.now() + (duration * 60 * 1000),
                 goal: goal || 'Deep Work Session',
             isActive: true,

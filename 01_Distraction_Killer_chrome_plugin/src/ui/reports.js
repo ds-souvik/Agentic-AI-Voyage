@@ -65,8 +65,8 @@ class DistractionKillerReports {
 
     async loadSessionHistory() {
         try {
-            const result = await chrome.storage.local.get(['sessionHistory']);
-            this.sessionHistory = result.sessionHistory || [];
+            const result = await chrome.storage.local.get(['gamificationData']);
+            this.sessionHistory = result.gamificationData?.sessionHistory || [];
         } catch (error) {
             console.error('Error loading session history:', error);
             this.sessionHistory = [];
@@ -305,7 +305,7 @@ class DistractionKillerReports {
 
         this.recentSessionsList.innerHTML = recentSessions.slice(0, 5).map(session => {
             const startTime = new Date(session.startTime);
-            const score = session.score || 0;
+            const score = session.score || session.finalScore || 0;
             const scoreClass = score >= 0 ? 'positive-score' : 'negative-score';
             
             console.log('📊 DEBUG: Session score display:', {
@@ -314,13 +314,15 @@ class DistractionKillerReports {
                 source: 'session.score from recentSessions'
             });
             
-            // FIXED: Calculate duration properly with null checks
-            const duration = (session.endTime && session.startTime) ? 
+            // FIXED: Calculate actual vs planned duration correctly
+            const actualDuration = (session.endTime && session.startTime) ? 
                 session.endTime - session.startTime : 
                 (session.duration || 0);
             
-            const durationMinutes = Math.floor(Math.abs(duration) / (1000 * 60));
-            const plannedDuration = session.duration ? Math.floor(session.duration / (1000 * 60)) : durationMinutes;
+            const durationMinutes = Math.floor(Math.abs(actualDuration) / (1000 * 60));
+            const plannedDuration = session.plannedDuration ? 
+                Math.floor(session.plannedDuration / (1000 * 60)) : 
+                durationMinutes; // Fallback to actual duration for old sessions
             const blockedCount = session.blockedAttempts || 0;
             const focusScore = Math.max(0, 100 - (blockedCount * 5));
             
@@ -399,12 +401,23 @@ class DistractionKillerReports {
             const filteredSessions = this.getFilteredSessions();
             const summary = await this.gamificationService.getGamificationSummary();
             
+            // Pre-calculate scores for all sessions to avoid [object Promise] in template
+            const sessionsWithScores = await Promise.all(
+                filteredSessions.map(async (session) => {
+                    const score = await this.getSessionScore(session);
+                    return {
+                        ...session,
+                        calculatedScore: score
+                    };
+                })
+            );
+
             const data = {
                 period: this.currentPeriod,
                 exportDate: new Date().toISOString(),
-                sessions: filteredSessions,
+                sessions: sessionsWithScores,
                 summary: summary,
-                statistics: this.calculateStatistics(filteredSessions)
+                statistics: this.calculateStatistics(sessionsWithScores)
             };
 
             if (format === 'csv') {
@@ -440,7 +453,7 @@ class DistractionKillerReports {
                 const startTime = new Date(session.startTime);
                 const duration = Math.floor((session.endTime - session.startTime) / (1000 * 60));
                 const status = session.completed ? 'Completed' : session.stoppedEarly ? 'Stopped Early' : 'Incomplete';
-                const score = this.getSessionScore(session);
+                const score = session.calculatedScore || 0;
                 
                 return `${startTime.toLocaleDateString()},${startTime.toLocaleTimeString()},"${session.goal || 'Deep Work Session'}",${duration},${status},${session.blockedAttempts || 0},${score}`;
             })
@@ -506,7 +519,7 @@ class DistractionKillerReports {
                     const startTime = new Date(session.startTime);
                     const duration = Math.floor((session.endTime - session.startTime) / (1000 * 60));
                     const status = session.completed ? 'Completed' : session.stoppedEarly ? 'Stopped Early' : 'Incomplete';
-                    const score = this.getSessionScore(session);
+                    const score = session.calculatedScore || 0;
                     const scoreClass = score >= 0 ? 'positive-score' : 'negative-score';
                     
                     return `
