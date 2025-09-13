@@ -1,0 +1,7 @@
+Block_list/porn_blocklist.json
+Block_list/social_blocklist.json
+Block_list/shopping_blocklist.json
+Block_list/news_blocklist.json
+Block_list/entertainment_blocklist.json
+src/core/gamification.js
+src/core/blocklist-manager.js
