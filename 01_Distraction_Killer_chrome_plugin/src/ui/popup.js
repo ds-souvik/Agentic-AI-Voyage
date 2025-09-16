@@ -551,7 +551,7 @@ class DistractionKillerPopup {
      * Show help
      */
     showHelp() {
-        this.showNotification('Help: Start a deep work session to block distracting websites and stay focused!', 'info');
+        this.showNotification('Help: Start a deep work session to block distracting websites and stay focused! If you need any support with the app, mail here: 📨 souvik.ganguly.ds@gmail.com', 'info');
     }
 
     /**
