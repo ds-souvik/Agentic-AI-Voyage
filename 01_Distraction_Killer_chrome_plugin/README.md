@@ -71,8 +71,7 @@ When reporting bugs or issues, please include:
 - **Console Errors**: Any error messages from the browser console (F12)
 
 ### Contact for Contributions
-- **Email**: [souvik.ganguly.ds@gmail.com](mailto:souvik.ganguly.ds@gmail.com)
-- **LinkedIn**: [Souvik Ganguly](https://www.linkedin.com/in/souvik-ganguly-4a9924105/)
+- [��](mailto:souvik.ganguly.ds@gmail.com) [💼](https://www.linkedin.com/in/souvik-ganguly-4a9924105/)
 
 ## �� License
 
@@ -81,9 +80,7 @@ This project is proprietary software. The blocklist data and core algorithms are
 ## 🆘 Support
 
 For issues, feature requests, or technical support:
-
-- **Email**: [souvik.ganguly.ds@gmail.com](mailto:souvik.ganguly.ds@gmail.com)
-- **LinkedIn**: [Souvik Ganguly](https://www.linkedin.com/in/souvik-ganguly-4a9924105/)
+- [��](mailto:souvik.ganguly.ds@gmail.com) [💼](https://www.linkedin.com/in/souvik-ganguly-4a9924105/)
 
 **Before contacting support:**
 1. Check the browser console for error messages (F12)
