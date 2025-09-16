@@ -4,12 +4,11 @@ Hello! Thanks for choosing us as your primary Deep Work App. A professional Chro
 
 ## 🎬 See It In Action
 
-<div style="position: relative; display: inline-block; max-width: 100%;">
-  <a href="https://youtu.be/si2F3tewq68?si=4MEc3QBU6DHAWzJ6" target="_blank" style="text-decoration: none;">
-    <img src="https://img.youtube.com/vi/si2F3tewq68/maxresdefault.jpg" alt="Distraction Killer Demo" style="width: 100%; max-width: 800px; border-radius: 8px; box-shadow: 0 4px 8px rgba(0,0,0,0.1);">
-    <div style="position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); width: 80px; height: 80px; background: #ff0000; border-radius: 50%; display: flex; align-items: center; justify-content: center; box-shadow: 0 4px 12px rgba(255,0,0,0.3); transition: all 0.3s ease;">
-      <div style="width: 0; height: 0; border-left: 24px solid white; border-top: 16px solid transparent; border-bottom: 16px solid transparent; margin-left: 4px;"></div>
-    </div>
+<div align="center">
+  <a href="https://youtu.be/si2F3tewq68?si=4MEc3QBU6DHAWzJ6">
+    <img src="https://img.youtube.com/vi/si2F3tewq68/maxresdefault.jpg" alt="Distraction Killer Demo" width="800" style="border-radius: 8px;">
+    <br>
+    <img src="https://img.shields.io/badge/▶️-Watch%20Demo-red?style=for-the-badge&logo=youtube" alt="Watch Demo">
   </a>
 </div>
 
