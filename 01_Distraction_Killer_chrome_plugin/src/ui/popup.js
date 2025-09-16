@@ -151,7 +151,7 @@ class DistractionKillerPopup {
 
             // Convert achievedMilestones to Set if needed
             if (this.currentSession?.achievedMilestones && Array.isArray(this.currentSession.achievedMilestones)) {
-                this.currentSession.achievedMilestones = new Set(this.currentSession.achievedMilestones);
+                    this.currentSession.achievedMilestones = new Set(this.currentSession.achievedMilestones);
             }
             
             // Debug log to check session state
