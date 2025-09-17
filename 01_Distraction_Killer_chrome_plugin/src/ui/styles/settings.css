@@ -17,7 +17,7 @@ body {
 
 .settings-container {
     min-height: 100vh;
-    background: white;
+    background: #FAF9F5;
     display: flex;
     flex-direction: column;
     box-shadow: 0 0 50px rgba(0, 0, 0, 0.1);
@@ -95,7 +95,7 @@ body {
 
 /* Section Styles */
 .settings-section {
-    background: white;
+    background: #FAF9F5;
     border-radius: 12px;
     padding: 30px;
     margin-bottom: 30px;
@@ -175,7 +175,7 @@ body {
     border-radius: 8px;
     font-size: 14px;
     transition: all 0.3s ease;
-    background: white;
+    background: #FAF9F5;
 }
 
 .text-input:focus {
@@ -310,7 +310,7 @@ body {
     left: 2px;
     width: 20px;
     height: 20px;
-    background: white;
+    background: #FAF9F5;
     border-radius: 50%;
     transition: all 0.3s ease;
     box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
@@ -395,7 +395,7 @@ body {
     border-radius: 8px;
     cursor: pointer;
     transition: all 0.3s ease;
-    background: white;
+    background: #FAF9F5;
 }
 
 .theme-option:hover {
@@ -426,7 +426,7 @@ body {
 
 .theme-content {
     height: 40px;
-    background: white;
+    background: #FAF9F5;
     padding: 8px;
     display: flex;
     flex-direction: column;
@@ -453,7 +453,7 @@ body {
 }
 
 .theme-preview.default-theme .theme-content {
-    background: white !important;
+    background: #FAF9F5 !important;
 }
 
 .theme-preview.default-theme .theme-element {
@@ -465,7 +465,7 @@ body {
 }
 
 .theme-preview.auto-theme .theme-content {
-    background: white !important;
+    background: #FAF9F5 !important;
 }
 
 .theme-preview.auto-theme .theme-element {
@@ -489,7 +489,7 @@ body {
 }
 
 .theme-preview.forest-theme .theme-content {
-    background: white !important;
+    background: #FAF9F5 !important;
 }
 
 .theme-preview.forest-theme .theme-element {
@@ -501,7 +501,7 @@ body {
 }
 
 .theme-preview.sunset-theme .theme-content {
-    background: white !important;
+    background: #FAF9F5 !important;
 }
 
 .theme-preview.sunset-theme .theme-element {

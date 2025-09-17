@@ -12,6 +12,7 @@
 // Import core services
 importScripts('../core/gamification.js');
 importScripts('../core/blocklist-manager.js');
+importScripts('../core/session-notification-manager.js');
 
 class DistractionKillerBackground {
     constructor() {
@@ -414,6 +415,9 @@ class DistractionKillerBackground {
             chrome.alarms.clear('sessionComplete');
             await chrome.storage.local.remove(['temporaryAccess', 'lastBlockedUrl', 'lastBlockedTabId']);
             
+            // Show completion notification
+            showSessionCompleteNotification(finalSessionData);
+            
             console.log('Session completed successfully');
         } catch (error) {
             console.error('Error completing session:', error);
@@ -678,6 +682,62 @@ class DistractionKillerBackground {
         };
     }
 }
+
+/**
+ * Show session completion notification - Standalone function
+ * @param {Object} sessionData - Completed session data
+ */
+async function showSessionCompleteNotification(sessionData) {
+    try {
+        const notificationId = 'distraction-killer-session-complete';
+        
+        // Clear any existing notification
+        await chrome.notifications.clear(notificationId);
+
+        // Calculate session duration
+        const durationMinutes = sessionData.durationMinutes || 
+            Math.floor((sessionData.duration || 0) / 60000);
+
+        // Create notification
+        const notificationOptions = {
+            type: 'basic',
+            iconUrl: chrome.runtime.getURL('assets/icons/icon48.png'),
+            title: '🎉 Deep Work Session Completed!',
+            message: `Great job! You completed a ${durationMinutes}-minute session.`,
+            buttons: [
+                { title: 'Start Another Session' },
+                { title: 'Schedule Later' }
+            ],
+            priority: 2
+        };
+
+        // Show notification
+        await chrome.notifications.create(notificationId, notificationOptions);
+        
+        console.log('🔔 Session completion notification shown');
+    } catch (error) {
+        console.error('❌ Error showing notification:', error);
+        // Fail silently - don't break the app
+    }
+}
+
+// Set up notification button handlers
+chrome.notifications.onButtonClicked.addListener((notificationId, buttonIndex) => {
+    if (notificationId === 'distraction-killer-session-complete') {
+        chrome.notifications.clear(notificationId);
+        if (buttonIndex === 0) {
+            // "Start Another Session" clicked
+            chrome.action.openPopup();
+        }
+    }
+});
+
+chrome.notifications.onClicked.addListener((notificationId) => {
+    if (notificationId === 'distraction-killer-session-complete') {
+        chrome.notifications.clear(notificationId);
+        chrome.action.openPopup();
+    }
+});
 
 // Initialize the background service
 const distractionKiller = new DistractionKillerBackground();
