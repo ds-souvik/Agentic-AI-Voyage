@@ -13,9 +13,10 @@ html {
     min-height: 600px;
 }
 
+/* Line 18 - Update body background gradient */
 body {
     font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
-    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    background: linear-gradient(135deg, #7A9E9F 0%, #6B8B8C 100%);
     color: #333;
     line-height: 1.6;
     width: 380px;
@@ -39,9 +40,9 @@ body {
     overflow: hidden;
 }
 
-/* Header Styles */
+/* Line 44 - Update header background gradient */
 .header {
-    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    background: linear-gradient(135deg, #7A9E9F 0%, #6B8B8C 100%);
     color: white;
     padding: 20px;
     display: flex;
@@ -141,55 +142,21 @@ body {
     background: #FAF9F5;
 }
 
+/* Line 144-147 - Update focus states */
 .duration-select:focus, input[type="text"]:focus, input[type="number"]:focus {
     outline: none;
-    border-color: #667eea;
-    box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+    border-color: #7A9E9F;
+    box-shadow: 0 0 0 3px rgba(122, 158, 159, 0.1);
 }
 
-.start-btn {
-    width: 100%;
-    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-    color: white;
-    border: none;
-    padding: 16px 24px;
-    border-radius: 12px;
-    font-size: 16px;
-    font-weight: 600;
-    cursor: pointer;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    gap: 10px;
-    transition: all 0.3s ease;
-    box-shadow: 0 4px 15px rgba(102, 126, 234, 0.3);
-}
 
-.start-btn:hover {
-    transform: translateY(-2px);
-    box-shadow: 0 8px 25px rgba(102, 126, 234, 0.4);
-}
-
-.start-btn:active {
-    transform: translateY(0);
-}
-
-.btn-icon {
-    font-size: 18px;
-}
-
-/* Active Session */
+/* Line 182-184 - Update active-session display */
 .active-session {
+    display: none;
     text-align: center;
 }
 
-.session-info h2 {
-    font-size: 20px;
-    font-weight: 600;
-    color: #2d3748;
-    margin-bottom: 12px;
-}
-
+/* Line 203 - Update goal display border color */
 .goal-display {
     background: #f7fafc;
     padding: 12px 16px;
@@ -197,14 +164,7 @@ body {
     font-size: 14px;
     color: #4a5568;
     margin-bottom: 24px;
-    border-left: 4px solid #667eea;
-}
-
-/* Timer */
-.timer-container {
-    display: flex;
-    justify-content: center;
-    margin: 24px 0;
+    border-left: 4px solid #7A9E9F;
 }
 
 .timer-circle {
@@ -219,15 +179,10 @@ body {
     transform: rotate(-90deg);
 }
 
-.timer-bg {
-    fill: none;
-    stroke: #e2e8f0;
-    stroke-width: 8;
-}
-
+/* Line 228-236 - Update timer progress color */
 .timer-progress {
     fill: none;
-    stroke: #667eea;
+    stroke: #7A9E9F;
     stroke-width: 8;
     stroke-linecap: round;
     stroke-dasharray: 283;
@@ -249,13 +204,6 @@ body {
     font-weight: 700;
     color: #2d3748;
     line-height: 1;
-}
-
-.time-label {
-    font-size: 12px;
-    color: #718096;
-    text-transform: uppercase;
-    letter-spacing: 0.5px;
 }
 
 /* Session Stats */
@@ -287,7 +235,7 @@ body {
     letter-spacing: 0.5px;
 }
 
-/* Session Actions */
+/* Line 291-295 - Update session-actions margin */
 .session-actions {
     display: flex;
     gap: 12px;
@@ -309,8 +257,9 @@ body {
     transition: all 0.2s ease;
 }
 
+/* Line 312-315 - Update action-btn primary color */
 .action-btn.primary {
-    background: #667eea;
+    background: #7A9E9F;
     color: white;
 }
 
@@ -329,8 +278,9 @@ body {
     box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
 }
 
-/* Session Complete */
+/* Line 333-335 - Update session-complete display */
 .session-complete {
+    display: none;
     text-align: center;
 }
 
@@ -356,37 +306,6 @@ body {
     border: 1px solid #9ae6b4;
 }
 
-.completion-actions {
-    display: flex;
-    gap: 12px;
-    margin-top: 24px;
-}
-
-/* Footer */
-.footer {
-    background: #f7fafc;
-    padding: 16px 24px;
-    border-top: 1px solid #e2e8f0;
-}
-
-.footer-links {
-    display: flex;
-    justify-content: space-around;
-}
-
-.footer-btn {
-    background: none;
-    border: none;
-    color: #718096;
-    font-size: 12px;
-    cursor: pointer;
-    padding: 8px 12px;
-    border-radius: 6px;
-    transition: all 0.2s ease;
-    display: flex;
-    align-items: center;
-    gap: 4px;
-}
 
 .footer-btn:hover {
     background: #e2e8f0;
@@ -403,21 +322,13 @@ body {
     animation: fadeIn 0.3s ease;
 }
 
-/* Center Container for Timer */
-.center-container {
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    margin: 20px 0;
-}
-
-/* Footer Styles */
+/* Line 420-422 - Update footer background gradient */
 .footer {
     position: fixed;
     bottom: 0;
     left: 0;
     right: 0;
-    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    background: linear-gradient(135deg, #7A9E9F 0%, #6B8B8C 100%);
     padding: 12px 16px;
     border-top: 1px solid rgba(255, 255, 255, 0.1);
 }
@@ -455,32 +366,31 @@ body {
     box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
 }
 
-/* Adjust main content to account for footer */
-.popup-content {
-    padding-bottom: 60px; /* Space for fixed footer */
-}
 
-/* Gamification Progress */
+/* Line 464-471 - Update gamification-section styling */
 .gamification-section {
-    margin-top: 16px;
-    padding: 16px;
-    background: rgba(255, 255, 255, 0.1);
+    margin-top: 12px;
+    padding: 8px;
+    background: rgba(122, 158, 159, 0.1);
     backdrop-filter: blur(10px);
     border-radius: 12px;
-    border: 1px solid rgba(255, 255, 255, 0.2);
+    border: 1px solid rgba(122, 158, 159, 0.2);
 }
 
+/* Line 473-476 - Update progress-stats display */
 .progress-stats {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: 12px;
+    justify-content: center;
+    display: flex;
+    margin-bottom: 0;
 }
 
+/* Line 479-484 - Update progress-item styling */
 .progress-item {
     display: flex;
     flex-direction: column;
     align-items: center;
     text-align: center;
+    min-width: 0;
 }
 
 .progress-label {
@@ -489,10 +399,11 @@ body {
     margin-bottom: 4px;
 }
 
+/* Line 492-496 - Update progress-value styling */
 .progress-value {
-    font-size: 14px;
-    font-weight: 600;
-    color: white;
+    font-size: 1.2rem;
+    font-weight: 700;
+    color: grey;
 }
 
 /* Responsive */
@@ -507,16 +418,17 @@ body {
 }
 
 /* Custom Start Session Button - matches inline styles exactly */
+/* Line 510-525 - Update start-session-btn color */
 .start-session-btn {
-    background: #667eea;
+    background: #7A9E9F;
     color: #fff;
     font-size: 1.25rem;
     font-weight: 700;
-    font-family: 'Segoe UI', 'Arial', sans-serif;
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
     padding: 16px 36px;
     border: none;
     border-radius: 10px;
-    box-shadow: 0 2px 8px rgba(102, 126, 234, 0.15);
+    box-shadow: 0 2px 8px rgba(122, 158, 159, 0.15);
     cursor: pointer;
     display: flex;
     align-items: center;
@@ -524,12 +436,45 @@ body {
     transition: background 0.2s, transform 0.2s;
 }
 
+/* Line 527-530 - Update start-session-btn hover */
 .start-session-btn:hover {
-    background: #5a67d8;
+    background: #6B8B8C;
     transform: translateY(-2px);
 }
 
+/* Line 532-535 - Update start-session-btn focus */
 .start-session-btn:focus {
-    background: #667eea;
+    background: #7A9E9F;
     transform: none;
+}
+
+/* New classes for HTML cleanup */
+.custom-duration {
+    display: none;
+}
+
+.start-session-container {
+    display: flex;
+    justify-content: center;
+    margin-top: 20px;
+}
+
+.timer-section {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+}
+
+.timer-text {
+    text-align: center;
+}
+
+.gamification-title {
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+    font-size: 1rem;
+    font-weight: 600;
+    margin-bottom: 6px;
+    text-align: center;
+    color: grey;
 }

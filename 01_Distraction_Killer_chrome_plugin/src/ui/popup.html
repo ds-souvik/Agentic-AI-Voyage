@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Distraction Killer - Deep Focus Assistant</title>
+    <title>Focus Zone</title>
     <link rel="stylesheet" href="styles/popup.css">
 </head>
 <body>
@@ -12,7 +12,7 @@
         <header class="header">
             <div class="logo">
                 <div class="logo-icon">🎯</div>
-                <h1>Distraction Killer</h1>
+                <h1 style="font-size: 1.3rem;">Focus Zone</h1>
             </div>
             <div class="status-indicator" id="statusIndicator">
                 <span class="status-dot"></span>
@@ -24,20 +24,20 @@
         <main class="main-content">
             <!-- Session Setup -->
             <div class="session-setup" id="sessionSetup">
-                <h2>Start Deep Work Session</h2>
+                <h2 style="color: grey;">Start Deep Work Session</h2>
                 <div class="form-group">
                     <label for="sessionDuration">Focus Duration</label>
                     <select id="sessionDuration" class="duration-select">
-                        <option value="25">25 minutes (Pomodoro)</option>
-                        <option value="45">45 minutes</option>
-                        <option value="60">1 hour</option>
-                        <option value="90">1.5 hours</option>
-                        <option value="120">2 hours</option>
-                        <option value="custom">Custom</option>
+                        <option value="25" style="color: grey;">25 minutes (Pomodoro)</option>
+                        <option value="45" style="color: grey;">45 minutes</option>
+                        <option value="60" style="color: grey;">1 hour</option>
+                        <option value="90" style="color: grey;">1.5 hours</option>
+                        <option value="120" style="color: grey;">2 hours</option>
+                        <option value="custom" style="color: grey;">Custom</option>
                     </select>
                 </div>
                 
-                <div class="form-group custom-duration" id="customDuration" style="display: none;">
+                <div class="form-group custom-duration" id="customDuration">
                     <label for="customMinutes">Custom Duration (minutes)</label>
                     <input type="number" id="customMinutes" min="5" max="480" placeholder="Enter minutes">
                 </div>
@@ -47,7 +47,7 @@
                     <input type="text" id="focusGoal" placeholder="What are you working on?">
                 </div>
 
-                <div style="display: flex; justify-content: center; margin-top: 20px;">
+                <div class="start-session-container">
                     <button id="startSession" class="start-session-btn">
                         🚀 Start Deep Work
                     </button>
@@ -55,20 +55,20 @@
             </div>
 
             <!-- Active Session -->
-            <div class="active-session" id="activeSession" style="display: none;">
+            <div class="active-session" id="activeSession">
                 <div class="session-header">
                     <h2>Deep Work in Progress</h2>
                     <p class="goal-display" id="goalDisplay">Working on important tasks</p>
                 </div>
 
-                <div class="timer-section" style="display: flex; flex-direction: column; align-items: center; justify-content: center;">
+                <div class="timer-section">
                     <div class="timer-circle">
                         <svg class="timer-svg" width="120" height="120">
                             <circle cx="60" cy="60" r="45" stroke="#e2e8f0" stroke-width="8" fill="transparent"/>
-                            <circle cx="60" cy="60" r="45" stroke="#3182ce" stroke-width="8" fill="transparent"
+                            <circle cx="60" cy="60" r="45" stroke="#7A9E9F" stroke-width="8" fill="transparent"
                                     stroke-dasharray="283" stroke-dashoffset="283" id="timerProgress" class="timer-progress"/>
                         </svg>
-                        <div class="timer-text" style="text-align: center;">
+                        <div class="timer-text">
                             <span class="time-remaining" id="timeRemaining">25:00</span>
                         </div>
                     </div>
@@ -92,7 +92,7 @@
             </div>
 
             <!-- Session Complete -->
-            <div class="session-complete" id="sessionComplete" style="display: none;">
+            <div class="session-complete" id="sessionComplete">
                 <div class="completion-header">
                     <h2>🎉 Great Work!</h2>
                     <p>You've completed your deep work session</p>
@@ -109,20 +109,20 @@
                     </div>
                 </div>
 
-                <div class="session-actions" style="margin-top: 24px;">
+                <div class="session-actions">
                     <button class="action-btn primary" id="startNewSession">🔄 Start New Session</button>
                     <button class="action-btn secondary" id="viewReport">📊 View Report</button>
                 </div>
             </div>
 
             <!-- Gamification Progress -->
-            <div class="gamification-section" id="gamificationSection" style="margin-top: 24px;">
-                <h2 style="font-family: 'Inter', 'Segoe UI', Arial, sans-serif; font-size: 1.3rem; font-weight: 600; margin-bottom: 12px; text-align: center;">
-                    🎯 Your Progress
+            <div class="gamification-section" id="gamificationSection" style="margin-top:12px; padding:8px;">
+                <h2 class="gamification-title" style="font-size:1rem; margin-bottom:6px;">
+                    🎯 Focus Score
                 </h2>
-                <div class="progress-stats" style="justify-content: center; display: flex;">
-                    <div class="progress-item" style="text-align: center;">
-                        <span class="progress-value" id="totalPoints" style="font-size: 2rem; font-weight: 700;">0</span>
+                <div class="progress-stats" style="margin-bottom:0;">
+                    <div class="progress-item" style="min-width:0;">
+                        <span class="progress-value" id="totalPoints" style="font-size:1.2rem;">0</span>
                     </div>
                 </div>
             </div>
