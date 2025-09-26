@@ -60,8 +60,7 @@ class DistractionKillerBackground {
      */
     async handleMessage(request, sender, sendResponse) {
         try {
-            console.log('Background received message:', request.action);
-
+            // Remove excessive debug logging
             switch (request.action) {
                 case 'getSessionData':
                     sendResponse({
@@ -69,7 +68,7 @@ class DistractionKillerBackground {
                         userSettings: this.userSettings
                     });
                     break;
-
+    
                 case 'startSession':
                     await this.startSession(request.sessionData);
                     sendResponse({ success: true });
@@ -235,8 +234,7 @@ class DistractionKillerBackground {
      */
     async startSession(sessionData) {
         try {
-            console.log('Starting deep work session:', sessionData);
-            
+            // Use sessionData directly instead of redundant merging
             this.currentSession = {
                 ...sessionData,
                 isActive: true,
@@ -265,8 +263,6 @@ class DistractionKillerBackground {
             // Set up session completion alarm
             const alarmTime = new Date(sessionData.endTime);
             chrome.alarms.create('sessionComplete', { when: alarmTime.getTime() });
-            
-            console.log('Deep work session started successfully');
             
         } catch (error) {
             console.error('Error starting session:', error);

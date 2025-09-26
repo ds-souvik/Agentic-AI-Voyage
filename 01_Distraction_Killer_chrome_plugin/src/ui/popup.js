@@ -115,47 +115,25 @@ class DistractionKillerPopup {
      */
     async loadSessionData() {
         try {
-            // Add retry logic for better reliability
-            let retries = 3;
-            let response;
+            // Single retry attempt instead of complex retry logic
+            let response = await chrome.runtime.sendMessage({ action: 'getSessionData' });
             
-            while (retries > 0) {
-                try {
-                    response = await chrome.runtime.sendMessage({ action: 'getSessionData' });
-                    break;
-                } catch (error) {
-                    retries--;
-                    if (retries === 0) throw error;
-                    await new Promise(resolve => setTimeout(resolve, 50));
-                }
+            // If no session data, try once more after brief delay
+            if (!response.currentSession) {
+                await new Promise(resolve => setTimeout(resolve, 100));
+                response = await chrome.runtime.sendMessage({ action: 'getSessionData' });
             }
             
             this.currentSession = response.currentSession;
             
-            // If we got null session data but there might be an active session, retry once
-            if (!this.currentSession && response.currentSession === null) {
-                console.log('🔄 No session data received, retrying...');
-                await new Promise(resolve => setTimeout(resolve, 100)); // Brief delay
-                try {
-                    const retryResponse = await chrome.runtime.sendMessage({ action: 'getSessionData' });
-                    this.currentSession = retryResponse.currentSession;
-                    console.log('🔄 Retry result:', this.currentSession);
-                } catch (retryError) {
-                    console.log('🔄 Retry failed, using null session');
-                }
-            }
-
             // Load session history
             const result = await chrome.storage.local.get(['sessionHistory']);
             this.sessionHistory = result.sessionHistory || [];
-
-            // Convert achievedMilestones to Set if needed
-            if (this.currentSession?.achievedMilestones && Array.isArray(this.currentSession.achievedMilestones)) {
-                    this.currentSession.achievedMilestones = new Set(this.currentSession.achievedMilestones);
-            }
             
-            // Debug log to check session state
-            console.log('Loaded session data:', this.currentSession);
+            // Convert achievedMilestones to Set if needed (simplified)
+            if (this.currentSession?.achievedMilestones && Array.isArray(this.currentSession.achievedMilestones)) {
+                this.currentSession.achievedMilestones = new Set(this.currentSession.achievedMilestones);
+            }
             
         } catch (error) {
             console.error('Error loading session data:', error);
@@ -197,12 +175,11 @@ class DistractionKillerPopup {
         this.sessionSetup.style.display = 'none';
         this.sessionComplete.style.display = 'none';
         this.activeSession.style.display = 'block';
-        this.activeSession.classList.add('fade-in');
-
+    
         if (this.currentSession) {
             this.goalDisplay.textContent = this.currentSession.goal || 'Deep Work Session';
             this.updateTimerDisplay();
-            this.updateStats();
+            // Remove redundant updateStats() call - stats update via timer
         }
         
         this.updateStatus('active');
@@ -234,37 +211,37 @@ class DistractionKillerPopup {
      */
     async startDeepWorkSession() {
         try {
-        const duration = this.getSessionDuration();
-        const goal = this.focusGoal.value.trim();
-
-        if (!duration || duration < 5) {
-            this.showNotification('Please enter a valid duration (minimum 5 minutes)', 'error');
-            return;
-        }
-
-        const sessionData = {
-            id: Date.now().toString(),
-            startTime: Date.now(),
+            const duration = this.getSessionDuration();
+            const goal = this.focusGoal.value.trim();
+    
+            if (!duration || duration < 5) {
+                this.showNotification('Please enter a valid duration (minimum 5 minutes)', 'error');
+                return;
+            }
+    
+            const sessionData = {
+                id: Date.now().toString(),
+                startTime: Date.now(),
                 duration: duration * 60 * 1000,
-                plannedDuration: duration * 60 * 1000, // Store original scheduled duration
-            endTime: Date.now() + (duration * 60 * 1000),
+                plannedDuration: duration * 60 * 1000,
+                endTime: Date.now() + (duration * 60 * 1000),
                 goal: goal || 'Deep Work Session',
-            isActive: true,
-            isPaused: false,
-            pausedTime: 0,
-            blockedAttempts: 0,
+                isActive: true,
+                isPaused: false,
+                pausedTime: 0,
+                blockedAttempts: 0,
                 hadBlockedAttempts: false,
                 hadOverrides: false,
-            completed: false,
+                completed: false,
                 achievedMilestones: new Set()
             };
-
+    
             // Start session via background script
             await chrome.runtime.sendMessage({
                 action: 'startSession',
                 sessionData: sessionData
             });
-
+    
             this.currentSession = sessionData;
             this.showActiveSession();
             this.startTimer();
