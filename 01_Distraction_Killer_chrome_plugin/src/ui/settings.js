@@ -143,7 +143,7 @@ class DistractionKillerSettings {
         // Listen for system theme changes when using auto theme
         if (window.matchMedia) {
             const mediaQuery = window.matchMedia('(prefers-color-scheme: dark)');
-            mediaQuery.addListener((e) => {
+            mediaQuery.addEventListener('change', (e) => {
                 if (this.settings.theme === 'auto') {
                     this.applyThemeDirectly('auto');
                 }
@@ -212,12 +212,11 @@ class DistractionKillerSettings {
         this.renderCustomSites();
         
         // Apply site categories
-        console.log('Applying site categories:', this.settings.siteCategories);
         Object.keys(this.settings.siteCategories).forEach(category => {
             const input = document.getElementById(category);
+            // FIXED (CORRECT):
             if (input) {
                 input.checked = this.settings.siteCategories[category];
-                console.log(`Applied ${category}: ${this.settings.siteCategories[category]}`);
             } else {
                 console.warn(`Input element not found for category: ${category}`);
             }
@@ -349,17 +348,9 @@ class DistractionKillerSettings {
 
     updateCategorySettings() {
         const categoryInputs = this.categoryToggles.querySelectorAll('.toggle-input');
-        console.log('Updating category settings...');
         categoryInputs.forEach(input => {
             this.settings.siteCategories[input.id] = input.checked;
-            console.log(`Updated ${input.id}: ${input.checked}`);
         });
-        console.log('Category settings updated:', this.settings.siteCategories);
-        console.log('Social media enabled:', this.settings.siteCategories.socialMedia);
-        console.log('Shopping enabled:', this.settings.siteCategories.shopping);
-        console.log('News enabled:', this.settings.siteCategories.news);
-        console.log('Entertainment enabled:', this.settings.siteCategories.entertainment);
-        console.log('Adult enabled:', this.settings.siteCategories.adult);
         this.saveSettings();
     }
 
@@ -435,31 +426,9 @@ class DistractionKillerSettings {
         }
     }
 
-    applyTheme(themeName) {
-        const root = document.documentElement;
-        
-        switch (themeName) {
-            case 'dark':
-                root.style.setProperty('--primary-gradient', 'linear-gradient(135deg, #2d3748 0%, #1a202c 100%)');
-                root.style.setProperty('--accent-color', '#4299e1');
-                break;
-            case 'forest':
-                root.style.setProperty('--primary-gradient', 'linear-gradient(135deg, #38a169 0%, #2f855a 100%)');
-                root.style.setProperty('--accent-color', '#38a169');
-                break;
-            case 'sunset':
-                root.style.setProperty('--primary-gradient', 'linear-gradient(135deg, #ed8936 0%, #dd6b20 100%)');
-                root.style.setProperty('--accent-color', '#ed8936');
-                break;
-            case 'auto':
-                // Auto theme will be handled by CSS media queries
-                root.removeAttribute('data-theme');
-                break;
-            default: // default
-                root.style.setProperty('--primary-gradient', 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)');
-                root.style.setProperty('--accent-color', '#667eea');
-                break;
-        }
+    applyThemeImmediately() {
+        // Apply theme immediately after settings load
+        this.applyThemeDirectly(this.settings.theme);
         
         // Update header background
         const header = document.querySelector('.settings-header');
@@ -469,32 +438,8 @@ class DistractionKillerSettings {
     }
 
     applyThemeOnly(themeName) {
-        // Apply theme without saving (used during initialization)
-        this.themeOptions.forEach(option => {
-            option.classList.toggle('active', option.dataset.theme === themeName);
-        });
-        
-        // Don't apply theme during initialization, just update the UI
-        console.log('Theme UI updated to:', themeName);
-    }
-
-    applyThemeImmediately() {
-        // Apply theme immediately without saving
-        const theme = this.settings.theme || 'auto';
-        console.log('Applying theme immediately:', theme);
-        
-        // Update UI
-        this.themeOptions.forEach(option => {
-            option.classList.toggle('active', option.dataset.theme === theme);
-        });
-        
-        // Apply theme using theme manager if available
-        if (window.themeManager) {
-            window.themeManager.updateTheme(theme, this.settings.animations.speed, this.settings.animations.reduceMotion);
-        } else {
-            // Fallback: apply theme directly
-            this.applyThemeDirectly(theme);
-        }
+        // Apply theme without saving to avoid circular calls
+        this.applyThemeDirectly(themeName);
     }
 
     applyThemeDirectly(themeName) {
@@ -547,8 +492,8 @@ class DistractionKillerSettings {
                 root.style.removeProperty('--border-color');
                 break;
             default: // default
-                root.style.setProperty('--primary-gradient', 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)');
-                root.style.setProperty('--accent-color', '#667eea');
+                root.style.setProperty('--primary-gradient', 'linear-gradient(135deg, #7A9E9F 0%, #6B8B8C 100%)');
+                root.style.setProperty('--accent-color', '#7A9E9F');
                 root.style.setProperty('--text-primary', '#2d3748');
                 root.style.setProperty('--text-secondary', '#718096');
                 root.style.setProperty('--background-primary', '#ffffff');

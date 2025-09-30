@@ -272,12 +272,6 @@ class DistractionKillerReports {
         try {
             const summary = await this.gamificationService.getGamificationSummary();
             const reportData = await this.gamificationService.getGamificationReportData();
-
-            console.log('📊 DEBUG: Updating UI display with:', {
-                totalPoints: summary.totalPoints,
-                dailyPoints: summary.dailyPoints,
-                source: 'gamificationSummary'
-            });
             
             this.totalPoints.textContent = summary.totalPoints.toLocaleString();
             this.pointsToday.textContent = summary.dailyPoints.toLocaleString();
@@ -307,12 +301,6 @@ class DistractionKillerReports {
             const startTime = new Date(session.startTime);
             const score = session.score || session.finalScore || 0;
             const scoreClass = score >= 0 ? 'positive-score' : 'negative-score';
-            
-            console.log('📊 DEBUG: Session score display:', {
-                sessionId: session.sessionId,
-                score: score,
-                source: 'session.score from recentSessions'
-            });
             
             // FIXED: Calculate actual vs planned duration correctly
             const actualDuration = (session.endTime && session.startTime) ? 

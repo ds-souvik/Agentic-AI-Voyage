@@ -56,15 +56,9 @@ body {
     gap: 10px;
 }
 
-.logo-icon {
-    font-size: 24px;
-    background: rgba(255, 255, 255, 0.2);
-    width: 40px;
-    height: 40px;
-    border-radius: 50%;
-    display: flex;
-    align-items: center;
-    justify-content: center;
+.logo-icon img{
+    max-width: 100%;
+    height: auto; 
 }
 
 .logo h1 {

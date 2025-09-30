@@ -7,9 +7,10 @@
     box-sizing: border-box;
 }
 
+/* Line 12 - Update body background */
 body {
     font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
-    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    background: linear-gradient(135deg, #7A9E9F 0%, #6B8B8C 100%);
     color: #333;
     line-height: 1.6;
     min-height: 100vh;
@@ -23,9 +24,9 @@ body {
     box-shadow: 0 0 50px rgba(0, 0, 0, 0.1);
 }
 
-/* Header Styles */
+/* Line 28 - Update header background */
 .settings-header {
-    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    background: linear-gradient(135deg, #7A9E9F 0%, #6B8B8C 100%);
     color: white;
     padding: 20px 40px;
     box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
@@ -112,9 +113,10 @@ body {
     border-bottom: 2px solid #f7fafc;
 }
 
+/* Line 117 - Update section icon */
 .section-icon {
     font-size: 24px;
-    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    background: linear-gradient(135deg, #7A9E9F 0%, #6B8B8C 100%);
     color: white;
     padding: 12px;
     border-radius: 10px;
@@ -178,14 +180,16 @@ body {
     background: #FAF9F5;
 }
 
+/* Line 184 - Update focus border */
 .text-input:focus {
     outline: none;
-    border-color: #667eea;
-    box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+    border-color: #7A9E9F;
+    box-shadow: 0 0 0 3px rgba(122, 158, 159, 0.1);
 }
 
+/* Line 188 - Update add button */
 .add-btn {
-    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    background: linear-gradient(135deg, #7A9E9F 0%, #6B8B8C 100%);
     color: white;
     border: none;
     padding: 12px 20px;
@@ -202,7 +206,7 @@ body {
 
 .add-btn:hover {
     transform: translateY(-1px);
-    box-shadow: 0 4px 12px rgba(102, 126, 234, 0.3);
+    box-shadow: 0 4px 12px rgba(122, 158, 159, 0.3);
 }
 
 /* Lists */
@@ -316,8 +320,9 @@ body {
     box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
 }
 
+/* Line 320 - Update toggle active state */
 .toggle-input:checked + .toggle-slider {
-    background: #667eea;
+    background: #7A9E9F;
 }
 
 .toggle-input:checked + .toggle-slider::before {
@@ -404,10 +409,11 @@ body {
     box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
 }
 
+/* Line 408 - Update theme option active state */
 .theme-option.active {
-    border-color: #667eea;
+    border-color: #7A9E9F;
     background: #f7fafc;
-    box-shadow: 0 4px 12px rgba(102, 126, 234, 0.2);
+    box-shadow: 0 4px 12px rgba(122, 158, 159, 0.2);
 }
 
 .theme-preview {
@@ -419,9 +425,10 @@ body {
     box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
 }
 
+/* Line 424 - Update theme header */
 .theme-header {
     height: 20px;
-    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    background: linear-gradient(135deg, #7A9E9F 0%, #6B8B8C 100%);
 }
 
 .theme-content {
@@ -449,27 +456,11 @@ body {
 
 /* Theme Previews */
 .theme-preview.default-theme .theme-header {
-    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%) !important;
-}
-
-.theme-preview.default-theme .theme-content {
-    background: #FAF9F5 !important;
-}
-
-.theme-preview.default-theme .theme-element {
-    background: #e2e8f0 !important;
+    background: linear-gradient(135deg, #7A9E9F 0%, #6B8B8C 100%) !important;
 }
 
 .theme-preview.auto-theme .theme-header {
-    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%) !important;
-}
-
-.theme-preview.auto-theme .theme-content {
-    background: #FAF9F5 !important;
-}
-
-.theme-preview.auto-theme .theme-element {
-    background: #e2e8f0 !important;
+    background: linear-gradient(135deg, #7A9E9F 0%, #6B8B8C 100%) !important;
 }
 
 .theme-preview.dark-theme .theme-header {
@@ -551,8 +542,9 @@ body {
     transition: all 0.3s ease;
 }
 
+/* Line 556 - Update radio checked state */
 .radio-item input[type="radio"]:checked + .radio-custom {
-    border-color: #667eea;
+    border-color: #7A9E9F;
 }
 
 .radio-item input[type="radio"]:checked + .radio-custom::after {
@@ -563,7 +555,7 @@ body {
     transform: translate(-50%, -50%);
     width: 10px;
     height: 10px;
-    background: #667eea;
+    background: #7A9E9F;
     border-radius: 50%;
 }
 
@@ -602,13 +594,14 @@ body {
     appearance: none;
 }
 
+/* Line 611 - Update slider thumb */
 .slider::-webkit-slider-thumb {
     -webkit-appearance: none;
     appearance: none;
     width: 20px;
     height: 20px;
     border-radius: 50%;
-    background: #667eea;
+    background: #7A9E9F;
     cursor: pointer;
     box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
 }
@@ -617,7 +610,7 @@ body {
     width: 20px;
     height: 20px;
     border-radius: 50%;
-    background: #667eea;
+    background: #7A9E9F;
     cursor: pointer;
     border: none;
     box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
