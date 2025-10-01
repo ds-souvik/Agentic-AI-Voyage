@@ -1,0 +1,22 @@
+{% extends "base.html" %}
+{% block title %}Protect your focus. Build your future. | Focused Room{% endblock %}
+{% block content %}
+<section class="hero">
+  <div class="hero-left">
+    <h1>Protect your focus. Build your future.</h1>
+    <p>Turn Chrome into a calm workspace — block distractions, use friction override, and track progress with gamified reports.</p>
+    <div class="hero-cta">
+      <a class="btn primary" href="{{ url_for('main.download') }}">Install on Chrome — Free</a>
+      <a class="btn ghost" href="https://www.youtube.com/watch?v=si2F3tewq68">Watch demo</a>
+    </div>
+    <p class="privacy-note">No trackers • Data stays on your device</p>
+  </div>
+  <div class="hero-right">
+    <img src="{{ url_for('static', filename='assets/hero-screenshot.png') }}" alt="Focused Room screenshots">
+  </div>
+</section>
+
+<section id="features" class="features">
+  <!-- 4 feature cards -->
+</section>
+{% endblock %}

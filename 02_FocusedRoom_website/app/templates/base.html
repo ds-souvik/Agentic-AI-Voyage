@@ -1,0 +1,46 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8"/>
+  <meta name="viewport" content="width=device-width,initial-scale=1"/>
+  <title>{% block title %}Focused Room{% endblock %}</title>
+  <meta name="description" content="{% block description %}Protect your focus. Build your future.{% endblock %}">
+  <!-- Open Graph and Twitter cards -->
+  <meta property="og:title" content="Focused Room — Protect your focus. Build your future."/>
+  <meta property="og:description" content="Block distractions, protect your deep work, and gamify productivity."/>
+  <link rel="icon" href="{{ url_for('static', filename='assets/favicon.png') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/main.css') }}">
+  <!-- JSON-LD -->
+  {% block jsonld %}{% endblock %}
+</head>
+<body>
+  <header>
+    <nav>
+      <a href="{{ url_for('main.index') }}" class="logo">Focused Room</a>
+      <div class="nav-links">
+        <a href="{{ url_for('main.index') }}#features">Features</a>
+        <a href="{{ url_for('main.big_five') }}">Big Five</a>
+        <a href="/blog">Blog</a>
+        <a class="cta" href="{{ url_for('main.download') }}">Install — Free</a>
+      </div>
+    </nav>
+  </header>
+
+  <main>
+    {% block content %}{% endblock %}
+  </main>
+
+  <footer>
+    <div class="footer-cta">
+      <p>Get a free Deep Work Starter Pack</p>
+      <form id="subscribe-form">
+        <input type="email" id="sub-email" placeholder="your@email.com" required>
+        <button type="submit">Send me the ebook</button>
+      </form>
+    </div>
+    <small>© {{ now().year }} Focused Room • <a href="/privacy">Privacy</a></small>
+  </footer>
+
+  <script src="{{ url_for('static', filename='js/main.js') }}"></script>
+</body>
+</html>
