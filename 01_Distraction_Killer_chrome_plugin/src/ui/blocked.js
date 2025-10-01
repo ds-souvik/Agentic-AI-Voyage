@@ -5,10 +5,11 @@ class DistractionKillerBlocked {
         this.timerInterval = null;
         this.originalBlockedUrl = null;
         this.challengeParagraph = "I'm about to waste precious time on this site instead of working toward my goals. Every minute spent here is a minute I could've used to learn something new, finish a task, or make progress on what truly matters. I know I'm capable of better choices. Why am I letting distractions win?";
+        
         this.getOriginalUrl();
         this.initializeElements();
-        this.loadSessionData();
-        this.loadUserSettings();
+        this.loadUserSettings();    // Load settings FIRST (may override challengeParagraph)
+        this.loadSessionData();      // Then load session data and update display
         this.setupEventListeners();
         this.startTimer();
     }
@@ -68,6 +69,9 @@ class DistractionKillerBlocked {
         this.userInput.addEventListener('input', () => this.checkTypingProgress());
         this.grantAccess.addEventListener('click', () => this.grantTemporaryAccess());
         this.cancelAccess.addEventListener('click', () => this.cancelAccessRequest());
+
+        // Prevent copy/paste/cut/drop in typing area (programmatic event listeners)
+        this.preventCopyPasteEvents();
 
         // Alternative actions
         this.goBack.addEventListener('click', () => this.goBackToPreviousPage());
@@ -135,7 +139,7 @@ class DistractionKillerBlocked {
         const focusScore = Math.max(0, 100 - ((this.currentSession.blockedAttempts || 0) * 5));
         this.focusScore.textContent = `${focusScore}%`;
 
-        // Update challenge paragraph
+        // Update challenge paragraph from JavaScript (single source of truth for comparison)
         this.challengeParagraphEl.textContent = this.challengeParagraph;
         
         // Show which site was blocked
@@ -196,7 +200,7 @@ class DistractionKillerBlocked {
         const userText = this.userInput.value;
         const targetText = this.challengeParagraph;
         
-        // Calculate similarity (simple character-by-character comparison)
+        // Calculate similarity (character-by-character comparison)
         let correctChars = 0;
         const minLength = Math.min(userText.length, targetText.length);
         
@@ -234,67 +238,43 @@ class DistractionKillerBlocked {
         }
 
         try {
-            // Create temporary access permission for this specific URL and session
             const urlObj = new URL(this.originalBlockedUrl);
             const domain = urlObj.hostname.toLowerCase();
             
             const accessData = {
                 url: this.originalBlockedUrl,
                 domain: domain,
-                baseDomain: this.getBaseDomain(domain), // Store base domain for better matching
-                sessionId: this.currentSession.id, // Tie access to current session
-                minutes: duration, // Send duration in minutes as expected by background script
-                startTime: Date.now(),
-                endTime: Date.now() + (duration * 60 * 1000),
-                granted: true
+                sessionId: this.currentSession.id,
+                minutes: duration
             };
-
-            // If we have blocking reason, include it for better access matching
-            if (this.blockingReason) {
-                accessData.blockingType = this.blockingReason.type;
-                accessData.blockingValue = this.blockingReason.value;
-                accessData.blockingCategory = this.blockingReason.category;
-                
-                // If blocked by keyword, store the keyword for access matching
-                if (this.blockingReason.type === 'keyword') {
-                    accessData.keyword = this.blockingReason.value;
-                }
-                
-                console.log('Including blocking reason in access data:', {
-                    type: this.blockingReason.type,
-                    value: this.blockingReason.value,
-                    category: this.blockingReason.category
-                });
-            }
-
-            // Remove this line - don't store directly
-            // await chrome.storage.local.set({ temporaryAccess: accessData });
-
-            console.log('🎯 DEBUG: Blocked page sending grant access with:', JSON.stringify(accessData, null, 2));
             
-            // Notify background script - this will handle the storage properly
-            chrome.runtime.sendMessage({
+            console.log('🚀 Granting temporary access for:', this.originalBlockedUrl);
+            
+            // Send to background script and wait for confirmation
+            const response = await chrome.runtime.sendMessage({
                 action: 'grantTemporaryAccess',
                 accessData: accessData
             });
-
-            // Track gamification event for override
-            chrome.runtime.sendMessage({
-                action: 'trackGamificationEvent',
-                eventType: 'override',
-                data: { url: this.originalBlockedUrl, duration }
-            });
-
+            
+            if (!response || !response.success) {
+                throw new Error('Background script failed to grant access');
+            }
+            
+            // Verify access was stored by checking storage directly
+            const verification = await chrome.storage.local.get(['temporaryAccess']);
+            if (!verification.temporaryAccess?.granted) {
+                throw new Error('Temporary access verification failed');
+            }
+            
+            console.log('✅ Temporary access verified and stored');
             this.showNotification(`Temporary access granted for ${duration} minutes`, 'success');
             
-            // Redirect directly to the original blocked URL
-            setTimeout(() => {
-                window.location.href = this.originalBlockedUrl;
-            }, 1500);
-
+            // Redirect immediately after verification
+            window.location.href = this.originalBlockedUrl;
+            
         } catch (error) {
-            console.error('Error granting temporary access:', error);
-            this.showNotification('Failed to grant access. Please try again.', 'error');
+            console.error('❌ Error granting temporary access:', error);
+            this.showNotification(`Failed to grant access: ${error.message}`, 'error');
         }
     }
 
@@ -494,6 +474,135 @@ class DistractionKillerBlocked {
                 document.head.removeChild(style);
             }
         }, 4000);
+    }
+
+    /**
+     * Prevent copy, paste, cut, and drop operations in the typing challenge
+     * Uses programmatic event listeners for reliable prevention on all platforms (Windows, macOS, Linux)
+     */
+    preventCopyPasteEvents() {
+        if (!this.userInput) {
+            console.error('userInput element not found');
+            return;
+        }
+
+        // Prevent paste from keyboard (Ctrl+V, Cmd+V) and context menu
+        this.userInput.addEventListener('paste', (e) => {
+            e.preventDefault();
+            e.stopPropagation();
+            this.showBriefWarning('❌ Pasting is not allowed. Please type the text manually.');
+        }, true);
+
+        // Prevent drag and drop
+        this.userInput.addEventListener('drop', (e) => {
+            e.preventDefault();
+            e.stopPropagation();
+            this.showBriefWarning('❌ Drag and drop is not allowed. Please type the text manually.');
+        }, true);
+
+        // Prevent dragging over (required to prevent drop)
+        this.userInput.addEventListener('dragover', (e) => {
+            e.preventDefault();
+            e.stopPropagation();
+        }, true);
+
+        // Prevent drag enter
+        this.userInput.addEventListener('dragenter', (e) => {
+            e.preventDefault();
+            e.stopPropagation();
+        }, true);
+
+        // Prevent copy to clipboard
+        this.userInput.addEventListener('copy', (e) => {
+            e.preventDefault();
+            e.stopPropagation();
+        }, true);
+
+        // Prevent cut to clipboard
+        this.userInput.addEventListener('cut', (e) => {
+            e.preventDefault();
+            e.stopPropagation();
+        }, true);
+
+        // Prevent context menu (right-click) which provides copy/paste options
+        this.userInput.addEventListener('contextmenu', (e) => {
+            e.preventDefault();
+            e.stopPropagation();
+            this.showBriefWarning('❌ Right-click menu is disabled. Please type manually.');
+        }, true);
+
+        console.log('✅ Copy/paste prevention enabled for typing challenge');
+    }
+
+    /**
+     * Show a brief warning message to the user
+     * Non-intrusive visual feedback for prevented actions
+     */
+    showBriefWarning(message) {
+        // Check if warning already exists to prevent spam
+        if (document.querySelector('.paste-warning')) {
+            return;
+        }
+
+        const warning = document.createElement('div');
+        warning.className = 'paste-warning';
+        warning.textContent = message;
+        
+        const style = document.createElement('style');
+        style.id = 'paste-warning-style';
+        style.textContent = `
+            .paste-warning {
+                position: fixed;
+                top: 50%;
+                left: 50%;
+                transform: translate(-50%, -50%);
+                padding: 20px 30px;
+                background: linear-gradient(135deg, rgba(245, 101, 101, 0.95), rgba(229, 62, 62, 0.95));
+                color: white;
+                border-radius: 12px;
+                font-weight: 600;
+                font-size: 15px;
+                z-index: 10000;
+                box-shadow: 0 10px 40px rgba(0, 0, 0, 0.3);
+                animation: warningPulse 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+                max-width: 90%;
+                text-align: center;
+                pointer-events: none;
+                user-select: none;
+            }
+            @keyframes warningPulse {
+                0% { 
+                    transform: translate(-50%, -50%) scale(0.8);
+                    opacity: 0;
+                }
+                50% {
+                    transform: translate(-50%, -50%) scale(1.05);
+                }
+                100% { 
+                    transform: translate(-50%, -50%) scale(1);
+                    opacity: 1;
+                }
+            }
+        `;
+        
+        // Add style only if it doesn't exist
+        if (!document.getElementById('paste-warning-style')) {
+            document.head.appendChild(style);
+        }
+        document.body.appendChild(warning);
+        
+        // Remove warning after 2 seconds
+        setTimeout(() => {
+            if (document.body.contains(warning)) {
+                warning.style.opacity = '0';
+                warning.style.transition = 'opacity 0.3s ease';
+                setTimeout(() => {
+                    if (document.body.contains(warning)) {
+                        document.body.removeChild(warning);
+                    }
+                }, 300);
+            }
+        }, 2000);
     }
 }
 

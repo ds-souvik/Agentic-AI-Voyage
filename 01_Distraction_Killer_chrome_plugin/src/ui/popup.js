@@ -94,6 +94,15 @@ class DistractionKillerPopup {
         this.viewReports?.addEventListener('click', () => this.showReports());
         this.settings?.addEventListener('click', () => this.showSettings());
         this.help?.addEventListener('click', () => this.showHelp());
+
+        // Listen for session updates from background script
+        chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
+            if (request.action === 'sessionUpdated') {
+                this.currentSession = request.sessionData;
+                this.updateStats();
+                sendResponse({ success: true });
+            }
+        });
     }
 
     /**
@@ -179,7 +188,7 @@ class DistractionKillerPopup {
         if (this.currentSession) {
             this.goalDisplay.textContent = this.currentSession.goal || 'Deep Work Session';
             this.updateTimerDisplay();
-            // Remove redundant updateStats() call - stats update via timer
+            this.updateStats(); // Update stats when showing active session
         }
         
         this.updateStatus('active');
@@ -367,6 +376,7 @@ class DistractionKillerPopup {
         this.clearTimer();
         this.timerInterval = setInterval(() => {
             this.updateTimerDisplay();
+            this.updateStats(); // Update stats every second to catch background changes
         }, 1000);
     }
 
@@ -383,16 +393,21 @@ class DistractionKillerPopup {
     /**
      * Update timer display
      */
-    updateTimerDisplay() {
+    async updateTimerDisplay() {
         if (!this.currentSession) return;
         
         // If session is not active (stopped early), don't update timer
         if (!this.currentSession.isActive) {
-            console.log('🔧 DEBUG: Timer stopped - session not active');
             return;
         }
 
+        // Sync with background every 5 seconds to catch any updates
         const now = Date.now();
+        if (!this.lastSync || now - this.lastSync > 5000) {
+            await this.syncWithBackground();
+            this.lastSync = now;
+        }
+
         let remainingTime;
 
         if (this.currentSession.isPaused) {
@@ -402,7 +417,6 @@ class DistractionKillerPopup {
         }
 
         if (remainingTime <= 0) {
-            console.log('🔧 DEBUG: Timer completed - calling completeSession');
             this.completeSession();
             return;
         }
@@ -421,6 +435,20 @@ class DistractionKillerPopup {
         const offset = circumference - (progress * circumference);
         
         this.timerProgress.style.strokeDashoffset = offset;
+    }
+
+    /**
+     * Sync current session data with background script
+     */
+    async syncWithBackground() {
+        try {
+            const response = await chrome.runtime.sendMessage({ action: 'getSessionData' });
+            if (response.currentSession) {
+                this.currentSession = response.currentSession;
+            }
+        } catch (error) {
+            console.error('Error syncing with background:', error);
+        }
     }
 
     /**

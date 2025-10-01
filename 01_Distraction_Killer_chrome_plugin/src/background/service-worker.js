@@ -124,8 +124,13 @@ class DistractionKillerBackground {
                     break;
 
                 case 'grantTemporaryAccess':
-                    await this.grantTemporaryAccess(request.accessData);
-                    sendResponse({ success: true });
+                    try {
+                        await this.grantTemporaryAccess(request.accessData);
+                        sendResponse({ success: true });
+                    } catch (error) {
+                        console.error('❌ Error in grantTemporaryAccess handler:', error);
+                        sendResponse({ success: false, error: error.message });
+                    }
                     break;
 
                 case 'trackGamificationEvent':
@@ -434,8 +439,28 @@ class DistractionKillerBackground {
             await chrome.storage.local.set({ currentSession: this.currentSession });
             console.log('Session updated:', this.currentSession);
             
+            // Broadcast session update to all extension pages (popup, blocked page, etc.)
+            await this.broadcastSessionUpdate();
+            
         } catch (error) {
             console.error('Error updating session:', error);
+        }
+    }
+
+    /**
+     * Broadcast session update to all extension pages
+     */
+    async broadcastSessionUpdate() {
+        try {
+            // Send message to all extension contexts (popup, blocked page, etc.)
+            chrome.runtime.sendMessage({
+                action: 'sessionUpdated',
+                sessionData: this.currentSession
+            }).catch(() => {
+                // Ignore errors if no listeners are active (e.g., popup is closed)
+            });
+        } catch (error) {
+            // Ignore broadcast errors - this is not critical
         }
     }
 
@@ -476,22 +501,32 @@ class DistractionKillerBackground {
      */
     async grantTemporaryAccess(accessData) {
         try {
-            console.log('🎯 DEBUG: Grant access called with data:', JSON.stringify(accessData, null, 2));
+            console.log('🎯 Granting temporary access for:', accessData.url);
+            
+            // Validate input data
+            if (!accessData.url || !accessData.domain || !accessData.sessionId) {
+                throw new Error('Invalid access data provided');
+            }
             
             const temporaryAccess = {
                 url: accessData.url,
                 domain: accessData.domain,
-                keyword: accessData.keyword,
-                sessionId: this.currentSession?.id,
+                sessionId: accessData.sessionId,
                 endTime: Date.now() + (accessData.minutes * 60 * 1000),
-                granted: true
+                granted: true,
+                grantedAt: Date.now()
             };
             
-            console.log('🎯 DEBUG: Creating temporary access:', JSON.stringify(temporaryAccess, null, 2));
-            console.log('🎯 DEBUG: Minutes provided:', accessData.minutes);
-            console.log('🎯 DEBUG: Calculated endTime:', new Date(temporaryAccess.endTime).toISOString());
-            
+            // Store with error handling
             await chrome.storage.local.set({ temporaryAccess });
+            
+            // Verify storage
+            const verification = await chrome.storage.local.get(['temporaryAccess']);
+            if (!verification.temporaryAccess?.granted) {
+                throw new Error('Failed to store temporary access');
+            }
+            
+            console.log('✅ Temporary access stored successfully:', temporaryAccess.url);
             
             // Track as override event
             await this.trackGamificationEvent('override', {
@@ -499,9 +534,9 @@ class DistractionKillerBackground {
                 minutes: accessData.minutes
             });
             
-            console.log('✅ DEBUG: Temporary access granted and stored');
         } catch (error) {
-            console.error('Error granting temporary access:', error);
+            console.error('❌ Error granting temporary access:', error);
+            throw error; // Re-throw to be caught by message handler
         }
     }
 
@@ -513,34 +548,39 @@ class DistractionKillerBackground {
             const result = await chrome.storage.local.get(['temporaryAccess']);
             const temporaryAccess = result.temporaryAccess;
             
-            console.log('🔍 DEBUG: Checking temporary access for:', url);
-            console.log('🔍 DEBUG: Temporary access data:', JSON.stringify(temporaryAccess, null, 2));
+            console.log('🔍 Checking temporary access for:', url);
+            console.log('🔍 Stored access data:', temporaryAccess);
             
             if (!temporaryAccess?.granted) {
-                console.log('No temporary access granted');
+                console.log('❌ No temporary access granted');
                 return false;
             }
             
             const now = Date.now();
+            const timeRemaining = temporaryAccess.endTime - now;
             
-            // Check if access is still valid
-            console.log('🔍 DEBUG: Current session ID:', this.currentSession?.id);
-            console.log('🔍 DEBUG: Access session ID:', temporaryAccess.sessionId);
-            console.log('🔍 DEBUG: Current time:', now);
-            console.log('🔍 DEBUG: Access end time:', temporaryAccess.endTime);
-            console.log('🔍 DEBUG: Time remaining:', temporaryAccess.endTime - now, 'ms');
+            console.log('🔍 Time remaining:', Math.round(timeRemaining / 1000), 'seconds');
             
-            if (temporaryAccess.sessionId !== this.currentSession?.id || now >= temporaryAccess.endTime) {
-                console.log('🚫 DEBUG: Temporary access expired or wrong session');
+            // Check if access expired
+            if (now >= temporaryAccess.endTime) {
+                console.log('❌ Temporary access expired');
                 await chrome.storage.local.remove(['temporaryAccess']);
                 return false;
+            }
+            
+            // Check if sessionId matches (if both exist)
+            if (temporaryAccess.sessionId && this.currentSession?.id) {
+                if (temporaryAccess.sessionId !== this.currentSession.id) {
+                    console.log('❌ Session ID mismatch:', temporaryAccess.sessionId, 'vs', this.currentSession.id);
+                    return false;
+                }
             }
             
             // Check if URL matches
             const urlObj = new URL(url);
             const hostname = urlObj.hostname.toLowerCase();
             
-            console.log('Checking URL match for hostname:', hostname);
+            console.log('🔍 Checking URL match - hostname:', hostname, 'vs stored:', temporaryAccess.domain);
             
             // Exact URL match
             if (temporaryAccess.url && url === temporaryAccess.url) {
@@ -548,7 +588,7 @@ class DistractionKillerBackground {
                 return true;
             }
             
-            // Domain match - check both exact and subdomain matches
+            // Domain match
             if (temporaryAccess.domain) {
                 const accessDomain = temporaryAccess.domain.toLowerCase();
                 if (hostname === accessDomain || hostname.endsWith('.' + accessDomain) || accessDomain.endsWith('.' + hostname)) {
@@ -557,19 +597,11 @@ class DistractionKillerBackground {
                 }
             }
             
-            // Keyword match
-            if (temporaryAccess.keyword) {
-                const keyword = temporaryAccess.keyword.toLowerCase();
-                if (url.toLowerCase().includes(keyword) || hostname.includes(keyword)) {
-                    console.log('✅ Keyword match:', keyword);
-                    return true;
-                }
-            }
-            
-            console.log('❌ No temporary access match found');
+            console.log('❌ No URL match found');
             return false;
+            
         } catch (error) {
-            console.error('Error checking temporary access:', error);
+            console.error('❌ Error checking temporary access:', error);
             return false;
         }
     }
@@ -737,3 +769,4 @@ chrome.notifications.onClicked.addListener((notificationId) => {
 
 // Initialize the background service
 const distractionKiller = new DistractionKillerBackground();
+
