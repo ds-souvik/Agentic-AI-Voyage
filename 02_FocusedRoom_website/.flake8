@@ -1,0 +1,41 @@
+[flake8]
+# Maximum line length
+max-line-length = 100
+
+# Ignore specific rules
+extend-ignore =
+    E203,  # Whitespace before ':' (black compatibility)
+    E501,  # Line too long (handled by black)
+    W503,  # Line break before binary operator (black compatibility)
+    E402,  # Module level import not at top of file
+    F401,  # Imported but unused (handled by isort)
+
+# Exclude directories
+exclude =
+    .git,
+    __pycache__,
+    .venv,
+    venv,
+    env,
+    build,
+    dist,
+    *.egg-info,
+    .pytest_cache,
+    instance,
+    migrations
+
+# Maximum complexity
+max-complexity = 10
+
+# Count errors and warnings
+count = True
+statistics = True
+show-source = True
+
+# File patterns to check
+filename = *.py
+
+# Per-file ignores
+per-file-ignores =
+    __init__.py:F401
+    tests/*:S101
