@@ -1,0 +1,73 @@
+{% extends "base.html" %}
+
+{% block title %}Big Five Personality Test - Free & Science-Based | Focused Room{% endblock %}
+{% block meta_title %}Big Five Personality Test - Free & Science-Based | Focused Room{% endblock %}
+{% block description %}Take the scientifically-validated Big Five personality test and discover your unique personality profile. Get personalized productivity recommendations based on your traits.{% endblock %}
+{% block keywords %}big five, personality test, psychology, personality traits, self-assessment, personality quiz, ocean model, five factor model{% endblock %}
+
+{% block og_title %}Big Five Personality Test - Free & Science-Based{% endblock %}
+{% block og_description %}Discover your personality profile with the Big Five test. Get personalized insights and productivity recommendations.{% endblock %}
+{% block og_image %}{{ request.url_root }}static/assets/og-image-bigfive.png{% endblock %}
+{% block og_type %}website{% endblock %}
+
+{% block twitter_title %}Big Five Personality Test - Free & Science-Based{% endblock %}
+{% block twitter_description %}Discover your personality profile and get personalized productivity insights.{% endblock %}
+
+{% block canonical %}{{ request.url_root }}big-five{% endblock %}
+
+{% block jsonld %}
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "WebApplication",
+  "name": "Big Five Personality Test",
+  "applicationCategory": "LifestyleApplication",
+  "description": "Take the scientifically-validated Big Five personality test and discover your unique personality profile.",
+  "url": "{{ request.url_root }}big-five",
+  "offers": {
+    "@type": "Offer",
+    "price": "0",
+    "priceCurrency": "USD"
+  },
+  "publisher": {
+    "@type": "Organization",
+    "name": "Focused Room"
+  }
+}
+</script>
+
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "BreadcrumbList",
+  "itemListElement": [
+    {
+      "@type": "ListItem",
+      "position": 1,
+      "name": "Home",
+      "item": "{{ request.url_root }}"
+    },
+    {
+      "@type": "ListItem",
+      "position": 2,
+      "name": "Big Five Personality Test",
+      "item": "{{ request.url_root }}big-five"
+    }
+  ]
+}
+</script>
+{% endblock %}
+
+{% block content %}
+<section class="big-five-test">
+  <div class="test-header">
+    <h1>Big Five Personality Test</h1>
+    <p>Discover your unique personality profile based on the scientifically-validated Five Factor Model.</p>
+  </div>
+  
+  <div class="test-content">
+    <!-- Big Five test form will go here -->
+    <p>Test content coming soon...</p>
+  </div>
+</section>
+{% endblock %}
