@@ -1,5 +1,7 @@
 from flask import Blueprint, Response, jsonify, redirect, render_template, request
 
+from app.utils.gemini_client import generate_personality_suggestions
+
 from .models import BigFiveResult, Subscriber, db
 from .utils.bigfive import compute_bigfive_scores, validate_answers
 from .utils.emailer import send_subscription_confirmation
@@ -15,10 +17,15 @@ def index():
     return render_template("index.html")
 
 
+# Line 23 - Split long URL
 @main_bp.route("/download")
 def download():
-    # redirect to Chrome Web Store; include UTM
-    cws = "https://chromewebstore.google.com/detail/distraction-killer-deep-f/caeoilelbbcpmpfifbkgkmabbeiibiko?utm_source=ext_app_menu<your-extension-id>?utm_source=site&utm_medium=cta&utm_campaign=launch"
+    """Redirect to Chrome Web Store."""
+    base_url = "https://chromewebstore.google.com/detail/"
+    extension_id = "distraction-killer-deep-f/"
+    tracking = "caeoilelbbcpmpfifbkgkmabbeiibiko?"
+    utm_params = "utm_source=site&utm_medium=cta&utm_campaign=launch"
+    cws = f"{base_url}{extension_id}{tracking}{utm_params}"
     return redirect(cws)
 
 
@@ -119,7 +126,9 @@ def big_five():
 
             # For now, generate placeholder suggestions
             # In MILESTONE 5, this will be replaced with Gemini/LLM integration
-            suggestions = _generate_placeholder_suggestions(scores)
+            suggestions = generate_personality_suggestions(
+                scores=scores, percentiles=percentiles, fallback=True  # Auto-fallback if API fails
+            )
 
             # Store result in database
             result = BigFiveResult(
@@ -150,7 +159,8 @@ def big_five():
             return jsonify({"success": False, "error": "Internal server error"}), 500
 
 
-def _generate_placeholder_suggestions(scores: dict) -> str:
+# commenting out the placeholder suggestions for now
+''' def _generate_placeholder_suggestions(scores: dict) -> str:
     """
     Generate placeholder suggestions based on scores.
     This will be replaced with LLM integration in MILESTONE 5.
@@ -177,7 +187,7 @@ def _generate_placeholder_suggestions(scores: dict) -> str:
     if not suggestions:
         suggestions.append("Your personality profile shows balanced traits across all dimensions.")
 
-    return " ".join(suggestions)
+    return " ".join(suggestions) '''
 
 
 @main_bp.route("/sitemap.xml")
@@ -188,10 +198,13 @@ def sitemap():
     return Response(sitemap_xml, mimetype="application/xml")
 
 
+# Use context manager for file handling
 @main_bp.route("/robots.txt")
 def robots():
     """Serve robots.txt file."""
-    return Response(open("app/static/robots.txt").read(), mimetype="text/plain")
+    with open("app/static/robots.txt") as f:
+        content = f.read()
+    return Response(content, mimetype="text/plain")
 
 
 @main_bp.route("/features")
