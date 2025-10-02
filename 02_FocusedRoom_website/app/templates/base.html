@@ -4,7 +4,7 @@
   <meta charset="utf-8"/>
   <meta name="viewport" content="width=device-width,initial-scale=1"/>
   <meta http-equiv="X-UA-Compatible" content="IE=edge"/>
-  
+
   <!-- Primary Meta Tags -->
   <title>{% block title %}Focused Room - Block Distractions, Build Your Future{% endblock %}</title>
   <meta name="title" content="{% block meta_title %}Focused Room - Block Distractions, Build Your Future{% endblock %}"/>
@@ -12,10 +12,10 @@
   <meta name="keywords" content="{% block keywords %}productivity, focus, chrome extension, distraction blocker, deep work, time management{% endblock %}"/>
   <meta name="author" content="Focused Room"/>
   <meta name="robots" content="index, follow"/>
-  
+
   <!-- Canonical URL -->
   <link rel="canonical" href="{% block canonical %}{{ request.url_root }}{% endblock %}"/>
-  
+
   <!-- Open Graph / Facebook -->
   <meta property="og:type" content="{% block og_type %}website{% endblock %}"/>
   <meta property="og:url" content="{{ request.url }}"/>
@@ -26,7 +26,7 @@
   <meta property="og:image:height" content="630"/>
   <meta property="og:site_name" content="Focused Room"/>
   <meta property="og:locale" content="en_US"/>
-  
+
   <!-- Twitter Card -->
   <meta name="twitter:card" content="{% block twitter_card %}summary_large_image{% endblock %}"/>
   <meta name="twitter:url" content="{{ request.url }}"/>
@@ -35,15 +35,15 @@
   <meta name="twitter:image" content="{% block twitter_image %}{{ request.url_root }}static/assets/og-image.png{% endblock %}"/>
   <meta name="twitter:site" content="@focusedroom"/>
   <meta name="twitter:creator" content="@focusedroom"/>
-  
+
   <!-- Favicon -->
   <link rel="icon" type="image/png" sizes="32x32" href="{{ url_for('static', filename='assets/favicon.png') }}"/>
   <link rel="icon" type="image/png" sizes="16x16" href="{{ url_for('static', filename='assets/favicon.png') }}"/>
   <link rel="apple-touch-icon" sizes="180x180" href="{{ url_for('static', filename='assets/apple-touch-icon.png') }}"/>
-  
+
   <!-- Stylesheets -->
   <link rel="stylesheet" href="{{ url_for('static', filename='css/main.css') }}"/>
-  
+
   <!-- JSON-LD Structured Data -->
   {% block jsonld %}
   <script type="application/ld+json">
@@ -64,7 +64,7 @@
   }
   </script>
   {% endblock %}
-  
+
   <!-- Additional Scripts -->
   {% block head_scripts %}{% endblock %}
 </head>
