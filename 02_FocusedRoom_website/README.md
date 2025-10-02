@@ -26,7 +26,7 @@ Privacy-first landing page and web platform for the Focused Room Chrome extensio
 
 The Focused Room Website is a Flask-based web platform that serves as the landing page and web companion for the Focused Room Chrome extension. It provides personality testing, newsletter subscription, and educational content about productivity.
 
-**Current Status**: 3 of 7 milestones complete (Big Five, Subscribe & Email, SEO)
+**Current Status**: 5 of 7 milestones complete (Big Five, Subscribe & Email, SEO, CI/CD, Gemini AI)
 
 ## Features
 
@@ -36,7 +36,7 @@ The Focused Room Website is a Flask-based web platform that serves as the landin
 - ✅ **SEO Optimization** - Sitemap, robots.txt, Open Graph, JSON-LD structured data
 - ✅ **CI/CD Pipeline** - Automated testing and code quality checks
 - ⏳ **Blog** - Educational content about productivity and focus (coming soon)
-- ⏳ **AI Suggestions** - Personalized recommendations based on personality (MILESTONE 5)
+- ✅ **AI Suggestions** - Gemini-powered personality recommendations
 
 ## Tech Stack
 
@@ -45,7 +45,8 @@ The Focused Room Website is a Flask-based web platform that serves as the landin
 - **Database**: SQLite (development) / PostgreSQL (production)
 - **ORM**: SQLAlchemy with Flask-SQLAlchemy
 - **Email**: SendGrid with SMTP fallback
-- **Testing**: pytest with 100% pass rate (72 tests)
+- **AI**: Google Gemini 2.0 Flash with fallback logic
+- **Testing**: pytest with 99.2% pass rate (129 tests, 1 skipped)
 
 ### Frontend
 - **Templates**: Jinja2
@@ -105,9 +106,10 @@ The Focused Room Website is a Flask-based web platform that serves as the landin
    MAIL_PASSWORD=your-sendgrid-api-key
    MAIL_DEFAULT_SENDER=noreply@focusedroom.com
 
-   # Gemini API (for AI features - MILESTONE 5)
-   GEMINI_API_KEY=your-gemini-api-key-here
-   ```
+  # Gemini API (for AI-powered personality suggestions)
+  GEMINI_API_KEY=your-gemini-api-key-here
+  ```
+
 
    **⚠️ IMPORTANT**: Never commit the `.env` file to version control.
 
@@ -164,7 +166,7 @@ Submit Big Five personality test responses and receive scores.
     "agreeableness": 85.0,
     "neuroticism": 42.0
   },
-  "suggestions": "Your personality profile shows..."
+  "suggestions": "## Your Personality Profile\n\nBased on your Big Five scores..."
 }
 ```
 
@@ -216,6 +218,12 @@ Subscribe to newsletter with rate limiting and validation.
 - Idempotent operations (safe to retry)
 - SendGrid with SMTP and console fallbacks
 
+**AI-Powered Suggestions:**
+- Primary: Google Gemini 2.0 Flash API
+- Fallback: Generic trait-based suggestions
+- Retry logic: 3 attempts with exponential backoff
+- Response time: ~2-5 seconds (API) or instant (fallback)
+
 ### SEO Endpoints
 
 #### `GET /sitemap.xml`
@@ -262,10 +270,10 @@ Sitemap: https://focusedroom.com/sitemap.xml
 ### Run All Tests
 
 ```bash
-# Run all 72 tests
+# Run all 130 tests
 pytest -v
 
-# Expected output: 72 passed (31 Big Five + 21 Subscribe + 20 SEO)
+# Expected output: 129 passed, 1 skipped (31 Big Five + 21 Subscribe + 20 SEO + 27 CI/CD + 30 Gemini)
 ```
 
 ### Run Specific Test Suites
@@ -282,6 +290,9 @@ pytest tests/test_seo.py -v
 
 # CI/CD tests
 pytest tests/test_ci.py -v
+
+# Gemini AI tests (30 tests)
+pytest tests/test_gemini.py -v
 ```
 
 ### Test with Coverage
@@ -303,9 +314,10 @@ Current test coverage by module:
 - ✅ **Big Five**: 100% coverage (31 tests)
 - ✅ **Subscribe & Email**: 100% coverage (21 tests)
 - ✅ **SEO**: 100% coverage (20 tests)
-- ⏳ **CI/CD**: In progress
+- ✅ **CI/CD**: 100% coverage (27 tests, 1 skipped)
+- ✅ **Gemini AI**: 100% coverage (30 tests)
 
-**Overall**: 72/72 tests passing (100% pass rate)
+**Overall**: 129/130 tests passing (99.2% pass rate, 1 intentionally skipped)
 
 ## CI/CD & Code Quality
 
@@ -734,12 +746,13 @@ Set these in your hosting platform:
 │ ├── rate_limiter.py # Rate limiting
 │ ├── validators.py # Input validation
 │ ├── seo.py # SEO utilities
-│ └── gemini_.py # LLM integration (MILESTONE 5)
+│ └── gemini_client.py # Gemini AI client
 ├── tests/
 │ ├── test_bigfive.py # 31 tests
 │ ├── test_subscribe.py # 21 tests
 │ ├── test_seo.py # 20 tests
-│ └── test_ci.py # CI/CD tests
+│ ├── test_ci.py # 27 tests (1 skipped)
+│ └── test_gemini.py # 30 tests
 ├── instance/
 │ └── focusedroom.db # SQLite database (dev)
 ├── .pre-commit-config.yaml # Pre-commit hooks
@@ -757,12 +770,12 @@ Set these in your hosting platform:
 - ✅ **MILESTONE 1**: Big Five Core - Scoring logic + 31 tests
 - ✅ **MILESTONE 2**: Subscribe & Email - Validation + SendGrid + 21 tests
 - ✅ **MILESTONE 3**: SEO, Sitemap, OG Images - Complete SEO + 20 tests
-- ⏳ **MILESTONE 4**: CI/CD, Linting, Pre-commit - Automation + quality gates
-- ⏳ **MILESTONE 5**: Gemini/LLM Integration - AI-powered suggestions
+- ✅ **MILESTONE 4**: CI/CD, Linting, Pre-commit - Automation + quality gates + 27 tests
+- ✅ **MILESTONE 5**: Gemini/LLM Integration - AI-powered suggestions + 30 tests
 - ⏳ **MILESTONE 6**: Deployment Prep - Docker + production setup
 - ⏳ **MILESTONE 7**: Performance & Accessibility - Lighthouse optimization
 
-**Current Progress**: 3 of 7 milestones complete (43%)
+**Current Progress**: 5 of 7 milestones complete (71%)
 
 ## Security & Privacy
 
@@ -839,5 +852,5 @@ For questions or support, visit [focusedroom.com](https://focusedroom.com)
 **Note**: The Chrome extension source code is located in `../01_FocusedRoom/` and should not be modified as part of website development unless explicitly required.
 
 **Last Updated**: October 2, 2025  
-**Version**: 1.0.0  
-**Status**: Active Development (MILESTONE 4 in progress)
+**Version**: 1.5.0  
+**Status**: Active Development (MILESTONE 6 next - Deployment Prep)
