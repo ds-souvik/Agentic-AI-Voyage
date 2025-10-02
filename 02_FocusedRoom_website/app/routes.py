@@ -1,7 +1,9 @@
 from flask import Blueprint, render_template, request, jsonify, redirect, url_for
 from .models import db, Subscriber, BigFiveResult
-from .utils.emailer import send_subscription_confirmation
+from .utils.emailer import send_subscription_confirmation, send_big_five_results
 from .utils.bigfive import compute_bigfive_scores, validate_answers
+from .utils.rate_limiter import rate_limit, get_client_ip
+from .utils.validators import validate_subscription_request, validate_email
 
 main_bp = Blueprint('main', __name__)
 
@@ -16,20 +18,78 @@ def download():
     return redirect(cws)
 
 @main_bp.route('/api/subscribe', methods=['POST'])
+@rate_limit(limit=5, window=3600)  # 5 requests per hour per IP
 def subscribe():
-    data = request.get_json()
-    email = data.get('email')
-    if not email:
-        return jsonify({"success": False, "error": "Email required"}), 400
-    existing = Subscriber.query.filter_by(email=email).first()
-    if existing:
-        return jsonify({"success": True, "message": "Already subscribed"})
-    sub = Subscriber(email=email)
-    db.session.add(sub)
-    db.session.commit()
-    # send confirmation email (async recommended)
-    send_subscription_confirmation(email)
-    return jsonify({"success": True})
+    """
+    Enhanced newsletter subscription endpoint with validation and rate limiting.
+    
+    Rate limit: 5 requests per hour per IP address
+    """
+    try:
+        # Get request data
+        try:
+            data = request.get_json()
+        except Exception:
+            # Handle malformed JSON or empty body
+            return jsonify({
+                "success": False, 
+                "error": "Email is required"
+            }), 400
+        
+        # Validate request data
+        is_valid, error_msg = validate_subscription_request(data)
+        if not is_valid:
+            return jsonify({
+                "success": False, 
+                "error": error_msg
+            }), 400
+        
+        email = data['email'].lower().strip()  # Normalize email
+        
+        # Check for existing subscription (idempotent operation)
+        existing = Subscriber.query.filter_by(email=email).first()
+        if existing:
+            # Update existing subscription if needed
+            existing.opt_in = True
+            db.session.commit()
+            
+            # Send confirmation email (idempotent - safe to resend)
+            email_result = send_subscription_confirmation(email)
+            
+            return jsonify({
+                "success": True,
+                "message": "Already subscribed - confirmation sent",
+                "email_sent": email_result.get('success', False),
+                "email_provider": email_result.get('provider', 'unknown')
+            })
+        
+        # Create new subscription
+        subscriber = Subscriber(email=email, opt_in=True)
+        db.session.add(subscriber)
+        db.session.commit()
+        
+        # Send confirmation email
+        email_result = send_subscription_confirmation(email)
+        
+        return jsonify({
+            "success": True,
+            "message": "Successfully subscribed to newsletter",
+            "email_sent": email_result.get('success', False),
+            "email_provider": email_result.get('provider', 'unknown'),
+            "subscriber_id": subscriber.id
+        })
+        
+    except Exception as e:
+        # Rollback database transaction on error
+        db.session.rollback()
+        
+        # Log error (in production, use proper logging)
+        print(f"Subscription error: {str(e)}")
+        
+        return jsonify({
+            "success": False,
+            "error": "Internal server error"
+        }), 500
 
 @main_bp.route('/big-five', methods=['GET', 'POST'])
 def big_five():
