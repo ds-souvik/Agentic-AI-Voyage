@@ -1,9 +1,11 @@
-from flask import Blueprint, render_template, request, jsonify, redirect, url_for
+from flask import Blueprint, render_template, request, jsonify, redirect, url_for, Response
 from .models import db, Subscriber, BigFiveResult
 from .utils.emailer import send_subscription_confirmation, send_big_five_results
 from .utils.bigfive import compute_bigfive_scores, validate_answers
 from .utils.rate_limiter import rate_limit, get_client_ip
 from .utils.validators import validate_subscription_request, validate_email
+from .utils.seo import generate_sitemap_xml
+
 
 main_bp = Blueprint('main', __name__)
 
@@ -173,3 +175,43 @@ def _generate_placeholder_suggestions(scores: dict) -> str:
         suggestions.append("Your personality profile shows balanced traits across all dimensions.")
     
     return " ".join(suggestions)
+
+
+@main_bp.route('/sitemap.xml')
+def sitemap():
+    """Generate and serve XML sitemap."""
+    base_url = request.url_root.rstrip('/')
+    sitemap_xml = generate_sitemap_xml(base_url)
+    return Response(sitemap_xml, mimetype='application/xml')
+
+
+@main_bp.route('/robots.txt')
+def robots():
+    """Serve robots.txt file."""
+    return Response(
+        open('app/static/robots.txt').read(),
+        mimetype='text/plain'
+    )
+
+@main_bp.route('/features')
+def features():
+    """Features page."""
+    return render_template('features.html')
+
+
+@main_bp.route('/privacy')
+def privacy():
+    """Privacy policy page."""
+    return render_template('privacy.html')
+
+
+@main_bp.route('/blog')
+def blog():
+    """Blog listing page."""
+    return render_template('blog_list.html')
+
+
+@main_bp.route('/blog/<slug>')
+def blog_post(slug):
+    """Individual blog post page."""
+    return render_template('blog_post.html', slug=slug)

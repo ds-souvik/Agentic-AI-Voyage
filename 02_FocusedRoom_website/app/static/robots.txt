@@ -1,0 +1,24 @@
+# Focused Room - Robots.txt
+# Updated: 2025-10-02
+
+User-agent: *
+Allow: /
+Disallow: /api/
+Disallow: /admin/
+Disallow: *.json$
+
+# Sitemap
+Sitemap: https://focusedroom.com/sitemap.xml
+
+# Crawl delay (optional, adjust if needed)
+Crawl-delay: 1
+
+# Specific bots
+User-agent: Googlebot
+Allow: /
+
+User-agent: Bingbot
+Allow: /
+
+User-agent: GPTBot
+Disallow: /

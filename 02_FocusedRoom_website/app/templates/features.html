@@ -1,0 +1,60 @@
+{% extends "base.html" %}
+
+{% block title %}Features - Focused Room Chrome Extension{% endblock %}
+{% block meta_title %}Features - Focused Room Chrome Extension{% endblock %}
+{% block description %}Explore Focused Room features: distraction blocking, friction override, gamified progress tracking, and privacy-first design.{% endblock %}
+{% block keywords %}chrome extension features, productivity tools, distraction blocking, focus tools, time management features{% endblock %}
+
+{% block og_title %}Focused Room Features - Productivity Redefined{% endblock %}
+{% block og_description %}Distraction blocking, friction override, gamified tracking. All the features you need for deep work.{% endblock %}
+{% block og_image %}{{ request.url_root }}static/assets/og-image-features.png{% endblock %}
+
+{% block canonical %}{{ request.url_root }}features{% endblock %}
+
+{% block jsonld %}
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "ItemList",
+  "name": "Focused Room Features",
+  "description": "Key features of the Focused Room productivity extension",
+  "itemListElement": [
+    {
+      "@type": "ListItem",
+      "position": 1,
+      "name": "Distraction Blocking",
+      "description": "Block time-wasting websites automatically"
+    },
+    {
+      "@type": "ListItem",
+      "position": 2,
+      "name": "Friction Override",
+      "description": "Add friction before visiting distracting sites"
+    },
+    {
+      "@type": "ListItem",
+      "position": 3,
+      "name": "Gamified Progress",
+      "description": "Track your productivity with visual reports"
+    },
+    {
+      "@type": "ListItem",
+      "position": 4,
+      "name": "Privacy First",
+      "description": "Your data stays on your device"
+    }
+  ]
+}
+</script>
+{% endblock %}
+
+{% block content %}
+<section class="features-page">
+  <div class="content-container">
+    <h1>Features</h1>
+    <p>Everything you need to protect your focus and build better work habits.</p>
+    
+    <!-- Feature cards will go here -->
+  </div>
+</section>
+{% endblock %}

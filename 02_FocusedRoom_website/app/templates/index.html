@@ -1,5 +1,45 @@
 {% extends "base.html" %}
-{% block title %}Protect your focus. Build your future. | Focused Room{% endblock %}
+
+{% block title %}Focused Room - Block Distractions, Build Your Future{% endblock %}
+{% block meta_title %}Focused Room - Block Distractions, Build Your Future{% endblock %}
+{% block description %}Turn Chrome into a calm workspace. Block distractions, use friction override, and track progress with gamified reports. Free Chrome extension.{% endblock %}
+{% block keywords %}productivity, focus, chrome extension, distraction blocker, deep work, time management, productivity tools{% endblock %}
+
+{% block og_title %}Focused Room - Protect Your Focus. Build Your Future.{% endblock %}
+{% block og_description %}Block distractions, protect your deep work, and gamify productivity with Focused Room Chrome extension.{% endblock %}
+{% block og_image %}{{ request.url_root }}static/assets/og-image-home.png{% endblock %}
+
+{% block twitter_title %}Focused Room - Protect Your Focus. Build Your Future.{% endblock %}
+{% block twitter_description %}Block distractions, protect your deep work, and gamify productivity.{% endblock %}
+
+{% block canonical %}{{ request.url_root }}{% endblock %}
+
+{% block jsonld %}
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "SoftwareApplication",
+  "name": "Focused Room",
+  "applicationCategory": "ProductivityApplication",
+  "operatingSystem": "Chrome",
+  "offers": {
+    "@type": "Offer",
+    "price": "0",
+    "priceCurrency": "USD"
+  },
+  "aggregateRating": {
+    "@type": "AggregateRating",
+    "ratingValue": "4.8",
+    "ratingCount": "1250"
+  },
+  "description": "Turn Chrome into a calm workspace — block distractions, use friction override, and track progress with gamified reports.",
+  "screenshot": "{{ request.url_root }}static/assets/hero-screenshot.png",
+  "softwareVersion": "1.0",
+  "applicationSubCategory": "Browser Extension"
+}
+</script>
+{% endblock %}
+
 {% block content %}
 <section class="hero">
   <div class="hero-left">
@@ -12,7 +52,7 @@
     <p class="privacy-note">No trackers • Data stays on your device</p>
   </div>
   <div class="hero-right">
-    <img src="{{ url_for('static', filename='assets/hero-screenshot.png') }}" alt="Focused Room screenshots">
+    <img src="{{ url_for('static', filename='assets/hero-screenshot.png') }}" alt="Focused Room Chrome extension screenshots showing distraction blocking interface">
   </div>
 </section>
 

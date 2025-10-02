@@ -3,15 +3,70 @@
 <head>
   <meta charset="utf-8"/>
   <meta name="viewport" content="width=device-width,initial-scale=1"/>
-  <title>{% block title %}Focused Room{% endblock %}</title>
-  <meta name="description" content="{% block description %}Protect your focus. Build your future.{% endblock %}">
-  <!-- Open Graph and Twitter cards -->
-  <meta property="og:title" content="Focused Room — Protect your focus. Build your future."/>
-  <meta property="og:description" content="Block distractions, protect your deep work, and gamify productivity."/>
-  <link rel="icon" href="{{ url_for('static', filename='assets/favicon.png') }}">
-  <link rel="stylesheet" href="{{ url_for('static', filename='css/main.css') }}">
-  <!-- JSON-LD -->
-  {% block jsonld %}{% endblock %}
+  <meta http-equiv="X-UA-Compatible" content="IE=edge"/>
+  
+  <!-- Primary Meta Tags -->
+  <title>{% block title %}Focused Room - Block Distractions, Build Your Future{% endblock %}</title>
+  <meta name="title" content="{% block meta_title %}Focused Room - Block Distractions, Build Your Future{% endblock %}"/>
+  <meta name="description" content="{% block description %}Turn Chrome into a calm workspace. Block distractions, use friction override, and track progress with gamified reports. Free Chrome extension.{% endblock %}"/>
+  <meta name="keywords" content="{% block keywords %}productivity, focus, chrome extension, distraction blocker, deep work, time management{% endblock %}"/>
+  <meta name="author" content="Focused Room"/>
+  <meta name="robots" content="index, follow"/>
+  
+  <!-- Canonical URL -->
+  <link rel="canonical" href="{% block canonical %}{{ request.url_root }}{% endblock %}"/>
+  
+  <!-- Open Graph / Facebook -->
+  <meta property="og:type" content="{% block og_type %}website{% endblock %}"/>
+  <meta property="og:url" content="{{ request.url }}"/>
+  <meta property="og:title" content="{% block og_title %}Focused Room - Protect Your Focus. Build Your Future.{% endblock %}"/>
+  <meta property="og:description" content="{% block og_description %}Block distractions, protect your deep work, and gamify productivity with Focused Room Chrome extension.{% endblock %}"/>
+  <meta property="og:image" content="{% block og_image %}{{ request.url_root }}static/assets/og-image.png{% endblock %}"/>
+  <meta property="og:image:width" content="1200"/>
+  <meta property="og:image:height" content="630"/>
+  <meta property="og:site_name" content="Focused Room"/>
+  <meta property="og:locale" content="en_US"/>
+  
+  <!-- Twitter Card -->
+  <meta name="twitter:card" content="{% block twitter_card %}summary_large_image{% endblock %}"/>
+  <meta name="twitter:url" content="{{ request.url }}"/>
+  <meta name="twitter:title" content="{% block twitter_title %}Focused Room - Protect Your Focus. Build Your Future.{% endblock %}"/>
+  <meta name="twitter:description" content="{% block twitter_description %}Block distractions, protect your deep work, and gamify productivity.{% endblock %}"/>
+  <meta name="twitter:image" content="{% block twitter_image %}{{ request.url_root }}static/assets/og-image.png{% endblock %}"/>
+  <meta name="twitter:site" content="@focusedroom"/>
+  <meta name="twitter:creator" content="@focusedroom"/>
+  
+  <!-- Favicon -->
+  <link rel="icon" type="image/png" sizes="32x32" href="{{ url_for('static', filename='assets/favicon.png') }}"/>
+  <link rel="icon" type="image/png" sizes="16x16" href="{{ url_for('static', filename='assets/favicon.png') }}"/>
+  <link rel="apple-touch-icon" sizes="180x180" href="{{ url_for('static', filename='assets/apple-touch-icon.png') }}"/>
+  
+  <!-- Stylesheets -->
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/main.css') }}"/>
+  
+  <!-- JSON-LD Structured Data -->
+  {% block jsonld %}
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "WebSite",
+    "name": "Focused Room",
+    "url": "{{ request.url_root }}",
+    "description": "Block distractions, protect your deep work, and gamify productivity with Focused Room Chrome extension.",
+    "publisher": {
+      "@type": "Organization",
+      "name": "Focused Room",
+      "logo": {
+        "@type": "ImageObject",
+        "url": "{{ request.url_root }}static/assets/logo.png"
+      }
+    }
+  }
+  </script>
+  {% endblock %}
+  
+  <!-- Additional Scripts -->
+  {% block head_scripts %}{% endblock %}
 </head>
 <body>
   <header>
@@ -42,5 +97,6 @@
   </footer>
 
   <script src="{{ url_for('static', filename='js/main.js') }}"></script>
+  {% block body_scripts %}{% endblock %}
 </body>
 </html>
