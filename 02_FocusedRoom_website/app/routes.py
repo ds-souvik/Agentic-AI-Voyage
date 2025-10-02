@@ -1,11 +1,11 @@
-from flask import Blueprint, Response, jsonify, redirect, render_template, request, url_for
+from flask import Blueprint, Response, jsonify, redirect, render_template, request
 
 from .models import BigFiveResult, Subscriber, db
 from .utils.bigfive import compute_bigfive_scores, validate_answers
-from .utils.emailer import send_big_five_results, send_subscription_confirmation
-from .utils.rate_limiter import get_client_ip, rate_limit
+from .utils.emailer import send_subscription_confirmation
+from .utils.rate_limiter import rate_limit
 from .utils.seo import generate_sitemap_xml
-from .utils.validators import validate_email, validate_subscription_request
+from .utils.validators import validate_subscription_request
 
 main_bp = Blueprint("main", __name__)
 
@@ -145,7 +145,7 @@ def big_five():
 
         except ValueError as e:
             return jsonify({"success": False, "error": str(e)}), 400
-        except Exception as e:
+        except Exception:
             db.session.rollback()
             return jsonify({"success": False, "error": "Internal server error"}), 500
 

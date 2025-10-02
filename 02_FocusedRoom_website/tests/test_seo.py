@@ -3,12 +3,6 @@ Unit tests for SEO utilities and functionality.
 Tests sitemap generation, meta tags, JSON-LD, and robots.txt.
 """
 
-import json
-from datetime import datetime
-
-import pytest
-from flask import Flask
-
 from app import create_app
 from app.utils.seo import (
     generate_canonical_url,

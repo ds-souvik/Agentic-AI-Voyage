@@ -6,7 +6,7 @@ Provides functions for generating sitemaps, JSON-LD structured data, and meta ta
 from datetime import datetime
 from typing import Any, Dict, List
 
-from flask import request, url_for
+from flask import request
 
 
 def generate_sitemap_xml(base_url: str) -> str:

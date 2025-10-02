@@ -9,11 +9,9 @@ Tests cover:
 - Error handling and edge cases
 """
 
-import time
-from unittest.mock import MagicMock, patch
+from unittest.mock import patch
 
-import pytest
-from flask import Flask, json
+from flask import json
 
 from app import create_app, db
 from app.models import Subscriber

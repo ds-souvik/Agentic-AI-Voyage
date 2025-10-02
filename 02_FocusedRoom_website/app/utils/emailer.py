@@ -7,9 +7,7 @@ confirmations, and other automated emails using SendGrid with fallback options.
 
 import logging
 import os
-from typing import Any, Dict, Optional
-
-from flask import current_app
+from typing import Any, Dict
 
 # Configure logging
 logger = logging.getLogger(__name__)
