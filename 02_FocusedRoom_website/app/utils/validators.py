@@ -5,11 +5,12 @@ This module provides validation functions for various input types
 including email addresses, form data, and API requests.
 """
 
+import contextlib
 import re
-from typing import Any, Dict, List, Optional, Tuple
+from typing import Any, Optional
 
 
-def validate_email(email: str) -> Tuple[bool, Optional[str]]:
+def validate_email(email: str) -> tuple[bool, Optional[str]]:
     """
     Validate email address format and basic rules.
 
@@ -32,9 +33,10 @@ def validate_email(email: str) -> Tuple[bool, Optional[str]]:
     if len(email) > 254:  # RFC 5321 limit
         return False, "Email is too long"
 
-    # RFC 5322 compliant regex (simplified)
+    # RFC 5322 compliant regex (simplified) - split for readability
     email_pattern = re.compile(
-        r"^[a-zA-Z0-9]([a-zA-Z0-9._+-]*[a-zA-Z0-9])?@[a-zA-Z0-9]([a-zA-Z0-9.-]*[a-zA-Z0-9])?\.[a-zA-Z]{2,}$"
+        r"^[a-zA-Z0-9]([a-zA-Z0-9._+-]*[a-zA-Z0-9])?"
+        r"@[a-zA-Z0-9]([a-zA-Z0-9.-]*[a-zA-Z0-9])?\.[a-zA-Z]{2,}$"
     )
 
     if not email_pattern.match(email):
@@ -64,7 +66,7 @@ def validate_email(email: str) -> Tuple[bool, Optional[str]]:
     return True, None
 
 
-def validate_big_five_answers(answers: List) -> Tuple[bool, Optional[str]]:
+def validate_big_five_answers(answers: list) -> tuple[bool, Optional[str]]:
     """
     Validate Big Five personality test answers.
 
@@ -91,7 +93,7 @@ def validate_big_five_answers(answers: List) -> Tuple[bool, Optional[str]]:
     return True, None
 
 
-def validate_subscription_request(data: Dict[str, Any]) -> Tuple[bool, Optional[str]]:
+def validate_subscription_request(data: dict[str, Any]) -> tuple[bool, Optional[str]]:
     """
     Validate newsletter subscription request.
 
@@ -150,7 +152,7 @@ def sanitize_input(text: str, max_length: int = 1000) -> str:
     return text
 
 
-def validate_rate_limit_headers(headers: Dict[str, str]) -> Dict[str, Any]:
+def validate_rate_limit_headers(headers: dict[str, str]) -> dict[str, Any]:
     """
     Extract and validate rate limiting information from headers.
 
@@ -160,31 +162,28 @@ def validate_rate_limit_headers(headers: Dict[str, str]) -> Dict[str, Any]:
     Returns:
         Dictionary with rate limit information
     """
-    rate_limit_info = {"limit": None, "remaining": None, "reset": None, "retry_after": None}
+    rate_limit_info: dict[str, Optional[int]] = {
+        "limit": None,
+        "remaining": None,
+        "reset": None,
+        "retry_after": None,
+    }
 
     # Check for standard rate limit headers
     if "X-RateLimit-Limit" in headers:
-        try:
+        with contextlib.suppress(ValueError):
             rate_limit_info["limit"] = int(headers["X-RateLimit-Limit"])
-        except ValueError:
-            pass
 
     if "X-RateLimit-Remaining" in headers:
-        try:
+        with contextlib.suppress(ValueError):
             rate_limit_info["remaining"] = int(headers["X-RateLimit-Remaining"])
-        except ValueError:
-            pass
 
     if "X-RateLimit-Reset" in headers:
-        try:
+        with contextlib.suppress(ValueError):
             rate_limit_info["reset"] = int(headers["X-RateLimit-Reset"])
-        except ValueError:
-            pass
 
     if "Retry-After" in headers:
-        try:
+        with contextlib.suppress(ValueError):
             rate_limit_info["retry_after"] = int(headers["Retry-After"])
-        except ValueError:
-            pass
 
     return rate_limit_info
