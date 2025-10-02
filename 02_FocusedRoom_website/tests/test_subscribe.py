@@ -254,7 +254,7 @@ class TestSubscriptionEndpoint:
         """Test successful subscription."""
         with self.app.app_context():
             response = self.client.post('/api/subscribe', 
-                                      json={'email': 'test@example.com'},
+                                      json={'email': 'success@example.com'},
                                       content_type='application/json')
             
             assert response.status_code == 200
@@ -263,7 +263,7 @@ class TestSubscriptionEndpoint:
             assert 'Successfully subscribed' in data['message']
             
             # Check database
-            subscriber = Subscriber.query.filter_by(email='test@example.com').first()
+            subscriber = Subscriber.query.filter_by(email='success@example.com').first()
             assert subscriber is not None
             assert subscriber.opt_in is True
     
