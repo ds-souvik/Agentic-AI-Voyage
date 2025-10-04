@@ -50,9 +50,17 @@ The Focused Room Website is a Flask-based web platform that serves as the landin
 
 ### Frontend
 - **Templates**: Jinja2
-- **Styling**: Custom CSS
+- **Styling**: Custom CSS with design tokens
 - **JavaScript**: Vanilla JS (no frameworks)
 - **SEO**: Open Graph, Twitter Cards, JSON-LD
+
+### Design System
+- **Color Palette**: Extracted from extension CSS for brand consistency
+- **Primary**: `#7A9E9F` (teal), `#38a169` (success green)
+- **Typography**: System font stack for performance
+- **Components**: Accessible buttons, cards, forms with WCAG 2.1 AA compliance
+- **Inspirations**: Apple minimalism, Notion clean design, Calm.com zen aesthetic
+- **Documentation**: See [`docs/DESIGN_SYSTEM.md`](./docs/DESIGN_SYSTEM.md)
 
 ### DevOps & Quality
 - **CI/CD**: GitHub Actions (Python 3.9-3.12)
@@ -815,9 +823,11 @@ Set these in your hosting platform:
 - ✅ **MILESTONE 4**: CI/CD, Linting, Pre-commit - Automation + quality gates + 27 tests
 - ✅ **MILESTONE 5**: Gemini/LLM Integration - AI-powered suggestions + 30 tests
 - ✅ **MILESTONE 6**: Deployment Prep - Docker + production setup + 43 tests
-- ⏳ **MILESTONE 7**: Performance & Accessibility - Lighthouse optimization
+- 🚧 **MILESTONE 7**: Performance & Accessibility - Production UI + Lighthouse >90 + WCAG 2.1 AA (IN PROGRESS)
+  - ✅ **PR A**: Hero + Asset Foundation - Complete design system + testimonials carousel
+  - ⏳ **PR B-H**: Features, Big Five UI, Accessibility, Performance, Images, Lighthouse CI, Polish
 
-**Current Progress: 6 of 7 milestones complete (86%)
+**Current Progress**: 6 of 7 milestones complete (86%) | MILESTONE 7: PR A complete, PR B-H pending
 
 
 ## Security & Privacy
@@ -896,4 +906,4 @@ For questions or support, visit [focusedroom.com](https://focusedroom.com)
 
 **Last Updated**: October 4, 2025  
 **Version**: 1.6.0  
-**Status**: Active Development (MILESTONE 7 next - Performance & Accessibility)
+**Status**: Active Development (MILESTONE 7 in progress - Performance & Accessibility)
