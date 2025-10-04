@@ -197,30 +197,32 @@
 - **Git**: Committed and pushed to GitHub
 
 ### ⏳ MILESTONE 7 - Performance & Accessibility (IN PROGRESS)
-- **Status**: PR A complete, ready for merge | PR B-H pending
+- **Status**: PR A+B complete, ready for merge | PR C-H pending
 - **Target**: Production-ready UI, Lighthouse >90, WCAG 2.1 AA compliance
 - **Brand**: Modern-minimal, calming/zen, gamified aesthetic
 - **Design System**: Custom color palette from extension CSS
 - **Phased Approach**: 8 PRs (Hero → Features → Big Five → Accessibility → Performance → Images → Lighthouse CI → Polish)
 
-#### ✅ PR A: Hero + Asset Foundation (COMPLETE)
+#### ✅ PR A+B: Hero + Testimonials + Features (COMPLETE)
 - **Branch**: `feature/ui-hero`
 - **Status**: Complete, ready for merge
 - **Implementation**:
-  - `app/static/css/main.css` (1116 lines) - Complete design system with tokens
+  - `app/static/css/main.css` (1403 lines) - Complete design system + features section
   - `app/static/js/main.js` (419 lines) - Form validation, carousel, accessibility
-  - `app/templates/base.html` - Accessibility improvements (skip link, landmarks, ARIA)
-  - `app/templates/index.html` - Polished hero + vertical testimonials carousel
+  - `app/templates/base.html` - Accessibility improvements (skip link, landmarks, ARIA, logo)
+  - `app/templates/index.html` - Hero + testimonials + 4-card features section
+  - `app/static/assets/4_features/` - 4 feature screenshots (Deep Work, Smart Blocking, Friction Override, Gamified Analytics)
   - `docs/DESIGN_SYSTEM.md` - Complete design tokens documentation
   - `.github/MILESTONE_7_SPEC.md` - 8-PR phased implementation plan
 - **Features**:
-  - Hero: 3-image carousel (auto-rotate 4s), animated science badge, gradient H1
-  - Typography: Logo teal→black hover, "Protect"/"Build" highlighted in teal
-  - Testimonials: Vertical auto-scroll (30s), fade masks, pause on hover
-  - Character: Floating orbs, layered gradients, depth, smooth animations
-  - Accessibility: WCAG 2.1 AA compliant (skip link, landmarks, focus states)
+  - **Hero**: 3-image carousel (auto-rotate 4s), animated science badge, gradient H1, logo with icon
+  - **Typography**: Logo teal→black hover, "Protect"/"Build" highlighted in teal
+  - **Testimonials**: Vertical auto-scroll (30s), fade masks, pause on hover, 5 customer reviews
+  - **Features**: 2x2 responsive grid, full screenshots (max 280px), compact cards, hover effects (lift, zoom, badge reveal)
+  - **Character**: Floating orbs, layered gradients, depth, smooth animations
+  - **Accessibility**: WCAG 2.1 AA compliant (skip link, landmarks, focus states, semantic HTML)
 - **Test Results**: 159/160 passing (99.4%)
-- **Git**: 2 commits (b8a894a, 0f301a2) on `feature/ui-hero`
+- **Git**: 3 commits on `feature/ui-hero` (b8a894a, 0f301a2, 0420911)
 
 #### Design System (MANDATORY - Never Deviate)
 **Color Palette** (extracted from extension CSS):
