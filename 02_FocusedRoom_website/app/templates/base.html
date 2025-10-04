@@ -81,7 +81,10 @@
       <div class="nav-links">
         <a href="{{ url_for('main.index') }}#features">Features</a>
         <a href="{{ url_for('main.index') }}#testimonials">Testimonials</a>
-        <a href="{{ url_for('main.big_five') }}">Big Five</a>
+        <a href="{{ url_for('main.big_five') }}" class="nav-bigfive-link">
+          <span class="bigfive-badge-icon">🧠</span>
+          <span class="bigfive-badge-text">The Big Five Test</span>
+        </a>
         <a href="/blog">Blog</a>
         <a class="cta" href="{{ url_for('main.download') }}">Install — Free</a>
       </div>
@@ -102,6 +105,9 @@
     </div>
     <small>© {{ now().year }} Focused Room • <a href="/privacy">Privacy</a></small>
   </footer>
+
+  <!-- Chart.js for Big Five radar chart -->
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js" integrity="sha384-xzCZPY8K1hpvfPL7R6dw3QQVQE8EZqGYKzLqxIBqNqBxR1qKLQvJZF7qJJmXG9Ql" crossorigin="anonymous"></script>
 
   <script src="{{ url_for('static', filename='js/main.js') }}"></script>
   {% block body_scripts %}{% endblock %}
