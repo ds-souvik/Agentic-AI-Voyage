@@ -47,7 +47,7 @@
       <span class="badge-icon">🧠</span>
       <span class="badge-text">Backed by Cognitive Behavioral Science</span>
     </div>
-    <h1>Protect your focus. Build your future.</h1>
+    <h1><span class="highlight-primary">Protect</span> your focus. <span class="highlight-primary">Build</span> your future.</h1>
     <p>Turn Chrome into a calm workspace — block distractions, use friction override, and track progress with gamified reports.</p>
     <div class="hero-cta">
       <a class="btn primary" href="{{ url_for('main.download') }}?utm_source=site&utm_medium=cta&utm_campaign=launch">Install on Chrome — Free</a>
@@ -98,26 +98,35 @@
         <span class="star">⭐</span>
         <span class="star">⭐</span>
       </div>
-      <h2>Loved by productivity enthusiasts worldwide</h2>
+      <h2>Loved by <span class="highlight-gradient">Productivity Enthusiasts</span> Worldwide</h2>
       <p class="testimonials-subtitle">Join thousands who've transformed their focus and reclaimed their time</p>
     </div>
 
-    <!-- Testimonials Grid -->
-    <div class="testimonials-grid">
-      <div class="testimonial-card">
-        <img src="{{ url_for('static', filename='assets/review_abhijit.png') }}" alt="5-star review by Abhijit" loading="lazy">
-      </div>
-      <div class="testimonial-card">
-        <img src="{{ url_for('static', filename='assets/review_atanu.png') }}" alt="5-star review by Atanu" loading="lazy">
-      </div>
-      <div class="testimonial-card">
-        <img src="{{ url_for('static', filename='assets/review_jahnavi.png') }}" alt="5-star review by Jahnavi" loading="lazy">
-      </div>
-      <div class="testimonial-card">
-        <img src="{{ url_for('static', filename='assets/review_sushanth.png') }}" alt="5-star review by Sushanth" loading="lazy">
-      </div>
-      <div class="testimonial-card">
-        <img src="{{ url_for('static', filename='assets/review_vedika.png') }}" alt="5-star review by Vedika" loading="lazy">
+    <!-- Testimonials Carousel (Vertical Auto-Scroll) -->
+    <div class="testimonials-carousel-container">
+      <div class="testimonials-carousel">
+        <div class="testimonial-card">
+          <img src="{{ url_for('static', filename='assets/review_abhijit.png') }}" alt="5-star review by Abhijit" loading="lazy">
+        </div>
+        <div class="testimonial-card">
+          <img src="{{ url_for('static', filename='assets/review_atanu.png') }}" alt="5-star review by Atanu" loading="lazy">
+        </div>
+        <div class="testimonial-card">
+          <img src="{{ url_for('static', filename='assets/review_jahnavi.png') }}" alt="5-star review by Jahnavi" loading="lazy">
+        </div>
+        <div class="testimonial-card">
+          <img src="{{ url_for('static', filename='assets/review_sushanth.png') }}" alt="5-star review by Sushanth" loading="lazy">
+        </div>
+        <div class="testimonial-card">
+          <img src="{{ url_for('static', filename='assets/review_vedika.png') }}" alt="5-star review by Vedika" loading="lazy">
+        </div>
+        <!-- Duplicate for seamless loop -->
+        <div class="testimonial-card">
+          <img src="{{ url_for('static', filename='assets/review_abhijit.png') }}" alt="5-star review by Abhijit" loading="lazy">
+        </div>
+        <div class="testimonial-card">
+          <img src="{{ url_for('static', filename='assets/review_atanu.png') }}" alt="5-star review by Atanu" loading="lazy">
+        </div>
       </div>
     </div>
 
