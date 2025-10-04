@@ -69,11 +69,18 @@
   {% block head_scripts %}{% endblock %}
 </head>
 <body>
-  <header>
-    <nav>
-      <a href="{{ url_for('main.index') }}" class="logo">Focused Room</a>
+  <!-- Skip Link for Accessibility -->
+  <a href="#main-content" class="skip-link">Skip to main content</a>
+
+  <header role="banner">
+    <nav role="navigation" aria-label="Main navigation">
+      <a href="{{ url_for('main.index') }}" class="logo">
+        <img src="{{ url_for('static', filename='assets/logo_1.png') }}" alt="Focused Room logo" class="logo-icon">
+        <span class="logo-text">Focused Room</span>
+      </a>
       <div class="nav-links">
         <a href="{{ url_for('main.index') }}#features">Features</a>
+        <a href="{{ url_for('main.index') }}#testimonials">Testimonials</a>
         <a href="{{ url_for('main.big_five') }}">Big Five</a>
         <a href="/blog">Blog</a>
         <a class="cta" href="{{ url_for('main.download') }}">Install — Free</a>
@@ -81,15 +88,15 @@
     </nav>
   </header>
 
-  <main>
+  <main id="main-content" role="main">
     {% block content %}{% endblock %}
   </main>
 
-  <footer>
+  <footer role="contentinfo">
     <div class="footer-cta">
       <p>Get a free Deep Work Starter Pack</p>
-      <form id="subscribe-form">
-        <input type="email" id="sub-email" placeholder="your@email.com" required>
+      <form id="subscribe-form" aria-label="Newsletter subscription">
+        <input type="email" id="sub-email" placeholder="your@email.com" aria-label="Email address" required>
         <button type="submit">Send me the ebook</button>
       </form>
     </div>

@@ -43,20 +43,98 @@
 {% block content %}
 <section class="hero">
   <div class="hero-left">
+    <div class="science-badge">
+      <span class="badge-icon">🧠</span>
+      <span class="badge-text">Backed by Cognitive Behavioral Science</span>
+    </div>
     <h1>Protect your focus. Build your future.</h1>
     <p>Turn Chrome into a calm workspace — block distractions, use friction override, and track progress with gamified reports.</p>
     <div class="hero-cta">
-      <a class="btn primary" href="{{ url_for('main.download') }}">Install on Chrome — Free</a>
-      <a class="btn ghost" href="https://www.youtube.com/watch?v=si2F3tewq68">Watch demo</a>
+      <a class="btn primary" href="{{ url_for('main.download') }}?utm_source=site&utm_medium=cta&utm_campaign=launch">Install on Chrome — Free</a>
+      <a class="btn ghost" href="https://www.youtube.com/watch?v=si2F3tewq68" target="_blank" rel="noopener noreferrer">Watch demo</a>
     </div>
     <p class="privacy-note">No trackers • Data stays on your device</p>
   </div>
   <div class="hero-right">
-    <img src="{{ url_for('static', filename='assets/hero-screenshot.png') }}" alt="Focused Room Chrome extension screenshots showing distraction blocking interface">
+    <div class="hero-carousel">
+      <div class="carousel-track">
+        <img
+          src="{{ url_for('static', filename='assets/your-image.png') }}"
+          alt="Focused Room Chrome extension main interface"
+          loading="eager"
+          class="carousel-slide active"
+        >
+        <img
+          src="{{ url_for('static', filename='assets/blocking.png') }}"
+          alt="Focused Room site blocking feature"
+          loading="lazy"
+          class="carousel-slide"
+        >
+        <img
+          src="{{ url_for('static', filename='assets/friction_text.png') }}"
+          alt="Focused Room friction override feature"
+          loading="lazy"
+          class="carousel-slide"
+        >
+      </div>
+      <div class="carousel-indicators">
+        <button class="indicator active" aria-label="View slide 1" data-slide="0"></button>
+        <button class="indicator" aria-label="View slide 2" data-slide="1"></button>
+        <button class="indicator" aria-label="View slide 3" data-slide="2"></button>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- Testimonials Section -->
+<section id="testimonials" class="testimonials-section">
+  <div class="container">
+    <!-- Header with Stars -->
+    <div class="testimonials-header">
+      <div class="stars-large">
+        <span class="star">⭐</span>
+        <span class="star">⭐</span>
+        <span class="star">⭐</span>
+        <span class="star">⭐</span>
+        <span class="star">⭐</span>
+      </div>
+      <h2>Loved by productivity enthusiasts worldwide</h2>
+      <p class="testimonials-subtitle">Join thousands who've transformed their focus and reclaimed their time</p>
+    </div>
+
+    <!-- Testimonials Grid -->
+    <div class="testimonials-grid">
+      <div class="testimonial-card">
+        <img src="{{ url_for('static', filename='assets/review_abhijit.png') }}" alt="5-star review by Abhijit" loading="lazy">
+      </div>
+      <div class="testimonial-card">
+        <img src="{{ url_for('static', filename='assets/review_atanu.png') }}" alt="5-star review by Atanu" loading="lazy">
+      </div>
+      <div class="testimonial-card">
+        <img src="{{ url_for('static', filename='assets/review_jahnavi.png') }}" alt="5-star review by Jahnavi" loading="lazy">
+      </div>
+      <div class="testimonial-card">
+        <img src="{{ url_for('static', filename='assets/review_sushanth.png') }}" alt="5-star review by Sushanth" loading="lazy">
+      </div>
+      <div class="testimonial-card">
+        <img src="{{ url_for('static', filename='assets/review_vedika.png') }}" alt="5-star review by Vedika" loading="lazy">
+      </div>
+    </div>
+
+    <!-- CTA Box -->
+    <div class="testimonials-cta">
+      <div class="cta-content">
+        <h3>Ready to join them?</h3>
+        <p>Start your journey to better focus today — completely free</p>
+      </div>
+      <a class="btn primary btn-lg" href="{{ url_for('main.download') }}?utm_source=site&utm_medium=testimonials&utm_campaign=social_proof">
+        Install on Chrome — Free
+      </a>
+    </div>
   </div>
 </section>
 
 <section id="features" class="features">
-  <!-- 4 feature cards -->
+  <!-- Feature cards will be added in PR B -->
 </section>
 {% endblock %}
