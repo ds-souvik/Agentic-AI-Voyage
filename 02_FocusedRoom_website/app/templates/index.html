@@ -143,7 +143,127 @@
   </div>
 </section>
 
-<section id="features" class="features">
-  <!-- Feature cards will be added in PR B -->
+<!-- Features Section -->
+<section id="features" class="features-section">
+  <div class="container">
+    <!-- Section Header -->
+    <div class="features-header">
+      <h2>Everything you need to <span class="highlight-primary">reclaim your focus</span></h2>
+      <p class="features-subtitle">Powerful tools designed for deep work and sustained productivity</p>
+    </div>
+
+    <!-- Features Grid -->
+    <div class="features-grid">
+      <!-- Feature 1: Deep Work Sessions (Top Left) -->
+      <article class="feature-card" data-feature="deep-work">
+        <div class="feature-image-wrapper">
+          <img
+            src="{{ url_for('static', filename='assets/4_features/Deep Work Sessions.png') }}"
+            alt="Deep Work Sessions - Customizable focus blocks with distraction blocking"
+            loading="lazy"
+            class="feature-image"
+          >
+          <div class="feature-overlay">
+            <span class="feature-badge">Core Feature</span>
+          </div>
+        </div>
+        <div class="feature-content">
+          <div class="feature-icon">🎯</div>
+          <h3>Deep Work Sessions</h3>
+          <p>Customizable focus blocks that protect your time. Set durations, block distractions, and enter flow state with one click.</p>
+          <ul class="feature-highlights">
+            <li>⏱️ Flexible session timers (25min - 4hrs)</li>
+            <li>🔒 Auto-block distracting sites</li>
+            <li>📊 Track your focus streaks</li>
+          </ul>
+        </div>
+      </article>
+
+      <!-- Feature 2: Gamified Analytics (Top Right) -->
+      <article class="feature-card" data-feature="gamified-analytics">
+        <div class="feature-image-wrapper">
+          <img
+            src="{{ url_for('static', filename='assets/4_features/Gamified Analytics.png') }}"
+            alt="Gamified Analytics - Track streaks, XP, and productivity insights"
+            loading="lazy"
+            class="feature-image"
+          >
+          <div class="feature-overlay">
+            <span class="feature-badge">Gamified</span>
+          </div>
+        </div>
+        <div class="feature-content">
+          <div class="feature-icon">📊</div>
+          <h3>Gamified Analytics</h3>
+          <p>Track streaks, earn XP, and visualize your productivity journey. Turn focus into a rewarding habit with beautiful insights.</p>
+          <ul class="feature-highlights">
+            <li>🔥 Daily & weekly streaks</li>
+            <li>⭐ Level up with XP points</li>
+            <li>📉 Visualize your progress</li>
+          </ul>
+        </div>
+      </article>
+
+      <!-- Feature 3: Smart Blocking (Bottom Left) -->
+      <article class="feature-card" data-feature="smart-blocking">
+        <div class="feature-image-wrapper">
+          <img
+            src="{{ url_for('static', filename='assets/4_features/smart blocking.png') }}"
+            alt="Smart Blocking - AI-powered site categorization with flexible rules"
+            loading="lazy"
+            class="feature-image"
+          >
+          <div class="feature-overlay">
+            <span class="feature-badge">AI-Powered</span>
+          </div>
+        </div>
+        <div class="feature-content">
+          <div class="feature-icon">🛡️</div>
+          <h3>Smart Blocking</h3>
+          <p>AI-powered site categorization with flexible rules. Block entire categories or specific sites with intelligent pattern matching.</p>
+          <ul class="feature-highlights">
+            <li>🤖 Auto-categorize 10,000+ sites</li>
+            <li>📝 Custom blocklists & allowlists</li>
+            <li>⚡ Instant sync across devices</li>
+          </ul>
+        </div>
+      </article>
+
+      <!-- Feature 4: Friction Override (Bottom Right) -->
+      <article class="feature-card" data-feature="friction-override">
+        <div class="feature-image-wrapper">
+          <img
+            src="{{ url_for('static', filename='assets/4_features/Friction Override.png') }}"
+            alt="Friction Override - Mindful pause before accessing blocked sites"
+            loading="lazy"
+            class="feature-image"
+          >
+          <div class="feature-overlay">
+            <span class="feature-badge">Behavioral Science</span>
+          </div>
+        </div>
+        <div class="feature-content">
+          <div class="feature-icon">⏸️</div>
+          <h3>Friction Override</h3>
+          <p>Mindful pause before accessing blocked sites. Type your intention to proceed — backed by cognitive behavioral science.</p>
+          <ul class="feature-highlights">
+            <li>🧠 Interrupt automatic habits</li>
+            <li>✍️ Reflect before you click</li>
+            <li>📈 Reduce impulsive browsing by 80%</li>
+          </ul>
+        </div>
+      </article>
+    </div>
+
+    <!-- Features CTA -->
+    <div class="features-cta">
+      <h3>Ready to transform your productivity?</h3>
+      <p>Join thousands of professionals, students, and creators who've reclaimed their focus</p>
+      <a class="btn primary btn-lg" href="{{ url_for('main.download') }}?utm_source=site&utm_medium=features&utm_campaign=conversion">
+        Install on Chrome — Free
+      </a>
+      <p class="features-cta-note">✨ No credit card required • 5-minute setup • Works offline</p>
+    </div>
+  </div>
 </section>
 {% endblock %}
