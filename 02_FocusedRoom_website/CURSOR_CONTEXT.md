@@ -196,9 +196,120 @@
 - **Documentation**: Complete deployment guide with troubleshooting
 - **Git**: Committed and pushed to GitHub
 
-### ⏳ MILESTONE 7 - Performance & Accessibility
-- **Target**: Lighthouse optimization
-- **Components**: Performance audit, accessibility fixes
+### ⏳ MILESTONE 7 - Performance & Accessibility (IN PROGRESS)
+- **Status**: PR A complete, ready for merge | PR B-H pending
+- **Target**: Production-ready UI, Lighthouse >90, WCAG 2.1 AA compliance
+- **Brand**: Modern-minimal, calming/zen, gamified aesthetic
+- **Design System**: Custom color palette from extension CSS
+- **Phased Approach**: 8 PRs (Hero → Features → Big Five → Accessibility → Performance → Images → Lighthouse CI → Polish)
+
+#### ✅ PR A: Hero + Asset Foundation (COMPLETE)
+- **Branch**: `feature/ui-hero`
+- **Status**: Complete, ready for merge
+- **Implementation**:
+  - `app/static/css/main.css` (1116 lines) - Complete design system with tokens
+  - `app/static/js/main.js` (419 lines) - Form validation, carousel, accessibility
+  - `app/templates/base.html` - Accessibility improvements (skip link, landmarks, ARIA)
+  - `app/templates/index.html` - Polished hero + vertical testimonials carousel
+  - `docs/DESIGN_SYSTEM.md` - Complete design tokens documentation
+  - `.github/MILESTONE_7_SPEC.md` - 8-PR phased implementation plan
+- **Features**:
+  - Hero: 3-image carousel (auto-rotate 4s), animated science badge, gradient H1
+  - Typography: Logo teal→black hover, "Protect"/"Build" highlighted in teal
+  - Testimonials: Vertical auto-scroll (30s), fade masks, pause on hover
+  - Character: Floating orbs, layered gradients, depth, smooth animations
+  - Accessibility: WCAG 2.1 AA compliant (skip link, landmarks, focus states)
+- **Test Results**: 159/160 passing (99.4%)
+- **Git**: 2 commits (b8a894a, 0f301a2) on `feature/ui-hero`
+
+#### Design System (MANDATORY - Never Deviate)
+**Color Palette** (extracted from extension CSS):
+```css
+:root {
+  --color-primary-500: #7A9E9F;   /* main teal */
+  --color-primary-600: #6B8B8C;   /* darker teal */
+  --color-accent:      #38a169;   /* success/positive */
+  --color-neutral-100: #FAF9F5;   /* card backgrounds */
+  --color-neutral-200: #F7FAFC;   /* alternate surfaces */
+  --color-border:      #E2E8F0;   /* borders */
+  --color-text-900:    #2d3748;   /* primary text */
+  --color-text-700:    #4a5568;   /* secondary text */
+  --color-danger:      #e53e3e;   /* errors */
+  --color-muted:       #718096;   /* muted text */
+  --color-cta-accent:  #667eea;   /* optional micro-accent */
+  --gradient-primary:  linear-gradient(135deg, #7A9E9F 0%, #6B8B8C 100%);
+  --bg: #ffffff;
+  --bg-dark: #0f1724;
+  --radius: 12px;
+  --shadow-soft: 0 8px 30px rgba(15, 23, 36, 0.08);
+}
+
+[data-theme="dark"] {
+  --color-bg: #0f1724;
+  --color-surface: #111827;
+  --color-text: #e6eef6;
+  --color-muted: #9aa6b2;
+  --color-border: #2b3942;
+}
+```
+
+**CTA Button Standards**:
+- Primary: Solid `--color-primary-500`, white text, pill shape, 2px outline + 3px focus ring
+- Secondary: Ghost style, border `--color-primary-500`, text in that color
+- Success states: `--color-accent` (#38a169)
+- Micro-animations: `--color-cta-accent` (#667eea) sparingly
+
+**Inspirations**: Apple minimalism, Notion clean design, Calm.com zen, Duolingo gamification, Linear.app professional
+
+#### Workflow Rules (STRICT - Enforce in Every PR)
+**Allowed File Modifications**:
+- ✅ `app/templates/*`, `app/static/**/*`
+- ✅ `app/utils/performance.py` (new file only)
+- ✅ `.github/workflows/*` (Lighthouse CI only)
+- ✅ `docs/*.md` (documentation)
+- ✅ `tests/test_performance.py`, `tests/test_accessibility.py` (new tests only)
+
+**Forbidden Modifications**:
+- ❌ Core backend: `app/routes.py`, `app/models.py`, `app/__init__.py`
+- ❌ Existing tests: `tests/test_bigfive.py`, `tests/test_subscribe.py`, etc.
+- ❌ Extension code: `../01_FocusedRoom/*`
+- ❌ Any secrets/API keys
+
+**Branch Naming**: `feature/<short-description>` (e.g., `feature/ui-hero`)
+
+**PR Requirements** (Every PR must include):
+1. Brief description + files changed + impact statement
+2. `pytest` output (all tests passing)
+3. Screenshots (desktop + mobile)
+4. Lighthouse scores (if UI changes)
+5. Accessibility audit (if applicable)
+6. Local preview commands
+7. Rollback plan
+
+#### Phased Deliverables (8 PRs)
+1. **PR A**: Hero + Asset Foundation (CSS variables, buttons, responsive layout)
+2. **PR B**: Features section + Screenshot carousel + Testimonials
+3. **PR C**: Big Five UI (paginated questionnaire, progress bar)
+4. **PR D**: Accessibility site-wide (skip links, ARIA, semantic HTML)
+5. **PR E**: Performance foundation (caching, compression, asset versioning)
+6. **PR F**: Image optimization (WebP, srcset, lazy loading)
+7. **PR G**: Lighthouse CI (GitHub Action, thresholds)
+8. **PR H**: Final polish (microinteractions, dark mode, theme toggle)
+
+#### Performance Targets
+**Immediate** (while iterating):
+- Lighthouse: Performance ≥80, Accessibility ≥90, SEO ≥90
+- Core Web Vitals: LCP <3s, CLS <0.1
+
+**Final** (before merge to main):
+- Lighthouse: Performance ≥90, Accessibility ≥95, SEO ≥100
+- Core Web Vitals: LCP <2.5s, FID <100ms, CLS <0.1
+
+#### Test Coverage Goals
+- 45+ new tests (25 performance + 20 accessibility)
+- 247/248 total tests passing (99.6% pass rate)
+- axe-core: 0 critical violations, ≤2 minor
+- No regressions in existing backend tests
 
 ## 📊 Current API Endpoints
 
