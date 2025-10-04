@@ -26,7 +26,7 @@ Privacy-first landing page and web platform for the Focused Room Chrome extensio
 
 The Focused Room Website is a Flask-based web platform that serves as the landing page and web companion for the Focused Room Chrome extension. It provides personality testing, newsletter subscription, and educational content about productivity.
 
-**Current Status**: 5 of 7 milestones complete (Big Five, Subscribe & Email, SEO, CI/CD, Gemini AI)
+**Current Status**: 6 of 7 milestones complete (Big Five, Subscribe & Email, SEO, CI/CD, Gemini AI, Deployment)
 
 ## Features
 
@@ -46,7 +46,7 @@ The Focused Room Website is a Flask-based web platform that serves as the landin
 - **ORM**: SQLAlchemy with Flask-SQLAlchemy
 - **Email**: SendGrid with SMTP fallback
 - **AI**: Google Gemini 2.0 Flash with fallback logic
-- **Testing**: pytest with 99.2% pass rate (129 tests, 1 skipped)
+- **Testing**: pytest with 99.5% pass rate (202 tests, 1 skipped)
 
 ### Frontend
 - **Templates**: Jinja2
@@ -270,10 +270,10 @@ Sitemap: https://focusedroom.com/sitemap.xml
 ### Run All Tests
 
 ```bash
-# Run all 130 tests
+# Run all 203 tests
 pytest -v
 
-# Expected output: 129 passed, 1 skipped (31 Big Five + 21 Subscribe + 20 SEO + 27 CI/CD + 30 Gemini)
+# Expected output: 202 passed, 1 skipped (31 Big Five + 21 Subscribe + 20 SEO + 27 CI/CD + 30 Gemini + 43 Deployment)
 ```
 
 ### Run Specific Test Suites
@@ -293,6 +293,9 @@ pytest tests/test_ci.py -v
 
 # Gemini AI tests (30 tests)
 pytest tests/test_gemini.py -v
+
+# Deployment tests (43 tests)
+pytest tests/test_deployment.py -v
 ```
 
 ### Test with Coverage
@@ -316,8 +319,9 @@ Current test coverage by module:
 - ✅ **SEO**: 100% coverage (20 tests)
 - ✅ **CI/CD**: 100% coverage (27 tests, 1 skipped)
 - ✅ **Gemini AI**: 100% coverage (30 tests)
+- ✅ **Deployment**: 100% coverage (43 tests)
 
-**Overall**: 129/130 tests passing (99.2% pass rate, 1 intentionally skipped)
+**Overall**: 202/203 tests passing (99.5% pass rate, 1 intentionally skipped)
 
 ## CI/CD & Code Quality
 
@@ -681,22 +685,60 @@ pre-commit run --all-files
 
 ## Deployment
 
-### Render Deployment (Recommended)
+**📖 See [DEPLOYMENT.md](./DEPLOYMENT.md) for complete deployment guide**
 
-1. **Create Web Service** on [Render](https://render.com)
-2. **Connect GitHub repository**
-3. **Set environment variables** in dashboard
-4. **Configure build:**
-   - Build Command: `pip install -r requirements.txt`
-   - Start Command: `gunicorn run:app`
-5. **Set health check path**: `/`
+### Quick Start Options
 
-### Railway Deployment
+#### Option 1: Docker (Local Testing)
 
-1. **Create project** on [Railway](https://railway.app)
-2. **Connect repository**
-3. **Add environment variables**
-4. Railway auto-detects Flask and deploys
+```bash
+# Build and run
+docker-compose up --build
+
+# Access application
+http://localhost:5000
+
+# Check health
+curl http://localhost:5000/health
+```
+
+#### Option 2: Render.com (Production)
+
+1. **Connect Repository**: Link GitHub repo to Render
+2. **Auto-Deploy**: Uses `render.yaml` for configuration
+3. **Environment Variables**: Set in Render dashboard
+4. **Health Checks**: Automatic via `/health` endpoint
+
+#### Option 3: Railway (Alternative)
+
+1. **Connect Repository**: Link to Railway
+2. **Auto-Detection**: Railway detects Flask automatically
+3. **Environment Variables**: Set in project settings
+4. **Deploy**: Automatic on push to main
+
+### Health Check Endpoint
+
+```bash
+GET /health
+```
+
+**Response:**
+```json
+{
+  "status": "healthy",
+  "timestamp": "2025-10-04T12:34:56.789Z",
+  "database": "healthy",
+  "version": "1.5.0",
+  "environment": "production"
+}
+```
+
+### Production Requirements
+
+- Python 3.9+
+- PostgreSQL (or SQLite for testing)
+- Environment variables configured
+- Gunicorn for WSGI server
 
 ### Production Environment Variables
 
@@ -772,10 +814,11 @@ Set these in your hosting platform:
 - ✅ **MILESTONE 3**: SEO, Sitemap, OG Images - Complete SEO + 20 tests
 - ✅ **MILESTONE 4**: CI/CD, Linting, Pre-commit - Automation + quality gates + 27 tests
 - ✅ **MILESTONE 5**: Gemini/LLM Integration - AI-powered suggestions + 30 tests
-- ⏳ **MILESTONE 6**: Deployment Prep - Docker + production setup
+- ✅ **MILESTONE 6**: Deployment Prep - Docker + production setup + 43 tests
 - ⏳ **MILESTONE 7**: Performance & Accessibility - Lighthouse optimization
 
-**Current Progress**: 5 of 7 milestones complete (71%)
+**Current Progress: 6 of 7 milestones complete (86%)
+
 
 ## Security & Privacy
 
@@ -851,6 +894,6 @@ For questions or support, visit [focusedroom.com](https://focusedroom.com)
 
 **Note**: The Chrome extension source code is located in `../01_FocusedRoom/` and should not be modified as part of website development unless explicitly required.
 
-**Last Updated**: October 2, 2025  
-**Version**: 1.5.0  
-**Status**: Active Development (MILESTONE 6 next - Deployment Prep)
+**Last Updated**: October 4, 2025  
+**Version**: 1.6.0  
+**Status**: Active Development (MILESTONE 7 next - Performance & Accessibility)
