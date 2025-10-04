@@ -99,7 +99,7 @@ class TestPreCommitConfig:
 
     def test_precommit_yaml_is_valid(self):
         """Test that pre-commit YAML is valid."""
-        import yaml
+        import yaml  # type: ignore[import-untyped]
 
         config_path = Path(".pre-commit-config.yaml")
         with open(config_path) as f:
@@ -245,7 +245,8 @@ class TestProjectStructure:
         test_files = list(tests_dir.glob("*.py"))
 
         for test_file in test_files:
-            if test_file.name != "__init__.py":
+            # Exempt standard pytest configuration files
+            if test_file.name not in ["__init__.py", "conftest.py"]:
                 assert test_file.name.startswith(
                     "test_"
                 ), f"Test file {test_file.name} doesn't follow naming convention"

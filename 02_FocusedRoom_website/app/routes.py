@@ -1,4 +1,8 @@
+import os
+from datetime import datetime, timezone
+
 from flask import Blueprint, Response, jsonify, redirect, render_template, request
+from sqlalchemy import text
 
 from app.utils.gemini_client import generate_personality_suggestions
 
@@ -229,3 +233,30 @@ def blog():
 def blog_post(slug):
     """Individual blog post page."""
     return render_template("blog_post.html", slug=slug)
+
+
+@main_bp.route("/health")
+def health_check():
+    """
+    Health check endpoint for monitoring and load balancers.
+
+    Returns:
+        JSON response with application health status
+    """
+    try:
+        # Check database connection
+        db.session.execute(text("SELECT 1"))
+        db_status = "healthy"
+    except Exception as e:
+        db_status = f"unhealthy: {str(e)}"
+
+    health_data = {
+        "status": "healthy" if db_status == "healthy" else "degraded",
+        "timestamp": datetime.now(timezone.utc).isoformat(),  # Python 3.9+ compatible
+        "database": db_status,
+        "version": "1.5.0",
+        "environment": os.environ.get("FLASK_ENV", "production"),
+    }
+
+    status_code = 200 if health_data["status"] == "healthy" else 503
+    return jsonify(health_data), status_code
