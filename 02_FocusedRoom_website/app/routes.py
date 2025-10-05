@@ -140,9 +140,13 @@ def big_five():
         # Extract and validate required fields
         answers = data.get("answers")
         email = data.get("email", "").strip().lower() if data.get("email") else None
+        demographics = data.get("demographics", {})
 
         if not answers:
             return jsonify({"success": False, "error": "Answers array required"}), 400
+
+        # Log demographics for debugging
+        logger.info(f"Received demographics: {demographics}")
 
         # Validate answers format and content
         is_valid, error_msg = validate_answers(answers)
@@ -185,9 +189,11 @@ def big_five():
             logger.info(f"Computed Big Five scores for {user_type}")
 
             # Generate AI-powered personality suggestions (Gemini with fallback)
+            # Pass demographics for hyper-personalized insights
             suggestions = generate_personality_suggestions(
                 scores=scores,
                 percentiles=percentiles,
+                demographics=demographics,
                 fallback=True,  # Graceful fallback if API fails
             )
 
