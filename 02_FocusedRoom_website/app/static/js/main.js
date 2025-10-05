@@ -959,14 +959,58 @@ function isValidEmail(email) {
         aiInsights.style.display = 'block';
       }
 
+      // Parse and display quote (if present)
+      displayPersonalityQuote(data.suggestions || '');
+
       // Display radar chart
       displayRadarChart(data.scores);
 
-      // Display trait breakdowns (full version with descriptions)
-      displayTraitBreakdowns(data.scores);
+      // Display trait breakdowns with enhanced descriptions from AI
+      displayTraitBreakdowns(data.scores, data.suggestions || '');
 
-      // Display AI insights
+      // Display AI insights (life domains, productivity, etc.)
       displayAIInsights(data.suggestions || 'Generating your personalized insights...');
+    }
+
+    function displayPersonalityQuote(suggestions) {
+      const quoteContainer = document.getElementById('results-quote');
+      if (!quoteContainer) return;
+
+      // Extract quote from suggestions (format: ## QUOTE\n"Quote text" — Author)
+      const quoteMatch = suggestions.match(/## QUOTE\s*\n\s*[""](.+?)[""][\s—]+(.+?)(?:\n|$)/);
+
+      if (quoteMatch) {
+        const quoteText = quoteMatch[1].trim();
+        const quoteAuthor = quoteMatch[2].trim();
+
+        quoteContainer.innerHTML = `
+          <p class="quote-text">"${quoteText}"</p>
+          <p class="quote-author">— ${quoteAuthor}</p>
+        `;
+        quoteContainer.style.display = 'block';
+      }
+    }
+
+    function extractTraitDescription(suggestions, traitName) {
+      // Extract detailed description for each trait from AI suggestions
+      // Format: ### TraitName: XX/100\n[description text]
+      const pattern = new RegExp(`### ${traitName}[^\\n]*\\n([^#]+)`, 'i');
+      const match = suggestions.match(pattern);
+
+      if (match) {
+        return match[1].trim();
+      }
+
+      // Fallback to generic descriptions
+      const fallbacks = {
+        'Openness to Experience': 'This reflects your curiosity, imagination, and willingness to try new experiences.',
+        'Conscientiousness': 'This measures your organization, self-discipline, and reliability in pursuing goals.',
+        'Extraversion': 'This indicates your energy level, sociability, and preference for social interaction.',
+        'Agreeableness': 'This shows your compassion, cooperation, and concern for harmonious relationships.',
+        'Emotional Stability': 'This reflects your ability to remain calm, resilient, and emotionally balanced under pressure.'
+      };
+
+      return fallbacks[traitName] || 'Your score in this trait reveals important aspects of your personality.';
     }
 
     function displayRadarChart(scores) {
@@ -1033,7 +1077,7 @@ function isValidEmail(email) {
       });
     }
 
-    function displayTraitBreakdowns(scores) {
+    function displayTraitBreakdowns(scores, suggestions) {
       const resultsTraits = document.getElementById('results-traits');
       if (!resultsTraits) return;
 
@@ -1052,9 +1096,13 @@ function isValidEmail(email) {
         // Round to whole number for display
         const score = Math.round(displayScore);
 
-        // Determine if high or low for description
+        // Get enhanced AI-generated description (if available)
+        const aiDescription = extractTraitDescription(suggestions, desc.name);
+
+        // Fallback to generic description if AI parsing fails
         const isHigh = score >= 50;
-        const description = isHigh ? desc.high : desc.low;
+        const fallbackDescription = isHigh ? desc.high : desc.low;
+        const description = aiDescription || fallbackDescription;
 
         return `
           <div class="result-trait-card">
