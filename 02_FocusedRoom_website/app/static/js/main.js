@@ -14,26 +14,32 @@
  * - Accessible (ARIA, keyboard support)
  */
 
+// ============================================
+// SHARED UTILITIES MODULE (Global Scope)
+// ============================================
+
+/**
+ * Email validation regex (RFC 5322 compliant)
+ * Shared across all modules for consistency
+ */
+const EMAIL_REGEX = /^[a-zA-Z0-9.!#$%&'*+\/=?^_`{|}~-]+@[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?(?:\.[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?)*$/;
+
+/**
+ * Validate email format
+ * Shared utility used by Newsletter, Big Five, and other modules
+ * @param {string} email - Email address to validate
+ * @returns {boolean} True if valid, false otherwise
+ */
+function isValidEmail(email) {
+  return EMAIL_REGEX.test(email);
+}
+
+// ============================================
+// 1. NEWSLETTER FORM VALIDATION & SUBMISSION
+// ============================================
+
 (function() {
     'use strict';
-
-    // ============================================
-    // 1. NEWSLETTER FORM VALIDATION & SUBMISSION
-    // ============================================
-
-    /**
-     * Email validation regex (RFC 5322 compliant)
-     */
-    const EMAIL_REGEX = /^[a-zA-Z0-9.!#$%&'*+\/=?^_`{|}~-]+@[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?(?:\.[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?)*$/;
-
-    /**
-     * Validate email format
-     * @param {string} email - Email address to validate
-     * @returns {boolean} True if valid, false otherwise
-     */
-    function isValidEmail(email) {
-      return EMAIL_REGEX.test(email);
-    }
 
     /**
      * Show message to user (success or error)
@@ -968,16 +974,22 @@
         return;
       }
 
+      // Extract score values (handle both formats: nested objects or direct values)
+      const getScore = (trait) => {
+        const value = scores[trait];
+        return typeof value === 'object' ? value.score : value;
+      };
+
       const chartData = {
         labels: ['Openness', 'Conscientiousness', 'Extraversion', 'Agreeableness', 'Emotional Stability'],
         datasets: [{
           label: 'Your Personality Profile',
           data: [
-            scores.openness.score,
-            scores.conscientiousness.score,
-            scores.extraversion.score,
-            scores.agreeableness.score,
-            100 - scores.neuroticism.score // Invert neuroticism to emotional stability
+            getScore('openness'),
+            getScore('conscientiousness'),
+            getScore('extraversion'),
+            getScore('agreeableness'),
+            100 - getScore('neuroticism') // Invert neuroticism to emotional stability
           ],
           backgroundColor: 'rgba(122, 158, 159, 0.2)',
           borderColor: 'rgba(122, 158, 159, 1)',
@@ -1019,7 +1031,20 @@
 
       const traitsHTML = Object.entries(scores).map(([trait, data]) => {
         const desc = TRAIT_DESCRIPTIONS[trait];
-        const score = trait === 'neuroticism' ? 100 - data.score : data.score;
+
+        // Extract score value (handle both formats: nested objects or direct values)
+        const rawScore = typeof data === 'object' ? data.score : data;
+
+        // Validate score is a number
+        const validScore = !isNaN(rawScore) && rawScore !== null && rawScore !== undefined ? rawScore : 50;
+
+        // Invert neuroticism to show emotional stability
+        const displayScore = trait === 'neuroticism' ? 100 - validScore : validScore;
+
+        // Round to whole number for display
+        const score = Math.round(displayScore);
+
+        // Determine if high or low for description
         const isHigh = score >= 50;
         const description = isHigh ? desc.high : desc.low;
 
@@ -1047,7 +1072,72 @@
       const aiInsightsContent = document.getElementById('ai-insights-content');
       if (!aiInsightsContent) return;
 
-      aiInsightsContent.innerHTML = `<p>${suggestions}</p>`;
+      // Parse markdown-style text into structured HTML
+      const lines = suggestions.split('\n').filter(line => line.trim());
+      let html = '';
+      let currentSection = '';
+      let inList = false;
+
+      lines.forEach(line => {
+        const trimmed = line.trim();
+
+        // Section headers (## or ###)
+        if (trimmed.startsWith('###')) {
+          if (inList) {
+            html += '</ul></div>';
+            inList = false;
+          }
+          if (currentSection) html += '</div>';
+          const title = trimmed.replace(/^###\s*/, '');
+          html += `<div class="insight-section"><h4 class="insight-subtitle">✨ ${title}</h4>`;
+          currentSection = title;
+        }
+        else if (trimmed.startsWith('##')) {
+          if (inList) {
+            html += '</ul></div>';
+            inList = false;
+          }
+          if (currentSection) html += '</div>';
+          const title = trimmed.replace(/^##\s*/, '');
+          html += `<div class="insight-section"><h3 class="insight-title">🎯 ${title}</h3>`;
+          currentSection = title;
+        }
+        // List items
+        else if (trimmed.startsWith('- ') || trimmed.startsWith('* ')) {
+          if (!inList) {
+            html += '<ul class="insight-list">';
+            inList = true;
+          }
+          const item = trimmed.substring(2);
+          // Check if it's a bold item
+          const boldMatch = item.match(/^\*\*(.+?)\*\*:?\s*(.*)$/);
+          if (boldMatch) {
+            html += `<li><strong>${boldMatch[1]}</strong>${boldMatch[2] ? ': ' + boldMatch[2] : ''}</li>`;
+          } else {
+            html += `<li>${item}</li>`;
+          }
+        }
+        // Regular paragraphs
+        else if (trimmed.length > 0) {
+          if (inList) {
+            html += '</ul>';
+            inList = false;
+          }
+          // Handle bold text
+          const formatted = trimmed.replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>');
+          html += `<p class="insight-paragraph">${formatted}</p>`;
+        }
+      });
+
+      if (inList) html += '</ul>';
+      if (currentSection) html += '</div>';
+
+      // If no structured content, wrap in default formatting
+      if (!html) {
+        html = `<div class="insight-section"><p class="insight-paragraph">${suggestions}</p></div>`;
+      }
+
+      aiInsightsContent.innerHTML = html;
     }
 
     // Restore progress from localStorage on page load
