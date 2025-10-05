@@ -524,6 +524,7 @@
 
     // DOM elements
     const startTestBtn = document.getElementById('start-test-btn');
+    const startTestTriggers = document.querySelectorAll('.start-test-trigger');
     const questionnaireSection = document.getElementById('questionnaire-section');
     const questionContainer = document.getElementById('question-container');
     const progressFill = document.getElementById('progress-fill');
@@ -537,10 +538,13 @@
     const emailForm = document.getElementById('email-gate-form');
     const resultsSection = document.getElementById('results-section');
 
-    // Initialize
+    // Initialize - Attach event listeners to all start test buttons
     if (startTestBtn) {
       startTestBtn.addEventListener('click', startTest);
     }
+    startTestTriggers.forEach(btn => {
+      btn.addEventListener('click', startTest);
+    });
 
     function startTest() {
       // Scroll to questionnaire
@@ -682,17 +686,134 @@
     }
 
     function showEmailModal() {
-      emailModal.style.display = 'flex';
-      document.body.style.overflow = 'hidden';
+      // First, show preview of results to create desire
+      showPreviewResults();
 
-      // Close modal on overlay click
-      const overlay = document.getElementById('modal-overlay');
-      overlay.addEventListener('click', closeEmailModal);
+      // Then show email modal after a brief delay
+      setTimeout(() => {
+        emailModal.style.display = 'flex';
+        document.body.style.overflow = 'hidden';
+
+        // Close modal on overlay click
+        const overlay = document.getElementById('modal-overlay');
+        overlay.addEventListener('click', closeEmailModal);
+      }, 500);
     }
 
     function closeEmailModal() {
       emailModal.style.display = 'none';
       document.body.style.overflow = 'auto';
+    }
+
+    function showPreviewResults() {
+      // Calculate scores for preview
+      const scores = calculateScores();
+
+      // Hide questionnaire
+      questionnaireSection.style.display = 'none';
+
+      // Show results section in preview mode
+      resultsSection.style.display = 'block';
+      resultsSection.classList.add('preview-mode');
+      resultsSection.scrollIntoView({ behavior: 'smooth' });
+
+      // Display preview (scores visible, descriptions blurred)
+      displayPreviewResults(scores);
+    }
+
+    function displayPreviewResults(scores) {
+      // Display trait breakdowns (preview mode - scores only)
+      const resultsTraits = document.querySelector('.results-traits');
+      if (!resultsTraits) return;
+
+      // Custom unlock messages for each trait to create intrigue
+      const unlockMessages = {
+        openness: {
+          title: "Unlock Your Creative Potential",
+          items: [
+            "Why you think differently than 80% of people",
+            "Your hidden innovation superpowers",
+            "How to leverage your curiosity for success"
+          ]
+        },
+        conscientiousness: {
+          title: "Decode Your Work Style",
+          items: [
+            "The productivity system designed for YOUR brain",
+            "Why traditional advice might be failing you",
+            "Your secret weapon for achieving goals"
+          ]
+        },
+        extraversion: {
+          title: "Master Your Energy",
+          items: [
+            "Where you get your power (and how to protect it)",
+            "Your ideal work environment revealed",
+            "Why you thrive (or drain) in social settings"
+          ]
+        },
+        agreeableness: {
+          title: "Understand Your Relationships",
+          items: [
+            "How you naturally influence others",
+            "Your conflict resolution superpower",
+            "Why people respond to you the way they do"
+          ]
+        },
+        neuroticism: {
+          title: "Harness Your Emotions",
+          items: [
+            "Your stress response pattern decoded",
+            "How to turn sensitivity into strength",
+            "The resilience strategy built for you"
+          ]
+        }
+      };
+
+      const traitsHTML = Object.entries(scores).map(([trait, data]) => {
+        const desc = TRAIT_DESCRIPTIONS[trait];
+        const score = trait === 'neuroticism' ? 100 - data.score : data.score;
+        const unlockMsg = unlockMessages[trait];
+
+        return `
+          <div class="result-trait-card preview-locked">
+            <div class="result-trait-header">
+              <div>
+                <span style="font-size: 2rem; margin-right: 0.5rem;">${desc.icon}</span>
+                <span class="result-trait-name">${desc.name}</span>
+              </div>
+              <div class="result-trait-score">${score}%</div>
+            </div>
+            <div class="result-trait-bar">
+              <div class="result-trait-fill" style="width: ${score}%"></div>
+            </div>
+            <div class="preview-blur-overlay">
+              <div class="unlock-message">
+                <span class="lock-icon">🔒</span>
+                <p class="unlock-title"><strong>${unlockMsg.title}</strong></p>
+                <ul class="unlock-benefits">
+                  ${unlockMsg.items.map(item => `<li>${item}</li>`).join('')}
+                </ul>
+                <p class="unlock-cta">Enter your email to discover your full ${desc.name.toLowerCase()} profile</p>
+              </div>
+            </div>
+          </div>
+        `;
+      }).join('');
+
+      resultsTraits.innerHTML = traitsHTML;
+
+      // Hide AI insights section in preview
+      const aiInsights = document.querySelector('.results-ai-insights');
+      if (aiInsights) {
+        aiInsights.style.display = 'none';
+      }
+
+      // Hide radar chart in preview
+      const chartContainer = document.querySelector('.results-chart-container');
+      if (chartContainer) {
+        chartContainer.style.display = 'none';
+      }
     }
 
     // Handle email form submission
@@ -791,10 +912,25 @@
     }
 
     function displayResults(data) {
+      // Remove preview mode
+      resultsSection.classList.remove('preview-mode');
+
+      // Show radar chart
+      const chartContainer = document.querySelector('.results-chart-container');
+      if (chartContainer) {
+        chartContainer.style.display = 'block';
+      }
+
+      // Show AI insights
+      const aiInsights = document.querySelector('.results-ai-insights');
+      if (aiInsights) {
+        aiInsights.style.display = 'block';
+      }
+
       // Display radar chart
       displayRadarChart(data.scores);
 
-      // Display trait breakdowns
+      // Display trait breakdowns (full version with descriptions)
       displayTraitBreakdowns(data.scores);
 
       // Display AI insights
