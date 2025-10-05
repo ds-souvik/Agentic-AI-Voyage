@@ -2,7 +2,7 @@
   "manifest_version": 3,
   "name": "Focused Room",
   "version": "1.2.0",
-  "description": "Your Deepwork App. Block distractions. Stay focused, achieve more.",
+  "description": "Your Deepwork Application backed by Cognitive Behaviourial Science. Protect your Focus. Build Your Future.",
   "permissions": [
     "storage",
     "tabs",
@@ -43,9 +43,9 @@
   "web_accessible_resources": [
     {
       "resources": [
-        "src/ui/blocked.html", 
-        "src/ui/reports.html", 
-        "src/ui/settings.html", 
+        "src/ui/blocked.html",
+        "src/ui/reports.html",
+        "src/ui/settings.html",
         "src/core/*",
         "src/ui/*",
         "Block_list/*",
