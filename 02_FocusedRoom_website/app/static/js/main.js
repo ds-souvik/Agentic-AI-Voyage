@@ -541,10 +541,12 @@
     // Initialize - Attach event listeners to all start test buttons
     if (startTestBtn) {
       startTestBtn.addEventListener('click', startTest);
+      console.log('✅ Big Five: Start test button listener attached');
     }
     startTestTriggers.forEach(btn => {
       btn.addEventListener('click', startTest);
     });
+    console.log(`✅ Big Five: ${startTestTriggers.length} trigger buttons found`);
 
     function startTest() {
       // Scroll to questionnaire
@@ -559,6 +561,7 @@
       prevBtn.addEventListener('click', goToPreviousPage);
       nextBtn.addEventListener('click', goToNextPage);
       submitBtn.addEventListener('click', showEmailModal);
+      console.log('✅ Big Five: Navigation listeners attached');
     }
 
     function renderQuestionPage(pageIndex) {
@@ -635,9 +638,11 @@
 
       // Show submit button on last page if all answered
       if (currentPage === totalPages - 1 && answeredCount === BIG_FIVE_QUESTIONS.length) {
+        console.log(`✅ Big Five: All ${answeredCount} questions answered - showing submit button`);
         nextBtn.style.display = 'none';
         submitBtn.style.display = 'inline-flex';
       } else {
+        console.log(`⏳ Big Five: ${answeredCount}/${BIG_FIVE_QUESTIONS.length} answered, page ${currentPage + 1}/${totalPages}`);
         nextBtn.style.display = 'inline-flex';
         submitBtn.style.display = 'none';
       }
@@ -686,11 +691,14 @@
     }
 
     function showEmailModal() {
+      console.log('🔔 Big Five: showEmailModal called');
+
       // First, show preview of results to create desire
       showPreviewResults();
 
       // Then show email modal after a brief delay
       setTimeout(() => {
+        console.log('🔔 Big Five: Showing email modal');
         emailModal.style.display = 'flex';
         document.body.style.overflow = 'hidden';
 
@@ -838,6 +846,10 @@
     }
 
     async function submitResults() {
+      console.log('🚀 Big Five: Submitting results to backend...');
+      console.log('📧 Email:', userEmail);
+      console.log('📝 Answers:', answers.length, 'questions');
+
       try {
         // Calculate scores
         const scores = calculateScores();
@@ -854,11 +866,16 @@
           })
         });
 
+        console.log('📡 Response status:', response.status);
+
         if (!response.ok) {
-          throw new Error('Failed to submit results');
+          const errorData = await response.json();
+          console.error('❌ API error:', errorData);
+          throw new Error(errorData.error || 'Failed to submit results');
         }
 
         const data = await response.json();
+        console.log('✅ Results received:', data);
 
         // Hide questionnaire, show results
         questionnaireSection.style.display = 'none';
@@ -870,9 +887,10 @@
 
         // Clear localStorage
         localStorage.removeItem('bigfive_answers');
+        console.log('✅ Big Five: Test complete!');
 
       } catch (error) {
-        console.error('Error submitting results:', error);
+        console.error('❌ Error submitting results:', error);
         alert('There was an error processing your results. Please try again.');
       }
     }
