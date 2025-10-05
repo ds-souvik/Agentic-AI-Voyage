@@ -856,6 +856,12 @@ function isValidEmail(email) {
       console.log('📧 Email:', userEmail);
       console.log('📝 Answers:', answers.length, 'questions');
 
+      // Show loading state
+      const loadingSection = document.getElementById('loading-section');
+      questionnaireSection.style.display = 'none';
+      loadingSection.style.display = 'block';
+      loadingSection.scrollIntoView({ behavior: 'smooth' });
+
       try {
         // Calculate scores
         const scores = calculateScores();
@@ -883,8 +889,8 @@ function isValidEmail(email) {
         const data = await response.json();
         console.log('✅ Results received:', data);
 
-        // Hide questionnaire, show results
-        questionnaireSection.style.display = 'none';
+        // Hide loading, show results
+        loadingSection.style.display = 'none';
         resultsSection.style.display = 'block';
         resultsSection.scrollIntoView({ behavior: 'smooth' });
 
@@ -897,7 +903,9 @@ function isValidEmail(email) {
 
       } catch (error) {
         console.error('❌ Error submitting results:', error);
+        loadingSection.style.display = 'none';
         alert('There was an error processing your results. Please try again.');
+        questionnaireSection.style.display = 'block';
       }
     }
 

@@ -317,9 +317,29 @@
   </div>
 </div>
 
-<!-- Results Section (Hidden by default, shown after email) -->
+<!-- Loading State (Shown while processing results) -->
+<section class="bigfive-loading" id="loading-section" style="display: none;">
+  <div class="container">
+    <div class="loading-container">
+      <div class="loading-icon">🧘</div>
+      <h2 class="loading-title">Analyzing Your Personality...</h2>
+      <p class="loading-text">Our AI is crafting your personalized insights. This may take 10-15 seconds.</p>
+      <div class="loading-bar">
+        <div class="loading-progress"></div>
+      </div>
+      <p class="loading-mindfulness">💭 Take a deep breath. Your transformation begins in moments.</p>
+    </div>
+  </div>
+</section>
+
+<!-- Results Section (Hidden by default, shown after processing) -->
 <section class="bigfive-results" id="results-section" style="display: none;">
   <div class="container">
+    <!-- Personality Quote -->
+    <div class="results-quote" id="results-quote" style="display: none;">
+      <!-- Quote will be dynamically inserted here -->
+    </div>
+
     <div class="results-header">
       <h1>Your Personality Profile</h1>
       <p class="results-subtitle">Here's what makes you uniquely productive</p>

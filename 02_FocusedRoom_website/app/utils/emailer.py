@@ -7,7 +7,7 @@ confirmations, and other automated emails using SendGrid with fallback options.
 
 import logging
 import os
-from typing import Any, Dict
+from typing import Any
 
 # Configure logging
 logger = logging.getLogger(__name__)
@@ -45,7 +45,7 @@ class EmailService:
         else:
             return "console"
 
-    def send_subscription_confirmation(self, email: str) -> Dict[str, Any]:
+    def send_subscription_confirmation(self, email: str) -> dict[str, Any]:
         """
         Send subscription confirmation email.
 
@@ -63,7 +63,7 @@ class EmailService:
             to_email=email, subject=subject, html_content=html_content, text_content=text_content
         )
 
-    def send_big_five_results(self, email: str, results: Dict[str, Any]) -> Dict[str, Any]:
+    def send_big_five_results(self, email: str, results: dict[str, Any]) -> dict[str, Any]:
         """
         Send Big Five personality test results via email.
 
@@ -82,9 +82,54 @@ class EmailService:
             to_email=email, subject=subject, html_content=html_content, text_content=text_content
         )
 
+    def send_big_five_report_with_pdf(
+        self,
+        email: str,
+        results: dict[str, Any],
+        pdf_bytes: bytes,
+        pdf_filename: str = "personality_report.pdf",
+    ) -> dict[str, Any]:
+        """
+        Send Big Five personality test results via email with PDF attachment.
+
+        This is the PRODUCTION METHOD for delivering comprehensive personality reports.
+        It includes both an HTML email preview and a professional PDF attachment.
+
+        Args:
+            email: Recipient email address
+            results: Dictionary containing test results
+            pdf_bytes: PDF file as bytes
+            pdf_filename: Name for the PDF attachment (default: personality_report.pdf)
+
+        Returns:
+            Dict with success status and details
+
+        Example:
+            >>> from app.utils.report_generator import generate_bigfive_report_pdf
+            >>> pdf_bytes = generate_bigfive_report_pdf(...)
+            >>> email_service.send_big_five_report_with_pdf(
+            ...     email="user@example.com",
+            ...     results={...},
+            ...     pdf_bytes=pdf_bytes
+            ... )
+        """
+        subject = "🧠 Your Complete Big Five Personality Report - Focused Room"
+        html_content = self._get_big_five_pdf_email_html(results)
+        text_content = self._get_big_five_pdf_email_text(results)
+
+        return self._send_email_with_attachment(
+            to_email=email,
+            subject=subject,
+            html_content=html_content,
+            text_content=text_content,
+            attachment_bytes=pdf_bytes,
+            attachment_filename=pdf_filename,
+            attachment_type="application/pdf",
+        )
+
     def _send_email(
         self, to_email: str, subject: str, html_content: str, text_content: str
-    ) -> Dict[str, Any]:
+    ) -> dict[str, Any]:
         """
         Send email using the configured provider.
 
@@ -111,7 +156,7 @@ class EmailService:
 
     def _send_via_sendgrid(
         self, to_email: str, subject: str, html_content: str, text_content: str
-    ) -> Dict[str, Any]:
+    ) -> dict[str, Any]:
         """Send email via SendGrid API."""
         try:
             import sendgrid
@@ -156,7 +201,7 @@ class EmailService:
 
     def _send_via_smtp(
         self, to_email: str, subject: str, html_content: str, text_content: str
-    ) -> Dict[str, Any]:
+    ) -> dict[str, Any]:
         """Send email via SMTP."""
         try:
             import smtplib
@@ -192,7 +237,7 @@ class EmailService:
 
     def _send_via_console(
         self, to_email: str, subject: str, html_content: str, text_content: str
-    ) -> Dict[str, Any]:
+    ) -> dict[str, Any]:
         """Log email to console (development mode)."""
         logger.info("=" * 50)
         logger.info(f"EMAIL WOULD BE SENT TO: {to_email}")
@@ -285,7 +330,7 @@ class EmailService:
         If you didn't subscribe, you can safely ignore this email.
         """
 
-    def _get_big_five_email_html(self, results: Dict[str, Any]) -> str:
+    def _get_big_five_email_html(self, results: dict[str, Any]) -> str:
         """Generate HTML content for Big Five results email."""
         scores = results.get("scores", {})
 
@@ -337,7 +382,7 @@ class EmailService:
         </html>
         """
 
-    def _get_big_five_email_text(self, results: Dict[str, Any]) -> str:
+    def _get_big_five_email_text(self, results: dict[str, Any]) -> str:
         """Generate plain text content for Big Five results email."""
         scores = results.get("scores", {})
 
@@ -360,7 +405,7 @@ class EmailService:
 email_service = EmailService()
 
 
-def send_subscription_confirmation(email: str) -> Dict[str, Any]:
+def send_subscription_confirmation(email: str) -> dict[str, Any]:
     """
     Send subscription confirmation email.
 
@@ -373,7 +418,7 @@ def send_subscription_confirmation(email: str) -> Dict[str, Any]:
     return email_service.send_subscription_confirmation(email)
 
 
-def send_big_five_results(email: str, results: Dict[str, Any]) -> Dict[str, Any]:
+def send_big_five_results(email: str, results: dict[str, Any]) -> dict[str, Any]:
     """
     Send Big Five personality test results via email.
 
