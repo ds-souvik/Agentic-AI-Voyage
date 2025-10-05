@@ -1,10 +1,11 @@
+import logging
 import os
 from datetime import datetime, timezone
 
 from flask import Blueprint, Response, jsonify, redirect, render_template, request
 from sqlalchemy import text
 
-from app.utils.gemini_client import generate_personality_suggestions
+from app.utils.gemini_client import generate_personality_suggestions, get_gemini_client
 
 from .models import BigFiveResult, Subscriber, db
 from .utils.bigfive import compute_bigfive_scores, validate_answers
@@ -13,7 +14,19 @@ from .utils.rate_limiter import rate_limit
 from .utils.seo import generate_sitemap_xml
 from .utils.validators import validate_subscription_request
 
+# Configure logging
+logger = logging.getLogger(__name__)
+
 main_bp = Blueprint("main", __name__)
+
+
+def _get_gemini_provider() -> str:
+    """Helper function to get current Gemini provider for logging."""
+    try:
+        client = get_gemini_client()
+        return client.provider
+    except Exception:
+        return "unknown"
 
 
 @main_bp.route("/")
@@ -105,60 +118,115 @@ def subscribe():
 
 @main_bp.route("/big-five", methods=["GET", "POST"])
 def big_five():
+    """
+    Big Five Personality Test endpoint.
+
+    GET: Render test page
+    POST: Process test results, store in database, return AI insights
+    """
     if request.method == "GET":
         return render_template("bigfive.html")
+
     if request.method == "POST":
-        # Get answers from request
-        data = request.get_json()
+        # Get request data
+        try:
+            data = request.get_json()
+        except Exception:
+            return jsonify({"success": False, "error": "Invalid JSON data"}), 400
+
         if not data:
             return jsonify({"success": False, "error": "No data provided"}), 400
 
+        # Extract and validate required fields
         answers = data.get("answers")
+        email = data.get("email", "").strip().lower() if data.get("email") else None
+
         if not answers:
             return jsonify({"success": False, "error": "Answers array required"}), 400
 
-        # Validate answers first
+        # Validate answers format and content
         is_valid, error_msg = validate_answers(answers)
         if not is_valid:
             return jsonify({"success": False, "error": error_msg}), 400
+
+        # Validate email if provided (email is optional for anonymous tests)
+        subscriber_id = None
+        if email:
+            # Validate email format using existing validator
+            email_validation = validate_subscription_request({"email": email})
+            if not email_validation[0]:
+                return jsonify({"success": False, "error": email_validation[1]}), 400
+
+            # Get or create subscriber (idempotent)
+            try:
+                subscriber = Subscriber.query.filter_by(email=email).first()
+                if not subscriber:
+                    subscriber = Subscriber(email=email, opt_in=True)
+                    db.session.add(subscriber)
+                    db.session.flush()  # Get subscriber.id without committing
+                    logger.info(f"Created new subscriber: {email}")
+                else:
+                    logger.info(f"Found existing subscriber: {email}")
+
+                subscriber_id = subscriber.id
+            except Exception as e:
+                logger.error(f"Error managing subscriber: {str(e)}")
+                db.session.rollback()
+                return jsonify({"success": False, "error": "Failed to process email"}), 500
 
         try:
             # Compute Big Five scores
             result_data = compute_bigfive_scores(answers)
             scores = result_data["scores"]
             percentiles = result_data["percentiles"]
+            raw_scores = result_data.get("raw_scores", {})
 
-            # For now, generate placeholder suggestions
-            # In MILESTONE 5, this will be replaced with Gemini/LLM integration
+            user_type = f"subscriber {subscriber_id}" if subscriber_id else "anonymous user"
+            logger.info(f"Computed Big Five scores for {user_type}")
+
+            # Generate AI-powered personality suggestions (Gemini with fallback)
             suggestions = generate_personality_suggestions(
-                scores=scores, percentiles=percentiles, fallback=True  # Auto-fallback if API fails
+                scores=scores,
+                percentiles=percentiles,
+                fallback=True,  # Graceful fallback if API fails
             )
 
-            # Store result in database
+            logger.info(f"Generated personality suggestions using {_get_gemini_provider()}")
+
+            # Store result in database with subscriber link
             result = BigFiveResult(
+                subscriber_id=subscriber_id,
                 scores={
                     "scores": scores,
                     "percentiles": percentiles,
-                    "raw_scores": result_data.get("raw_scores", {}),
+                    "raw_scores": raw_scores,
                 },
                 suggestions=suggestions,
             )
             db.session.add(result)
             db.session.commit()
 
+            user_type = f"subscriber {subscriber_id}" if subscriber_id else "anonymous user"
+            logger.info(f"Stored Big Five result (ID: {result.id}) for {user_type}")
+
+            # Return comprehensive response
             return jsonify(
                 {
                     "success": True,
-                    "id": result.id,
+                    "result_id": result.id,
                     "scores": scores,
                     "percentiles": percentiles,
                     "suggestions": suggestions,
+                    "email_captured": email is not None,
+                    "subscriber_id": subscriber_id,
                 }
             )
 
         except ValueError as e:
+            logger.error(f"Validation error in Big Five processing: {str(e)}")
             return jsonify({"success": False, "error": str(e)}), 400
-        except Exception:
+        except Exception as e:
+            logger.error(f"Unexpected error in Big Five processing: {str(e)}")
             db.session.rollback()
             return jsonify({"success": False, "error": "Internal server error"}), 500
 
