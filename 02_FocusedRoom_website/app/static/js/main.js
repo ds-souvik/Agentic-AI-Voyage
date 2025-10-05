@@ -835,13 +835,102 @@ function isValidEmail(email) {
       emailForm.addEventListener('submit', async function(e) {
         e.preventDefault();
 
+        // Capture all demographic data
         const emailInput = document.getElementById('email-input');
-        userEmail = emailInput.value.trim();
+        const nameInput = document.getElementById('name-input');
+        const ageInput = document.getElementById('age-input');
+        const careerInput = document.getElementById('career-input');
+        const careerStageInput = document.getElementById('career-stage-input');
+        const primaryGoalInput = document.getElementById('primary-goal-input');
 
+        // Life pillar satisfaction inputs
+        const careerSatInput = document.getElementById('career-satisfaction-input');
+        const relationshipSatInput = document.getElementById('relationship-satisfaction-input');
+        const healthSatInput = document.getElementById('health-satisfaction-input');
+        const financialSatInput = document.getElementById('financial-satisfaction-input');
+        const growthSatInput = document.getElementById('growth-satisfaction-input');
+
+        userEmail = emailInput.value.trim();
+        const userName = nameInput.value.trim();
+        const userAge = parseInt(ageInput.value);
+        const userCareer = careerInput.value.trim();
+        const userCareerStage = careerStageInput.value;
+        const userPrimaryGoal = primaryGoalInput.value;
+
+        const careerSat = careerSatInput.value;
+        const relationshipSat = relationshipSatInput.value;
+        const healthSat = healthSatInput.value;
+        const financialSat = financialSatInput.value;
+        const growthSat = growthSatInput.value;
+
+        // Validation
         if (!userEmail || !isValidEmail(userEmail)) {
           alert('Please enter a valid email address');
           return;
         }
+
+        if (!userName || userName.length < 2) {
+          alert('Please enter your first name');
+          return;
+        }
+
+        if (!userAge || userAge < 13 || userAge > 100) {
+          alert('Please enter a valid age');
+          return;
+        }
+
+        if (!userCareer || userCareer.length < 2) {
+          alert('Please enter your current role or career');
+          return;
+        }
+
+        if (!userCareerStage) {
+          alert('Please select your career stage');
+          return;
+        }
+
+        if (!userPrimaryGoal) {
+          alert('Please select what brings you here today');
+          return;
+        }
+
+        // Validate life pillar questions
+        if (!careerSat) {
+          alert('Please tell us how you feel about your work/studies');
+          return;
+        }
+        if (!relationshipSat) {
+          alert('Please tell us about your relationships');
+          return;
+        }
+        if (!healthSat) {
+          alert('Please tell us about your health');
+          return;
+        }
+        if (!financialSat) {
+          alert('Please tell us about your financial situation');
+          return;
+        }
+        if (!growthSat) {
+          alert('Please tell us about your personal growth');
+          return;
+        }
+
+        // Store comprehensive demographic data for submission
+        window.userDemographics = {
+          name: userName,
+          age: userAge,
+          career: userCareer,
+          careerStage: careerStageInput.options[careerStageInput.selectedIndex].text,
+          primaryGoal: primaryGoalInput.options[primaryGoalInput.selectedIndex].text,
+          lifePillars: {
+            career: careerSatInput.options[careerSatInput.selectedIndex].text,
+            relationships: relationshipSatInput.options[relationshipSatInput.selectedIndex].text,
+            health: healthSatInput.options[healthSatInput.selectedIndex].text,
+            finances: financialSatInput.options[financialSatInput.selectedIndex].text,
+            growth: growthSatInput.options[growthSatInput.selectedIndex].text
+          }
+        };
 
         // Close modal
         closeEmailModal();
@@ -866,7 +955,7 @@ function isValidEmail(email) {
         // Calculate scores
         const scores = calculateScores();
 
-        // Submit to backend
+        // Submit to backend with demographics
         const response = await fetch('/big-five', {
           method: 'POST',
           headers: {
@@ -874,7 +963,8 @@ function isValidEmail(email) {
           },
           body: JSON.stringify({
             answers: answers,
-            email: userEmail
+            email: userEmail,
+            demographics: window.userDemographics || {}
           })
         });
 

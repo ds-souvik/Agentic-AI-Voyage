@@ -298,17 +298,157 @@
       </div>
 
       <form id="email-gate-form" class="email-gate-form">
-        <label for="email-input" class="form-label">Enter your email to see your results</label>
-        <input
-          type="email"
-          id="email-input"
-          name="email"
-          placeholder="your@email.com"
-          required
-          class="input"
-        >
+        <p class="form-intro">Help us personalize your insights (takes 30 seconds)</p>
+
+        <div class="form-row">
+          <div class="form-group">
+            <label for="name-input" class="form-label">First Name</label>
+            <input
+              type="text"
+              id="name-input"
+              name="name"
+              placeholder="Sarah"
+              required
+              class="input"
+            >
+          </div>
+          <div class="form-group">
+            <label for="age-input" class="form-label">Age</label>
+            <input
+              type="number"
+              id="age-input"
+              name="age"
+              placeholder="28"
+              min="13"
+              max="100"
+              required
+              class="input"
+            >
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label for="career-input" class="form-label">Current Role/Career</label>
+          <input
+            type="text"
+            id="career-input"
+            name="career"
+            placeholder="e.g., Software Engineer, Student, Marketing Manager"
+            required
+            class="input"
+          >
+        </div>
+
+        <div class="form-group">
+          <label for="career-stage-input" class="form-label">Career Stage</label>
+          <select id="career-stage-input" name="careerStage" required class="input select">
+            <option value="">Select...</option>
+            <option value="student">Student / Learning</option>
+            <option value="early">Early Career (0-3 years)</option>
+            <option value="mid">Mid-Career (4-10 years)</option>
+            <option value="senior">Senior / Leadership (10+ years)</option>
+            <option value="entrepreneur">Entrepreneur / Freelancer</option>
+            <option value="transition">Career Transition</option>
+          </select>
+        </div>
+
+        <div class="form-group">
+          <label for="primary-goal-input" class="form-label">What brings you here today?</label>
+          <select id="primary-goal-input" name="primaryGoal" required class="input select">
+            <option value="">Select your primary goal...</option>
+            <option value="career">Advance my career</option>
+            <option value="productivity">Improve productivity & focus</option>
+            <option value="relationships">Better relationships</option>
+            <option value="stress">Manage stress & burnout</option>
+            <option value="growth">Personal growth & self-awareness</option>
+            <option value="life-direction">Find life direction</option>
+          </select>
+        </div>
+
+        <div class="form-divider">
+          <span class="divider-text">Help us understand you better</span>
+        </div>
+
+        <!-- Life Pillar Questions -->
+        <div class="form-group">
+          <label for="career-satisfaction-input" class="form-label">💼 How do you feel about your current work/studies?</label>
+          <select id="career-satisfaction-input" name="careerSatisfaction" required class="input select">
+            <option value="">Select...</option>
+            <option value="love-it">I love it - it's fulfilling and exciting</option>
+            <option value="like-it">I like it - it's good but could be better</option>
+            <option value="neutral">It's okay - pays the bills</option>
+            <option value="dislike-it">I don't like it - feels draining</option>
+            <option value="hate-it">I hate it - desperately want change</option>
+            <option value="searching">I'm searching for my path</option>
+          </select>
+        </div>
+
+        <div class="form-group">
+          <label for="relationship-satisfaction-input" class="form-label">❤️ How satisfied are you with your relationships?</label>
+          <select id="relationship-satisfaction-input" name="relationshipSatisfaction" required class="input select">
+            <option value="">Select...</option>
+            <option value="thriving">Thriving - I have deep, meaningful connections</option>
+            <option value="good">Good - I have supportive people around me</option>
+            <option value="okay">Okay - some good, some challenging</option>
+            <option value="struggling">Struggling - I feel lonely or misunderstood</option>
+            <option value="isolated">Isolated - I lack meaningful connections</option>
+            <option value="complicated">It's complicated - going through changes</option>
+          </select>
+        </div>
+
+        <div class="form-group">
+          <label for="health-satisfaction-input" class="form-label">🏥 How's your physical and mental health?</label>
+          <select id="health-satisfaction-input" name="healthSatisfaction" required class="input select">
+            <option value="">Select...</option>
+            <option value="excellent">Excellent - I feel energized and balanced</option>
+            <option value="good">Good - mostly healthy with minor issues</option>
+            <option value="fair">Fair - managing but could be better</option>
+            <option value="struggling">Struggling - dealing with stress/health issues</option>
+            <option value="burnout">Burned out - exhausted physically/mentally</option>
+            <option value="recovering">Recovering - working on improvement</option>
+          </select>
+        </div>
+
+        <div class="form-group">
+          <label for="financial-satisfaction-input" class="form-label">💰 How do you feel about your financial situation?</label>
+          <select id="financial-satisfaction-input" name="financialSatisfaction" required class="input select">
+            <option value="">Select...</option>
+            <option value="abundant">Abundant - financially secure and growing</option>
+            <option value="comfortable">Comfortable - meeting needs with some savings</option>
+            <option value="managing">Managing - making ends meet</option>
+            <option value="stressed">Stressed - worried about money often</option>
+            <option value="struggling">Struggling - financial pressure is high</option>
+            <option value="building">Building - working toward stability</option>
+          </select>
+        </div>
+
+        <div class="form-group">
+          <label for="growth-satisfaction-input" class="form-label">🌱 Are you growing as a person?</label>
+          <select id="growth-satisfaction-input" name="growthSatisfaction" required class="input select">
+            <option value="">Select...</option>
+            <option value="thriving">Thriving - constantly learning and evolving</option>
+            <option value="growing">Growing - making steady progress</option>
+            <option value="stagnant">Stagnant - feel stuck in same patterns</option>
+            <option value="regressing">Regressing - feel like I'm going backward</option>
+            <option value="searching">Searching - looking for direction</option>
+            <option value="ready">Ready - prepared for transformation</option>
+          </select>
+        </div>
+
+        <div class="form-group">
+          <label for="email-input" class="form-label">📧 Email (to receive your comprehensive report)</label>
+          <input
+            type="email"
+            id="email-input"
+            name="email"
+            placeholder="your@email.com"
+            required
+            class="input"
+          >
+        </div>
+
         <button type="submit" class="btn primary btn-lg">
-          Get My Results
+          Generate My Personalized Report
           <span class="btn-icon">→</span>
         </button>
         <p class="privacy-note">🔒 Your data is private and secure. We'll never spam you.</p>
