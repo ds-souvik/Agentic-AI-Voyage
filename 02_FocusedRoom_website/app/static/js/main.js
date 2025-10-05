@@ -14,26 +14,32 @@
  * - Accessible (ARIA, keyboard support)
  */
 
+// ============================================
+// SHARED UTILITIES MODULE (Global Scope)
+// ============================================
+
+/**
+ * Email validation regex (RFC 5322 compliant)
+ * Shared across all modules for consistency
+ */
+const EMAIL_REGEX = /^[a-zA-Z0-9.!#$%&'*+\/=?^_`{|}~-]+@[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?(?:\.[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?)*$/;
+
+/**
+ * Validate email format
+ * Shared utility used by Newsletter, Big Five, and other modules
+ * @param {string} email - Email address to validate
+ * @returns {boolean} True if valid, false otherwise
+ */
+function isValidEmail(email) {
+  return EMAIL_REGEX.test(email);
+}
+
+// ============================================
+// 1. NEWSLETTER FORM VALIDATION & SUBMISSION
+// ============================================
+
 (function() {
     'use strict';
-
-    // ============================================
-    // 1. NEWSLETTER FORM VALIDATION & SUBMISSION
-    // ============================================
-
-    /**
-     * Email validation regex (RFC 5322 compliant)
-     */
-    const EMAIL_REGEX = /^[a-zA-Z0-9.!#$%&'*+\/=?^_`{|}~-]+@[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?(?:\.[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?)*$/;
-
-    /**
-     * Validate email format
-     * @param {string} email - Email address to validate
-     * @returns {boolean} True if valid, false otherwise
-     */
-    function isValidEmail(email) {
-      return EMAIL_REGEX.test(email);
-    }
 
     /**
      * Show message to user (success or error)
@@ -524,6 +530,7 @@
 
     // DOM elements
     const startTestBtn = document.getElementById('start-test-btn');
+    const startTestTriggers = document.querySelectorAll('.start-test-trigger');
     const questionnaireSection = document.getElementById('questionnaire-section');
     const questionContainer = document.getElementById('question-container');
     const progressFill = document.getElementById('progress-fill');
@@ -537,10 +544,15 @@
     const emailForm = document.getElementById('email-gate-form');
     const resultsSection = document.getElementById('results-section');
 
-    // Initialize
+    // Initialize - Attach event listeners to all start test buttons
     if (startTestBtn) {
       startTestBtn.addEventListener('click', startTest);
+      console.log('✅ Big Five: Start test button listener attached');
     }
+    startTestTriggers.forEach(btn => {
+      btn.addEventListener('click', startTest);
+    });
+    console.log(`✅ Big Five: ${startTestTriggers.length} trigger buttons found`);
 
     function startTest() {
       // Scroll to questionnaire
@@ -555,6 +567,7 @@
       prevBtn.addEventListener('click', goToPreviousPage);
       nextBtn.addEventListener('click', goToNextPage);
       submitBtn.addEventListener('click', showEmailModal);
+      console.log('✅ Big Five: Navigation listeners attached');
     }
 
     function renderQuestionPage(pageIndex) {
@@ -631,9 +644,11 @@
 
       // Show submit button on last page if all answered
       if (currentPage === totalPages - 1 && answeredCount === BIG_FIVE_QUESTIONS.length) {
+        console.log(`✅ Big Five: All ${answeredCount} questions answered - showing submit button`);
         nextBtn.style.display = 'none';
         submitBtn.style.display = 'inline-flex';
       } else {
+        console.log(`⏳ Big Five: ${answeredCount}/${BIG_FIVE_QUESTIONS.length} answered, page ${currentPage + 1}/${totalPages}`);
         nextBtn.style.display = 'inline-flex';
         submitBtn.style.display = 'none';
       }
@@ -682,12 +697,21 @@
     }
 
     function showEmailModal() {
-      emailModal.style.display = 'flex';
-      document.body.style.overflow = 'hidden';
+      console.log('🔔 Big Five: showEmailModal called');
 
-      // Close modal on overlay click
-      const overlay = document.getElementById('modal-overlay');
-      overlay.addEventListener('click', closeEmailModal);
+      // First, show preview of results to create desire
+      showPreviewResults();
+
+      // Then show email modal after a brief delay
+      setTimeout(() => {
+        console.log('🔔 Big Five: Showing email modal');
+        emailModal.style.display = 'flex';
+        document.body.style.overflow = 'hidden';
+
+        // Close modal on overlay click
+        const overlay = document.getElementById('modal-overlay');
+        overlay.addEventListener('click', closeEmailModal);
+      }, 500);
     }
 
     function closeEmailModal() {
@@ -695,18 +719,218 @@
       document.body.style.overflow = 'auto';
     }
 
+    function showPreviewResults() {
+      // Calculate scores for preview
+      const scores = calculateScores();
+
+      // Hide questionnaire
+      questionnaireSection.style.display = 'none';
+
+      // Show results section in preview mode
+      resultsSection.style.display = 'block';
+      resultsSection.classList.add('preview-mode');
+      resultsSection.scrollIntoView({ behavior: 'smooth' });
+
+      // Display preview (scores visible, descriptions blurred)
+      displayPreviewResults(scores);
+    }
+
+    function displayPreviewResults(scores) {
+      // Display trait breakdowns (preview mode - scores only)
+      const resultsTraits = document.querySelector('.results-traits');
+      if (!resultsTraits) return;
+
+      // Custom unlock messages for each trait to create intrigue
+      const unlockMessages = {
+        openness: {
+          title: "Unlock Your Creative Potential",
+          items: [
+            "Why you think differently than 80% of people",
+            "Your hidden innovation superpowers",
+            "How to leverage your curiosity for success"
+          ]
+        },
+        conscientiousness: {
+          title: "Decode Your Work Style",
+          items: [
+            "The productivity system designed for YOUR brain",
+            "Why traditional advice might be failing you",
+            "Your secret weapon for achieving goals"
+          ]
+        },
+        extraversion: {
+          title: "Master Your Energy",
+          items: [
+            "Where you get your power (and how to protect it)",
+            "Your ideal work environment revealed",
+            "Why you thrive (or drain) in social settings"
+          ]
+        },
+        agreeableness: {
+          title: "Understand Your Relationships",
+          items: [
+            "How you naturally influence others",
+            "Your conflict resolution superpower",
+            "Why people respond to you the way they do"
+          ]
+        },
+        neuroticism: {
+          title: "Harness Your Emotions",
+          items: [
+            "Your stress response pattern decoded",
+            "How to turn sensitivity into strength",
+            "The resilience strategy built for you"
+          ]
+        }
+      };
+
+      const traitsHTML = Object.entries(scores).map(([trait, data]) => {
+        const desc = TRAIT_DESCRIPTIONS[trait];
+        const score = trait === 'neuroticism' ? 100 - data.score : data.score;
+        const unlockMsg = unlockMessages[trait];
+
+        return `
+          <div class="result-trait-card preview-locked">
+            <div class="result-trait-header">
+              <div>
+                <span style="font-size: 2rem; margin-right: 0.5rem;">${desc.icon}</span>
+                <span class="result-trait-name">${desc.name}</span>
+              </div>
+              <div class="result-trait-score">${score}%</div>
+            </div>
+            <div class="result-trait-bar">
+              <div class="result-trait-fill" style="width: ${score}%"></div>
+            </div>
+            <div class="preview-blur-overlay">
+              <div class="unlock-message">
+                <span class="lock-icon">🔒</span>
+                <p class="unlock-title"><strong>${unlockMsg.title}</strong></p>
+                <ul class="unlock-benefits">
+                  ${unlockMsg.items.map(item => `<li>${item}</li>`).join('')}
+                </ul>
+                <p class="unlock-cta">Enter your email to discover your full ${desc.name.toLowerCase()} profile</p>
+              </div>
+            </div>
+          </div>
+        `;
+      }).join('');
+
+      resultsTraits.innerHTML = traitsHTML;
+
+      // Hide AI insights section in preview
+      const aiInsights = document.querySelector('.results-ai-insights');
+      if (aiInsights) {
+        aiInsights.style.display = 'none';
+      }
+
+      // Hide radar chart in preview
+      const chartContainer = document.querySelector('.results-chart-container');
+      if (chartContainer) {
+        chartContainer.style.display = 'none';
+      }
+    }
+
     // Handle email form submission
     if (emailForm) {
       emailForm.addEventListener('submit', async function(e) {
         e.preventDefault();
 
+        // Capture all demographic data
         const emailInput = document.getElementById('email-input');
-        userEmail = emailInput.value.trim();
+        const nameInput = document.getElementById('name-input');
+        const ageInput = document.getElementById('age-input');
+        const careerInput = document.getElementById('career-input');
+        const careerStageInput = document.getElementById('career-stage-input');
+        const primaryGoalInput = document.getElementById('primary-goal-input');
 
+        // Life pillar satisfaction inputs
+        const careerSatInput = document.getElementById('career-satisfaction-input');
+        const relationshipSatInput = document.getElementById('relationship-satisfaction-input');
+        const healthSatInput = document.getElementById('health-satisfaction-input');
+        const financialSatInput = document.getElementById('financial-satisfaction-input');
+        const growthSatInput = document.getElementById('growth-satisfaction-input');
+
+        userEmail = emailInput.value.trim();
+        const userName = nameInput.value.trim();
+        const userAge = parseInt(ageInput.value);
+        const userCareer = careerInput.value.trim();
+        const userCareerStage = careerStageInput.value;
+        const userPrimaryGoal = primaryGoalInput.value;
+
+        const careerSat = careerSatInput.value;
+        const relationshipSat = relationshipSatInput.value;
+        const healthSat = healthSatInput.value;
+        const financialSat = financialSatInput.value;
+        const growthSat = growthSatInput.value;
+
+        // Validation
         if (!userEmail || !isValidEmail(userEmail)) {
           alert('Please enter a valid email address');
           return;
         }
+
+        if (!userName || userName.length < 2) {
+          alert('Please enter your first name');
+          return;
+        }
+
+        if (!userAge || userAge < 13 || userAge > 100) {
+          alert('Please enter a valid age');
+          return;
+        }
+
+        if (!userCareer || userCareer.length < 2) {
+          alert('Please enter your current role or career');
+          return;
+        }
+
+        if (!userCareerStage) {
+          alert('Please select your career stage');
+          return;
+        }
+
+        if (!userPrimaryGoal) {
+          alert('Please select what brings you here today');
+          return;
+        }
+
+        // Validate life pillar questions
+        if (!careerSat) {
+          alert('Please tell us how you feel about your work/studies');
+          return;
+        }
+        if (!relationshipSat) {
+          alert('Please tell us about your relationships');
+          return;
+        }
+        if (!healthSat) {
+          alert('Please tell us about your health');
+          return;
+        }
+        if (!financialSat) {
+          alert('Please tell us about your financial situation');
+          return;
+        }
+        if (!growthSat) {
+          alert('Please tell us about your personal growth');
+          return;
+        }
+
+        // Store comprehensive demographic data for submission
+        window.userDemographics = {
+          name: userName,
+          age: userAge,
+          career: userCareer,
+          careerStage: careerStageInput.options[careerStageInput.selectedIndex].text,
+          primaryGoal: primaryGoalInput.options[primaryGoalInput.selectedIndex].text,
+          lifePillars: {
+            career: careerSatInput.options[careerSatInput.selectedIndex].text,
+            relationships: relationshipSatInput.options[relationshipSatInput.selectedIndex].text,
+            health: healthSatInput.options[healthSatInput.selectedIndex].text,
+            finances: financialSatInput.options[financialSatInput.selectedIndex].text,
+            growth: growthSatInput.options[growthSatInput.selectedIndex].text
+          }
+        };
 
         // Close modal
         closeEmailModal();
@@ -717,11 +941,21 @@
     }
 
     async function submitResults() {
+      console.log('🚀 Big Five: Submitting results to backend...');
+      console.log('📧 Email:', userEmail);
+      console.log('📝 Answers:', answers.length, 'questions');
+
+      // Show loading state
+      const loadingSection = document.getElementById('loading-section');
+      questionnaireSection.style.display = 'none';
+      loadingSection.style.display = 'block';
+      loadingSection.scrollIntoView({ behavior: 'smooth' });
+
       try {
         // Calculate scores
         const scores = calculateScores();
 
-        // Submit to backend
+        // Submit to backend with demographics
         const response = await fetch('/big-five', {
           method: 'POST',
           headers: {
@@ -729,18 +963,24 @@
           },
           body: JSON.stringify({
             answers: answers,
-            email: userEmail
+            email: userEmail,
+            demographics: window.userDemographics || {}
           })
         });
 
+        console.log('📡 Response status:', response.status);
+
         if (!response.ok) {
-          throw new Error('Failed to submit results');
+          const errorData = await response.json();
+          console.error('❌ API error:', errorData);
+          throw new Error(errorData.error || 'Failed to submit results');
         }
 
         const data = await response.json();
+        console.log('✅ Results received:', data);
 
-        // Hide questionnaire, show results
-        questionnaireSection.style.display = 'none';
+        // Hide loading, show results
+        loadingSection.style.display = 'none';
         resultsSection.style.display = 'block';
         resultsSection.scrollIntoView({ behavior: 'smooth' });
 
@@ -749,10 +989,13 @@
 
         // Clear localStorage
         localStorage.removeItem('bigfive_answers');
+        console.log('✅ Big Five: Test complete!');
 
       } catch (error) {
-        console.error('Error submitting results:', error);
+        console.error('❌ Error submitting results:', error);
+        loadingSection.style.display = 'none';
         alert('There was an error processing your results. Please try again.');
+        questionnaireSection.style.display = 'block';
       }
     }
 
@@ -791,14 +1034,73 @@
     }
 
     function displayResults(data) {
+      // Remove preview mode
+      resultsSection.classList.remove('preview-mode');
+
+      // Show radar chart
+      const chartContainer = document.querySelector('.results-chart-container');
+      if (chartContainer) {
+        chartContainer.style.display = 'block';
+      }
+
+      // Show AI insights
+      const aiInsights = document.querySelector('.results-ai-insights');
+      if (aiInsights) {
+        aiInsights.style.display = 'block';
+      }
+
+      // Parse and display quote (if present)
+      displayPersonalityQuote(data.suggestions || '');
+
       // Display radar chart
       displayRadarChart(data.scores);
 
-      // Display trait breakdowns
-      displayTraitBreakdowns(data.scores);
+      // Display trait breakdowns with enhanced descriptions from AI
+      displayTraitBreakdowns(data.scores, data.suggestions || '');
 
-      // Display AI insights
+      // Display AI insights (life domains, productivity, etc.)
       displayAIInsights(data.suggestions || 'Generating your personalized insights...');
+    }
+
+    function displayPersonalityQuote(suggestions) {
+      const quoteContainer = document.getElementById('results-quote');
+      if (!quoteContainer) return;
+
+      // Extract quote from suggestions (format: ## QUOTE\n"Quote text" — Author)
+      const quoteMatch = suggestions.match(/## QUOTE\s*\n\s*[""](.+?)[""][\s—]+(.+?)(?:\n|$)/);
+
+      if (quoteMatch) {
+        const quoteText = quoteMatch[1].trim();
+        const quoteAuthor = quoteMatch[2].trim();
+
+        quoteContainer.innerHTML = `
+          <p class="quote-text">"${quoteText}"</p>
+          <p class="quote-author">— ${quoteAuthor}</p>
+        `;
+        quoteContainer.style.display = 'block';
+      }
+    }
+
+    function extractTraitDescription(suggestions, traitName) {
+      // Extract detailed description for each trait from AI suggestions
+      // Format: ### TraitName: XX/100\n[description text]
+      const pattern = new RegExp(`### ${traitName}[^\\n]*\\n([^#]+)`, 'i');
+      const match = suggestions.match(pattern);
+
+      if (match) {
+        return match[1].trim();
+      }
+
+      // Fallback to generic descriptions
+      const fallbacks = {
+        'Openness to Experience': 'This reflects your curiosity, imagination, and willingness to try new experiences.',
+        'Conscientiousness': 'This measures your organization, self-discipline, and reliability in pursuing goals.',
+        'Extraversion': 'This indicates your energy level, sociability, and preference for social interaction.',
+        'Agreeableness': 'This shows your compassion, cooperation, and concern for harmonious relationships.',
+        'Emotional Stability': 'This reflects your ability to remain calm, resilient, and emotionally balanced under pressure.'
+      };
+
+      return fallbacks[traitName] || 'Your score in this trait reveals important aspects of your personality.';
     }
 
     function displayRadarChart(scores) {
@@ -814,16 +1116,22 @@
         return;
       }
 
+      // Extract score values (handle both formats: nested objects or direct values)
+      const getScore = (trait) => {
+        const value = scores[trait];
+        return typeof value === 'object' ? value.score : value;
+      };
+
       const chartData = {
         labels: ['Openness', 'Conscientiousness', 'Extraversion', 'Agreeableness', 'Emotional Stability'],
         datasets: [{
           label: 'Your Personality Profile',
           data: [
-            scores.openness.score,
-            scores.conscientiousness.score,
-            scores.extraversion.score,
-            scores.agreeableness.score,
-            100 - scores.neuroticism.score // Invert neuroticism to emotional stability
+            getScore('openness'),
+            getScore('conscientiousness'),
+            getScore('extraversion'),
+            getScore('agreeableness'),
+            100 - getScore('neuroticism') // Invert neuroticism to emotional stability
           ],
           backgroundColor: 'rgba(122, 158, 159, 0.2)',
           borderColor: 'rgba(122, 158, 159, 1)',
@@ -859,15 +1167,32 @@
       });
     }
 
-    function displayTraitBreakdowns(scores) {
+    function displayTraitBreakdowns(scores, suggestions) {
       const resultsTraits = document.getElementById('results-traits');
       if (!resultsTraits) return;
 
       const traitsHTML = Object.entries(scores).map(([trait, data]) => {
         const desc = TRAIT_DESCRIPTIONS[trait];
-        const score = trait === 'neuroticism' ? 100 - data.score : data.score;
+
+        // Extract score value (handle both formats: nested objects or direct values)
+        const rawScore = typeof data === 'object' ? data.score : data;
+
+        // Validate score is a number
+        const validScore = !isNaN(rawScore) && rawScore !== null && rawScore !== undefined ? rawScore : 50;
+
+        // Invert neuroticism to show emotional stability
+        const displayScore = trait === 'neuroticism' ? 100 - validScore : validScore;
+
+        // Round to whole number for display
+        const score = Math.round(displayScore);
+
+        // Get enhanced AI-generated description (if available)
+        const aiDescription = extractTraitDescription(suggestions, desc.name);
+
+        // Fallback to generic description if AI parsing fails
         const isHigh = score >= 50;
-        const description = isHigh ? desc.high : desc.low;
+        const fallbackDescription = isHigh ? desc.high : desc.low;
+        const description = aiDescription || fallbackDescription;
 
         return `
           <div class="result-trait-card">
@@ -893,7 +1218,72 @@
       const aiInsightsContent = document.getElementById('ai-insights-content');
       if (!aiInsightsContent) return;
 
-      aiInsightsContent.innerHTML = `<p>${suggestions}</p>`;
+      // Parse markdown-style text into structured HTML
+      const lines = suggestions.split('\n').filter(line => line.trim());
+      let html = '';
+      let currentSection = '';
+      let inList = false;
+
+      lines.forEach(line => {
+        const trimmed = line.trim();
+
+        // Section headers (## or ###)
+        if (trimmed.startsWith('###')) {
+          if (inList) {
+            html += '</ul></div>';
+            inList = false;
+          }
+          if (currentSection) html += '</div>';
+          const title = trimmed.replace(/^###\s*/, '');
+          html += `<div class="insight-section"><h4 class="insight-subtitle">✨ ${title}</h4>`;
+          currentSection = title;
+        }
+        else if (trimmed.startsWith('##')) {
+          if (inList) {
+            html += '</ul></div>';
+            inList = false;
+          }
+          if (currentSection) html += '</div>';
+          const title = trimmed.replace(/^##\s*/, '');
+          html += `<div class="insight-section"><h3 class="insight-title">🎯 ${title}</h3>`;
+          currentSection = title;
+        }
+        // List items
+        else if (trimmed.startsWith('- ') || trimmed.startsWith('* ')) {
+          if (!inList) {
+            html += '<ul class="insight-list">';
+            inList = true;
+          }
+          const item = trimmed.substring(2);
+          // Check if it's a bold item
+          const boldMatch = item.match(/^\*\*(.+?)\*\*:?\s*(.*)$/);
+          if (boldMatch) {
+            html += `<li><strong>${boldMatch[1]}</strong>${boldMatch[2] ? ': ' + boldMatch[2] : ''}</li>`;
+          } else {
+            html += `<li>${item}</li>`;
+          }
+        }
+        // Regular paragraphs
+        else if (trimmed.length > 0) {
+          if (inList) {
+            html += '</ul>';
+            inList = false;
+          }
+          // Handle bold text
+          const formatted = trimmed.replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>');
+          html += `<p class="insight-paragraph">${formatted}</p>`;
+        }
+      });
+
+      if (inList) html += '</ul>';
+      if (currentSection) html += '</div>';
+
+      // If no structured content, wrap in default formatting
+      if (!html) {
+        html = `<div class="insight-section"><p class="insight-paragraph">${suggestions}</p></div>`;
+      }
+
+      aiInsightsContent.innerHTML = html;
     }
 
     // Restore progress from localStorage on page load

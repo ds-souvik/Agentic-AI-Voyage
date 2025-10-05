@@ -18,7 +18,16 @@ class BigFiveResult(db.Model):  # type: ignore[name-defined]
     """Big Five personality test result model."""
 
     id = db.Column(db.Integer, primary_key=True)
-    # store normalized trait scores as JSON
+    # Foreign key to link result to subscriber (optional for anonymous tests)
+    subscriber_id = db.Column(db.Integer, db.ForeignKey("subscriber.id"), nullable=True, index=True)
+    # Store normalized trait scores as JSON (scores, percentiles, raw_scores)
     scores = db.Column(db.JSON, nullable=False)
+    # AI-generated personality suggestions (from Gemini or fallback)
     suggestions = db.Column(db.Text)
-    created_at = db.Column(db.DateTime, default=datetime.utcnow)
+    # Timestamp for analytics and sorting
+    created_at = db.Column(db.DateTime, default=datetime.utcnow, index=True)
+
+    # Relationship to Subscriber (enables result.subscriber.email access)
+    subscriber = db.relationship(
+        "Subscriber", backref=db.backref("big_five_results", lazy="dynamic")
+    )
