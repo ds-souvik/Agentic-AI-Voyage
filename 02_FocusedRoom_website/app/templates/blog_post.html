@@ -1,0 +1,79 @@
+{% extends "base.html" %}
+
+{% block title %}{{ post.title }} | Focused Room Blog{% endblock %}
+
+{% block meta_description %}{{ post.meta_description }}{% endblock %}
+
+{% block content %}
+<!-- Post Hero -->
+<article class="blog-post">
+  <header class="post-hero">
+    <div class="container">
+      <div class="post-breadcrumb">
+        <a href="/">Home</a> / <a href="/blog">Blog</a> / <span>{{ post.title }}</span>
+      </div>
+      <div class="post-meta">
+        <span class="post-date">📅 {{ post.date }}</span>
+        <span class="post-read-time">⏱️ {{ post.read_time }} read</span>
+        <span class="post-author">✍️ {{ post.author }}</span>
+      </div>
+      <h1 class="post-title">{{ post.title }}</h1>
+      <p class="post-excerpt">{{ post.excerpt }}</p>
+      <div class="post-tags">
+        {% for tag in post.tags %}
+        <span class="post-tag">{{ tag }}</span>
+        {% endfor %}
+      </div>
+    </div>
+    <div class="post-hero-image">
+      <img src="{{ post.hero_image }}" alt="{{ post.title }}">
+    </div>
+  </header>
+
+  <!-- Post Content -->
+  <div class="post-content-wrapper">
+    <div class="container">
+      <div class="post-content">
+        {{ content|safe }}
+      </div>
+    </div>
+  </div>
+
+  <!-- Post CTA -->
+  <aside class="post-cta">
+    <div class="container">
+      <div class="cta-box">
+        <h3>🧠 Ready to unlock your productivity potential?</h3>
+        <p>Take our AI-powered Big Five personality test and get a personalized productivity roadmap designed specifically for YOUR brain.</p>
+        <div class="cta-buttons">
+          <a href="/big-five" class="btn primary btn-lg">
+            Take the Free Test
+            <span class="btn-icon">→</span>
+          </a>
+          <a href="/download" class="btn ghost btn-lg">
+            Install Extension
+          </a>
+        </div>
+        <p class="cta-footnote">✅ Includes daily routine + 90-day improvement plan + newsletter</p>
+      </div>
+    </div>
+  </aside>
+
+  <!-- More Posts -->
+  <section class="post-more">
+    <div class="container">
+      <h3>Keep Reading</h3>
+      <div class="more-posts-grid">
+        {% for related_post in related_posts %}
+        <a href="/blog/{{ related_post.slug }}" class="more-post-card">
+          <img src="{{ related_post.hero_image }}" alt="{{ related_post.title }}">
+          <h4>{{ related_post.title }}</h4>
+          <span class="more-post-read-time">{{ related_post.read_time }}</span>
+        </a>
+        {% endfor %}
+      </div>
+    </div>
+  </section>
+</article>
+{% endblock %}
+

@@ -1,6 +1,8 @@
+import json
 import logging
 import os
 from datetime import datetime, timezone
+from pathlib import Path
 
 from flask import Blueprint, Response, jsonify, redirect, render_template, request
 from sqlalchemy import text
@@ -409,3 +411,69 @@ def export_subscribers():
     except Exception as e:
         logger.error(f"Error exporting subscribers: {str(e)}")
         return jsonify({"success": False, "error": "Failed to export subscribers"}), 500
+
+
+# ============================================
+# BLOG ROUTES - WORLD-CLASS CONTENT SYSTEM
+# ============================================
+
+@main_bp.route("/blog")
+def blog_list():
+    """Display blog post listing."""
+    try:
+        # Load blog data from JSON
+        blog_data_path = Path(__file__).parent / "static" / "blog_data.json"
+        with open(blog_data_path, 'r', encoding='utf-8') as f:
+            blog_data = json.load(f)
+        
+        posts = blog_data.get("posts", [])
+        logger.info(f"Loaded {len(posts)} blog posts")
+        
+        return render_template("blog_list.html", posts=posts)
+    
+    except Exception as e:
+        logger.error(f"Error loading blog list: {str(e)}")
+        return render_template("blog_list.html", posts=[])
+
+
+@main_bp.route("/blog/<slug>")
+def blog_post(slug):
+    """Display individual blog post."""
+    try:
+        # Load blog data
+        blog_data_path = Path(__file__).parent / "static" / "blog_data.json"
+        with open(blog_data_path, 'r', encoding='utf-8') as f:
+            blog_data = json.load(f)
+        
+        # Find the post
+        posts = blog_data.get("posts", [])
+        post = next((p for p in posts if p["slug"] == slug), None)
+        
+        if not post:
+            logger.warning(f"Blog post not found: {slug}")
+            return "Blog post not found", 404
+        
+        # Load post content
+        content_path = Path(__file__).parent / "blog_content" / f"{slug}.html"
+        if not content_path.exists():
+            logger.error(f"Blog content file not found: {content_path}")
+            return "Blog content not found", 404
+        
+        with open(content_path, 'r', encoding='utf-8') as f:
+            content = f.read()
+        
+        # Get related posts (all posts except current)
+        related_posts = [p for p in posts if p["slug"] != slug]
+        
+        logger.info(f"Serving blog post: {slug}")
+        
+        return render_template(
+            "blog_post.html",
+            post=post,
+            content=content,
+            related_posts=related_posts
+        )
+    
+    except Exception as e:
+        logger.error(f"Error loading blog post {slug}: {str(e)}")
+        return "Error loading blog post", 500

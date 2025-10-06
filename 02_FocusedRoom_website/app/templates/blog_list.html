@@ -1,0 +1,64 @@
+{% extends "base.html" %}
+
+{% block title %}Blog - Productivity Insights & Deep Work Strategies | Focused Room{% endblock %}
+
+{% block meta_description %}Discover science-backed productivity strategies, deep work techniques, and focus hacks. Real advice for students and knowledge workers.{% endblock %}
+
+{% block content %}
+<!-- Blog Hero -->
+<section class="blog-hero">
+  <div class="container">
+    <h1 class="blog-hero-title">The Focus Formula</h1>
+    <p class="blog-hero-subtitle">Science-backed strategies for deep work, focus, and unstoppable productivity.</p>
+    <p class="blog-hero-tagline">Written for students, knowledge workers, and anyone tired of feeling scattered.</p>
+  </div>
+</section>
+
+<!-- Blog Grid -->
+<section class="blog-grid-section">
+  <div class="container">
+    <div class="blog-grid">
+      {% for post in posts %}
+      <article class="blog-card">
+        <a href="/blog/{{ post.slug }}" class="blog-card-link">
+          <div class="blog-card-image">
+            <img src="{{ post.hero_image }}" alt="{{ post.title }}" loading="lazy">
+            <div class="blog-card-overlay">
+              <span class="blog-card-cta">Read Article →</span>
+            </div>
+          </div>
+          <div class="blog-card-content">
+            <div class="blog-card-meta">
+              <span class="blog-card-date">{{ post.date }}</span>
+              <span class="blog-card-read-time">⏱️ {{ post.read_time }}</span>
+            </div>
+            <h2 class="blog-card-title">{{ post.title }}</h2>
+            <p class="blog-card-excerpt">{{ post.excerpt }}</p>
+            <div class="blog-card-tags">
+              {% for tag in post.tags %}
+              <span class="blog-tag">{{ tag }}</span>
+              {% endfor %}
+            </div>
+          </div>
+        </a>
+      </article>
+      {% endfor %}
+    </div>
+  </div>
+</section>
+
+<!-- Newsletter CTA -->
+<section class="blog-newsletter-cta">
+  <div class="container">
+    <div class="newsletter-box">
+      <h2>Never miss a strategy</h2>
+      <p>Get The Focus Formula delivered to your inbox every Tuesday. Real insights, zero fluff.</p>
+      <a href="/big-five" class="btn primary btn-lg">
+        Take the Big Five Test (Includes Newsletter)
+        <span class="btn-icon">→</span>
+      </a>
+    </div>
+  </div>
+</section>
+{% endblock %}
+
