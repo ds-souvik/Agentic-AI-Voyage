@@ -2699,31 +2699,26 @@
   font-weight: 700;
   margin-bottom: var(--space-4);
   line-height: var(--leading-tight);
-}
-
-/* Match homepage gradient text effect */
-.blog-hero-title {
-  background: linear-gradient(135deg, var(--color-text-900) 0%, var(--color-primary-600) 100%);
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
-  background-clip: text;
+  color: var(--color-text-900);
 }
 
 .blog-hero-subtitle {
   font-size: var(--text-xl);
   color: var(--color-text-700);
-  margin-bottom: var(--space-2);
+  margin-bottom: var(--space-3);
   line-height: var(--leading-relaxed);
   max-width: 700px;
   margin-left: auto;
   margin-right: auto;
+  font-weight: 500;
 }
 
 .blog-hero-tagline {
   font-size: var(--text-base);
-  color: var(--color-muted);
+  color: var(--color-text-700);
   max-width: 600px;
   margin: 0 auto;
+  line-height: var(--leading-relaxed);
 }
 
 /* Blog Grid - Consistent with Homepage */
@@ -2853,29 +2848,37 @@
   font-weight: 500;
 }
 
-/* Blog Newsletter CTA */
+/* Blog Newsletter CTA - Matches Homepage Theme */
 .blog-newsletter-cta {
-  padding: var(--space-16) var(--space-4);
-  background: linear-gradient(135deg, var(--color-primary-500) 0%, var(--color-cta-accent) 100%);
+  padding: var(--space-20) var(--space-4);
+  background: var(--color-neutral-100);
+  border-top: 2px solid var(--color-border);
+  position: relative;
 }
 
 .newsletter-box {
-  max-width: 600px;
+  max-width: 700px;
   margin: 0 auto;
   text-align: center;
-  color: white;
+  padding: var(--space-10);
+  background: white;
+  border-radius: 24px;
+  box-shadow: var(--shadow-soft);
+  border: 2px solid var(--color-primary-500);
 }
 
 .newsletter-box h2 {
   font-size: var(--text-4xl);
   font-weight: 700;
   margin-bottom: var(--space-4);
+  color: var(--color-text-900);
 }
 
 .newsletter-box p {
   font-size: var(--text-lg);
   margin-bottom: var(--space-6);
-  opacity: 0.95;
+  color: var(--color-text-700);
+  line-height: var(--leading-relaxed);
 }
 
 /* ============================================
@@ -2890,6 +2893,8 @@
 .post-hero {
   padding: var(--space-12) var(--space-4) var(--space-8);
   background: linear-gradient(135deg, rgba(122, 158, 159, 0.03) 0%, rgba(102, 126, 234, 0.03) 100%);
+  position: relative;
+  z-index: 1;
 }
 
 .post-breadcrumb {
@@ -2956,13 +2961,13 @@
 
 .post-hero-image {
   max-width: 1200px;
-  margin: var(--space-8) auto 0;
+  margin: var(--space-8) auto var(--space-16);
   padding: 0 var(--space-4);
   border-radius: 16px;
   overflow: hidden;
   box-shadow: 0 20px 60px rgba(15, 23, 36, 0.15);
   position: relative;
-  z-index: 1;
+  z-index: 0;
 }
 
 .post-hero-image img {
@@ -2976,7 +2981,7 @@
 .post-content-wrapper {
   padding: var(--space-16) var(--space-4);
   position: relative;
-  z-index: 2;
+  z-index: 10;
   background: var(--bg);
 }
 
