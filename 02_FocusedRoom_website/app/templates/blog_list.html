@@ -2,7 +2,56 @@
 
 {% block title %}Blog - Productivity Insights & Deep Work Strategies | Focused Room{% endblock %}
 
-{% block meta_description %}Discover science-backed productivity strategies, deep work techniques, and focus hacks. Real advice for students and knowledge workers.{% endblock %}
+{% block meta_title %}Blog - Productivity Insights & Deep Work Strategies | Focused Room{% endblock %}
+
+{% block description %}Discover science-backed productivity strategies, deep work techniques, and focus hacks. Real advice for students and knowledge workers.{% endblock %}
+
+{% block keywords %}productivity blog, deep work, focus strategies, cognitive science, neuroscience, distraction management{% endblock %}
+
+{% block og_title %}The Focus Formula - Blog | Focused Room{% endblock %}
+{% block og_description %}Science-backed strategies for deep work, focus, and unstoppable productivity. Written for students and knowledge workers.{% endblock %}
+
+{% block twitter_title %}The Focus Formula - Blog | Focused Room{% endblock %}
+{% block twitter_description %}Science-backed strategies for deep work, focus, and unstoppable productivity.{% endblock %}
+
+{% block canonical %}{{ request.url_root }}blog{% endblock %}
+
+{% block jsonld %}
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "Blog",
+  "name": "The Focus Formula",
+  "description": "Science-backed strategies for deep work, focus, and unstoppable productivity",
+  "url": "{{ request.url_root }}blog",
+  "publisher": {
+    "@type": "Organization",
+    "name": "Focused Room",
+    "logo": {
+      "@type": "ImageObject",
+      "url": "{{ request.url_root }}static/assets/logo_1.png"
+    }
+  },
+  "blogPost": [
+    {% for post in posts %}
+    {
+      "@type": "BlogPosting",
+      "headline": "{{ post.title }}",
+      "description": "{{ post.excerpt }}",
+      "url": "{{ request.url_root }}blog/{{ post.slug }}",
+      "datePublished": "{{ post.date }}",
+      "author": {
+        "@type": "Organization",
+        "name": "{{ post.author }}"
+      },
+      "image": "{{ request.url_root }}{{ post.hero_image[1:] }}",
+      "keywords": "{{ post.tags|join(', ') }}"
+    }{% if not loop.last %},{% endif %}
+    {% endfor %}
+  ]
+}
+</script>
+{% endblock %}
 
 {% block content %}
 <!-- Blog Hero -->
