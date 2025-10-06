@@ -2663,20 +2663,47 @@
    BLOG SYSTEM - WORLD-CLASS DESIGN
    ============================================ */
 
-/* Blog Hero */
+/* Blog Hero - Matches Homepage Theme */
 .blog-hero {
-  padding: var(--space-20) var(--space-4);
-  background: linear-gradient(135deg, rgba(122, 158, 159, 0.05) 0%, rgba(102, 126, 234, 0.05) 100%);
+  padding: var(--space-16) var(--space-4);
+  background: var(--bg);
+  position: relative;
+  overflow: hidden;
+}
+
+/* Match homepage background pattern */
+.blog-hero::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: 
+    radial-gradient(circle at 20% 50%, rgba(122, 158, 159, 0.08) 0%, transparent 50%),
+    radial-gradient(circle at 80% 80%, rgba(102, 126, 234, 0.08) 0%, transparent 50%);
+  pointer-events: none;
+  z-index: 0;
+}
+
+.blog-hero .container {
+  position: relative;
+  z-index: 1;
+  max-width: 1280px;
+  margin: 0 auto;
   text-align: center;
-  border-bottom: 2px solid var(--color-border);
 }
 
 .blog-hero-title {
-  font-size: var(--text-5xl);
+  font-size: clamp(2.5rem, 5vw, 4rem);
   font-weight: 700;
-  color: var(--color-text-900);
   margin-bottom: var(--space-4);
-  background: linear-gradient(135deg, var(--color-primary-500) 0%, var(--color-cta-accent) 100%);
+  line-height: var(--leading-tight);
+}
+
+/* Match homepage gradient text effect */
+.blog-hero-title {
+  background: linear-gradient(135deg, var(--color-text-900) 0%, var(--color-primary-600) 100%);
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
   background-clip: text;
@@ -2687,16 +2714,23 @@
   color: var(--color-text-700);
   margin-bottom: var(--space-2);
   line-height: var(--leading-relaxed);
+  max-width: 700px;
+  margin-left: auto;
+  margin-right: auto;
 }
 
 .blog-hero-tagline {
   font-size: var(--text-base);
   color: var(--color-muted);
+  max-width: 600px;
+  margin: 0 auto;
 }
 
-/* Blog Grid */
+/* Blog Grid - Consistent with Homepage */
 .blog-grid-section {
   padding: var(--space-20) var(--space-4);
+  background: var(--bg);
+  position: relative;
 }
 
 .blog-grid {
@@ -2923,20 +2957,27 @@
 .post-hero-image {
   max-width: 1200px;
   margin: var(--space-8) auto 0;
+  padding: 0 var(--space-4);
   border-radius: 16px;
   overflow: hidden;
   box-shadow: 0 20px 60px rgba(15, 23, 36, 0.15);
+  position: relative;
+  z-index: 1;
 }
 
 .post-hero-image img {
   width: 100%;
   height: auto;
   display: block;
+  border-radius: 12px;
 }
 
 /* Post Content */
 .post-content-wrapper {
   padding: var(--space-16) var(--space-4);
+  position: relative;
+  z-index: 2;
+  background: var(--bg);
 }
 
 .post-content {
