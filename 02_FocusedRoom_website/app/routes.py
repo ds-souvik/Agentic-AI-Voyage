@@ -299,18 +299,6 @@ def privacy():
     return render_template("privacy.html")
 
 
-@main_bp.route("/blog")
-def blog():
-    """Blog listing page."""
-    return render_template("blog_list.html")
-
-
-@main_bp.route("/blog/<slug>")
-def blog_post(slug):
-    """Individual blog post page."""
-    return render_template("blog_post.html", slug=slug)
-
-
 @main_bp.route("/health")
 def health_check():
     """
