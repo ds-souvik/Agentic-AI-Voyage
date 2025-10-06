@@ -1,0 +1,29 @@
+{
+  "posts": [
+    {
+      "id": 1,
+      "slug": "science-of-deep-work",
+      "title": "The Science of Deep Work: How to 10X Your Productivity (No BS)",
+      "excerpt": "You're not lazy. You're not broken. Your brain is just wired for the wrong century. Here's how to fix it.",
+      "author": "Focused Room Team",
+      "date": "2025-10-06",
+      "read_time": "8 min",
+      "hero_image": "/static/assets/blog folder/A working professional doing deep work.png",
+      "tags": ["deep work", "productivity", "cognitive science"],
+      "meta_description": "Discover the science behind deep work and learn proven strategies to 10X your productivity. Research-backed techniques for students and knowledge workers."
+    },
+    {
+      "id": 2,
+      "slug": "brain-on-distraction",
+      "title": "Your Brain on Distraction: Why You Can't Focus (And How to Fix It)",
+      "excerpt": "That Instagram notification just cost you 23 minutes. Here's what's really happening in your brain.",
+      "author": "Focused Room Team",
+      "date": "2025-10-06",
+      "read_time": "7 min",
+      "hero_image": "/static/assets/blog folder/Poor child doing deep work with minimum resources.png",
+      "tags": ["focus", "distraction", "neuroscience"],
+      "meta_description": "Understand the neuroscience of distraction and learn practical strategies to reclaim your focus. Science-backed advice for the digital age."
+    }
+  ]
+}
+
