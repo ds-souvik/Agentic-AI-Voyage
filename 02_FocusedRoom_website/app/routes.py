@@ -334,3 +334,78 @@ def health_check():
 
     status_code = 200 if health_data["status"] == "healthy" else 503
     return jsonify(health_data), status_code
+
+
+@main_bp.route("/admin/subscribers/export")
+def export_subscribers():
+    """
+    Export all subscribers to CSV format.
+    
+    Returns:
+        CSV file download with subscriber data including:
+        - Email, opt-in status, subscription date
+        - Big Five test count and latest test date
+        
+    TODO: Add authentication/admin protection in production.
+    """
+    import csv
+    from io import StringIO
+    
+    try:
+        # Query all subscribers with their Big Five results
+        subscribers = Subscriber.query.order_by(Subscriber.created_at.desc()).all()
+        
+        logger.info(f"Exporting {len(subscribers)} subscribers to CSV")
+        
+        # Create CSV in memory
+        output = StringIO()
+        writer = csv.writer(output)
+        
+        # Write header
+        writer.writerow([
+            'ID',
+            'Email',
+            'Opt-In',
+            'Subscription Date',
+            'Total Big Five Tests',
+            'Latest Test Date'
+        ])
+        
+        # Write data
+        for sub in subscribers:
+            # Count associated Big Five results
+            test_count = sub.big_five_results.count() if hasattr(sub, 'big_five_results') else 0
+            
+            # Get latest test date
+            if test_count > 0:
+                latest_test = sub.big_five_results.order_by(BigFiveResult.created_at.desc()).first()
+                latest_test_date = latest_test.created_at.strftime('%Y-%m-%d %H:%M:%S') if latest_test else 'N/A'
+            else:
+                latest_test_date = 'N/A'
+            
+            writer.writerow([
+                sub.id,
+                sub.email,
+                'Yes' if sub.opt_in else 'No',
+                sub.created_at.strftime('%Y-%m-%d %H:%M:%S'),
+                test_count,
+                latest_test_date
+            ])
+        
+        # Prepare response
+        output.seek(0)
+        filename = f'focused_room_subscribers_{datetime.now().strftime("%Y%m%d_%H%M%S")}.csv'
+        
+        logger.info(f"CSV export complete: {filename}")
+        
+        return Response(
+            output.getvalue(),
+            mimetype='text/csv',
+            headers={
+                'Content-Disposition': f'attachment; filename={filename}'
+            }
+        )
+        
+    except Exception as e:
+        logger.error(f"Error exporting subscribers: {str(e)}")
+        return jsonify({"success": False, "error": "Failed to export subscribers"}), 500
