@@ -141,14 +141,14 @@ class GeminiClient:
         # Construct prompt for Gemini with demographics
         prompt = self._build_gemini_prompt(scores, percentiles, demographics)
 
-        # Call Gemini API with higher token limit for comprehensive report
+        # Call Gemini API with maximum token limit for comprehensive report
         response = self.model.generate_content(
             prompt,
             generation_config={
-                "temperature": 0.85,  # Slightly higher for more creative, personal tone
+                "temperature": 0.9,  # Higher for more creative, human, personal tone
                 "top_p": 0.95,
                 "top_k": 40,
-                "max_output_tokens": 2048,  # Increased for detailed life domain insights
+                "max_output_tokens": 8192,  # MAXIMUM for daily routine + 90-day plan + life domains
             },
         )
 
@@ -380,15 +380,73 @@ REQUIRED OUTPUT FORMAT (Use EXACT Markdown structure with ## and ### headers, **
 - **YouTube**: [Learning channel]
 - **Action**: [One concrete action for THIS WEEK]
 
-## 🔥 30-Day Transformation Plan
+## 📅 Your Personalized Daily Routine
 
-**Week 1-2: Foundation**
-- [Specific action item based on their biggest growth edge]
-- [Specific action item leveraging their top strength]
+{name}, here's a daily routine scientifically designed for YOUR personality + life situation. This isn't generic advice - it's built specifically for your {conscientiousness_score:.0f}/100 conscientiousness, {openness_score:.0f}/100 openness, and {100 - neuroticism_score:.0f}/100 emotional stability.
 
-**Week 3-4: Expansion**
-- [Next-level action building on Week 1-2]
-- [New habit aligned with their profile]
+### 🌅 Morning Routine (5:30 AM - 9:00 AM)
+[Based on their personality + life pillars, create a specific morning routine. Example:
+"**5:30 AM - Wake Up & Mindfulness** (10 min): Your {100 - neuroticism_score:.0f}/100 emotional stability means you handle early mornings well. Start with 10 deep breaths.
+**5:40 AM - Movement** (20 min): Given {health_sat}, [specific exercise recommendation]
+**6:00 AM - Deep Work Block** (90 min): Your peak focus time. Tackle your most important {primary_goal} task.
+**7:30 AM - Breakfast & Connection** (30 min): [Based on relationship_sat and extraversion]
+**8:00 AM - Commute/Transition** (30 min): [Based on career and career_stage]
+**8:30 AM - Work Begins**: [Specific strategy for their career situation]"]
+
+### ☀️ Midday Routine (12:00 PM - 2:00 PM)
+[Lunch, recharge, social interaction based on extraversion + relationship_sat]
+
+### 🌆 Evening Routine (6:00 PM - 10:00 PM)
+[Based on their life pillars - family time, learning, side projects, rest based on emotional stability]
+
+### 🌙 Night Routine (10:00 PM - 10:30 PM)
+[Wind-down ritual based on emotional stability + sleep needs]
+
+**KEY PRINCIPLES FOR {name}:**
+- [3-4 principles based on their Big Five scores and life satisfaction]
+- Example: "Your moderate conscientiousness (XX/100) means rigid routines will fail. Build in 20% flexibility."
+
+## 🎯 90-Day Incremental Improvement Plan
+
+This is your roadmap from {career_sat}, {relationship_sat}, {health_sat}, {financial_sat}, and {growth_sat} to where you want to be. Small, daily actions compound into massive change.
+
+### Month 1: Stabilize & Build Foundation
+
+**💼 Career ({career_sat} → Better)**
+- **Week 1**: [Specific micro-action based on their career and personality]
+- **Week 2**: [Next step building on Week 1]
+- **Week 3**: [Momentum builder]
+- **Week 4**: [Milestone checkpoint]
+- **Daily Habit**: [5-min daily action for their career stage]
+
+**❤️ Relationships ({relationship_sat} → Better)**
+- **Week 1**: [Based on agreeableness + extraversion]
+- **Week 2-4**: [Progressive actions]
+- **Daily Habit**: [Connection ritual for their personality]
+
+**🏥 Health ({health_sat} → Better)**
+- **Week 1**: [Based on emotional stability]
+- **Week 2-4**: [Progressive actions]
+- **Daily Habit**: [Health action for their stress level]
+
+**💰 Finances ({financial_sat} → Better)**
+- **Week 1**: [Based on conscientiousness]
+- **Week 2-4**: [Progressive money actions]
+- **Daily Habit**: [5-min money management]
+
+**🌱 Growth ({growth_sat} → Better)**
+- **Week 1**: [Based on openness to experience]
+- **Week 2-4**: [Progressive learning]
+- **Daily Habit**: [Growth ritual]
+
+### Month 2: Momentum & Optimization
+[For each pillar: intermediate challenges that build on Month 1 foundation. More specific to their {primary_goal}]
+
+### Month 3: Transformation & Integration
+[For each pillar: advanced actions that require the foundation from Months 1-2. Show how pillars interconnect.]
+
+**🎯 Success Metrics for {name}:**
+[3-5 specific, measurable outcomes they should see in 90 days based on their starting point and personality]
 
 ## 🛠️ Focused Room: Your Personalized Setup
 
@@ -431,7 +489,7 @@ TONE EXAMPLES:
 ❌ BAD: "You may be experiencing career dissatisfaction."
 ✅ GOOD: "{name}, the fact that you feel {career_sat} about your work makes complete sense given your {conscientiousness_score:.0f}/100 conscientiousness - you crave structure and achievement, and your current role isn't providing that."
 
-Length: 1500-2000 words. NO LENGTH LIMIT if needed to be comprehensive. Dense. Valuable. Transformative. This is a $10,000 report."""
+Length: 2500-3500 words (with daily routine + 90-day plan). NO LENGTH LIMIT if needed to be comprehensive. Every section must be COMPLETE - don't cut short. Dense. Valuable. Transformative. Life-changing. This is a $10,000 executive coaching + therapy + productivity consultation."""
 
         return prompt
 

@@ -2107,6 +2107,47 @@
   letter-spacing: 0.05em;
 }
 
+.checkbox-group {
+  margin: var(--space-6) 0;
+  padding: var(--space-4);
+  background: rgba(122, 158, 159, 0.05);
+  border-radius: 12px;
+  border: 2px solid var(--color-primary-500);
+}
+
+.checkbox-label {
+  display: flex;
+  align-items: start;
+  gap: var(--space-3);
+  cursor: pointer;
+}
+
+.checkbox-input {
+  margin-top: 4px;
+  width: 20px;
+  height: 20px;
+  cursor: pointer;
+  accent-color: var(--color-accent);
+}
+
+.checkbox-text {
+  flex: 1;
+  font-size: var(--text-base);
+  color: var(--color-text-700);
+  line-height: var(--leading-relaxed);
+}
+
+.checkbox-text strong {
+  color: var(--color-text-900);
+  font-size: var(--text-lg);
+}
+
+.checkbox-text small {
+  color: var(--color-muted);
+  font-size: var(--text-sm);
+  line-height: var(--leading-normal);
+}
+
 /* Results Section */
 .bigfive-results {
   padding: var(--space-20) 0;
@@ -2212,12 +2253,14 @@
 }
 
 .results-ai-insights {
-  max-width: 900px;
+  max-width: 1000px;
   margin: 0 auto var(--space-16);
   padding: var(--space-12);
   background: linear-gradient(135deg, rgba(102, 126, 234, 0.05) 0%, rgba(122, 158, 159, 0.05) 100%);
   border-radius: 24px;
   border: 2px solid var(--color-border);
+  /* No max-height to allow full content display */
+  overflow: visible;
 }
 
 .results-ai-insights h2 {
