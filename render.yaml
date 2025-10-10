@@ -7,7 +7,7 @@ services:
     plan: free
     branch: main
     buildCommand: cd 02_FocusedRoom_website && pip install -r requirements.txt
-    startCommand: cd 02_FocusedRoom_website && gunicorn --bind 0.0.0.0:$PORT --workers 4 --timeout 120 run:app
+    startCommand: cd 02_FocusedRoom_website && gunicorn --bind 0.0.0.0:$PORT --workers 2 --timeout 120 run:app
     healthCheckPath: /health
     envVars:
       - key: PYTHON_VERSION
@@ -21,17 +21,17 @@ services:
           name: focusedroom-db
           property: connectionString
       - key: MAIL_SERVER
-        sync: false
+        value: smtp.gmail.com
       - key: MAIL_PORT
-        sync: false
+        value: "587"
       - key: MAIL_USERNAME
-        sync: false
+        value: your-email@gmail.com
       - key: MAIL_PASSWORD
-        sync: false
+        value: your-app-password
       - key: MAIL_DEFAULT_SENDER
-        sync: false
+        value: your-email@gmail.com
       - key: GEMINI_API_KEY
-        sync: false
+        value: your-gemini-api-key
 
 databases:
   - name: focusedroom-db
