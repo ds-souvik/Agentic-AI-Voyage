@@ -73,7 +73,18 @@
   }
   </script>
   {% endblock %}
-
+  <!-- Google Analytics 4 -->
+  <script async src="https://www.googletagmanager.com/gtag/js?id=G-XXXXXXXXXX"></script>
+  <script>
+    window.dataLayer = window.dataLayer || [];
+    function gtag(){dataLayer.push(arguments);}
+    gtag('js', new Date());
+    gtag('config', 'G-VH399W332C', {
+      'page_title': '{{ title }}',
+      'page_path': window.location.pathname,
+      'send_page_view': true
+    });
+  </script>
   <!-- Additional Scripts -->
   {% block head_scripts %}{% endblock %}
 </head>
