@@ -16,6 +16,10 @@
 
 {% block canonical %}{{ request.url_root }}blog{% endblock %}
 
+{% block preload_assets %}
+<!-- Performance: No preload needed for blog list (images below fold) -->
+{% endblock %}
+
 {% block jsonld %}
 <script type="application/ld+json">
 {
@@ -71,7 +75,14 @@
       <article class="blog-card">
         <a href="/blog/{{ post.slug }}" class="blog-card-link">
           <div class="blog-card-image">
-            <img src="{{ post.hero_image }}" alt="{{ post.title }}" loading="lazy">
+            <img
+              src="{{ post.hero_image }}"
+              alt="{{ post.title }}"
+              loading="lazy"
+              fetchpriority="low"
+              width="600"
+              height="400"
+            >
             <div class="blog-card-overlay">
               <span class="blog-card-cta">Read Article →</span>
             </div>
@@ -110,4 +121,3 @@
   </div>
 </section>
 {% endblock %}
-

@@ -41,6 +41,15 @@
   <link rel="icon" type="image/png" sizes="16x16" href="{{ url_for('static', filename='assets/favicon.png') }}"/>
   <link rel="apple-touch-icon" sizes="180x180" href="{{ url_for('static', filename='assets/apple-touch-icon.png') }}"/>
 
+  <!-- Performance: Resource Hints -->
+  <link rel="dns-prefetch" href="https://cdn.jsdelivr.net"/>
+  <link rel="preconnect" href="https://cdn.jsdelivr.net" crossorigin/>
+
+  <!-- Performance: Preload Critical Assets -->
+  <link rel="preload" href="{{ url_for('static', filename='css/main.css') }}" as="style"/>
+  <link rel="preload" href="{{ url_for('static', filename='js/main.js') }}" as="script"/>
+  {% block preload_assets %}{% endblock %}
+
   <!-- Stylesheets -->
   <link rel="stylesheet" href="{{ url_for('static', filename='css/main.css') }}"/>
 

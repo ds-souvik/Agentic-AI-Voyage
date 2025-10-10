@@ -14,6 +14,11 @@
 
 {% block canonical %}{{ request.url_root }}{% endblock %}
 
+{% block preload_assets %}
+<!-- Performance: Preload hero image for faster LCP -->
+<link rel="preload" href="{{ url_for('static', filename='assets/your-image.png') }}" as="image" fetchpriority="high"/>
+{% endblock %}
+
 {% block jsonld %}
 <script type="application/ld+json">
 {
@@ -62,19 +67,28 @@
           src="{{ url_for('static', filename='assets/your-image.png') }}"
           alt="Focused Room Chrome extension main interface"
           loading="eager"
+          fetchpriority="high"
           class="carousel-slide active"
+          width="650"
+          height="auto"
         >
         <img
           src="{{ url_for('static', filename='assets/blocking.png') }}"
           alt="Focused Room site blocking feature"
           loading="lazy"
+          fetchpriority="low"
           class="carousel-slide"
+          width="650"
+          height="auto"
         >
         <img
           src="{{ url_for('static', filename='assets/friction_text.png') }}"
           alt="Focused Room friction override feature"
           loading="lazy"
+          fetchpriority="low"
           class="carousel-slide"
+          width="650"
+          height="auto"
         >
       </div>
       <div class="carousel-indicators">

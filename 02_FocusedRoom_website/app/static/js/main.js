@@ -85,7 +85,7 @@ function isValidEmail(email) {
     }
 
     /**
-     * Set form loading state
+     * Set form loading state with spinner animation
      * @param {HTMLElement} form - Form element
      * @param {HTMLElement} button - Submit button
      * @param {boolean} loading - Loading state
@@ -94,12 +94,16 @@ function isValidEmail(email) {
       if (loading) {
         button.disabled = true;
         button.dataset.originalText = button.textContent;
-        button.textContent = 'Subscribing...';
+        button.classList.add('loading');
         button.setAttribute('aria-busy', 'true');
+        button.setAttribute('aria-live', 'polite');
+        // Keep button text visible, add spinner via CSS
       } else {
         button.disabled = false;
+        button.classList.remove('loading');
         button.textContent = button.dataset.originalText || 'Send me the ebook';
         button.removeAttribute('aria-busy');
+        button.removeAttribute('aria-live');
       }
     }
 

@@ -1,11 +1,10 @@
 {
   "manifest_version": 3,
   "name": "Focused Room",
-  "version": "1.2.0",
+  "version": "1.2.1",
   "description": "Your Deepwork Application backed by Cognitive Behaviourial Science. Protect your Focus. Build Your Future.",
   "permissions": [
     "storage",
-    "tabs",
     "webNavigation",
     "notifications",
     "alarms",
