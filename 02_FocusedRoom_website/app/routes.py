@@ -330,72 +330,76 @@ def health_check():
 def export_subscribers():
     """
     Export all subscribers to CSV format.
-    
+
     Returns:
         CSV file download with subscriber data including:
         - Email, opt-in status, subscription date
         - Big Five test count and latest test date
-        
+
     TODO: Add authentication/admin protection in production.
     """
     import csv
     from io import StringIO
-    
+
     try:
         # Query all subscribers with their Big Five results
         subscribers = Subscriber.query.order_by(Subscriber.created_at.desc()).all()
-        
+
         logger.info(f"Exporting {len(subscribers)} subscribers to CSV")
-        
+
         # Create CSV in memory
         output = StringIO()
         writer = csv.writer(output)
-        
+
         # Write header
-        writer.writerow([
-            'ID',
-            'Email',
-            'Opt-In',
-            'Subscription Date',
-            'Total Big Five Tests',
-            'Latest Test Date'
-        ])
-        
+        writer.writerow(
+            [
+                "ID",
+                "Email",
+                "Opt-In",
+                "Subscription Date",
+                "Total Big Five Tests",
+                "Latest Test Date",
+            ]
+        )
+
         # Write data
         for sub in subscribers:
             # Count associated Big Five results
-            test_count = sub.big_five_results.count() if hasattr(sub, 'big_five_results') else 0
-            
+            test_count = sub.big_five_results.count() if hasattr(sub, "big_five_results") else 0
+
             # Get latest test date
             if test_count > 0:
                 latest_test = sub.big_five_results.order_by(BigFiveResult.created_at.desc()).first()
-                latest_test_date = latest_test.created_at.strftime('%Y-%m-%d %H:%M:%S') if latest_test else 'N/A'
+                latest_test_date = (
+                    latest_test.created_at.strftime("%Y-%m-%d %H:%M:%S") if latest_test else "N/A"
+                )
             else:
-                latest_test_date = 'N/A'
-            
-            writer.writerow([
-                sub.id,
-                sub.email,
-                'Yes' if sub.opt_in else 'No',
-                sub.created_at.strftime('%Y-%m-%d %H:%M:%S'),
-                test_count,
-                latest_test_date
-            ])
-        
+                latest_test_date = "N/A"
+
+            writer.writerow(
+                [
+                    sub.id,
+                    sub.email,
+                    "Yes" if sub.opt_in else "No",
+                    sub.created_at.strftime("%Y-%m-%d %H:%M:%S"),
+                    test_count,
+                    latest_test_date,
+                ]
+            )
+
         # Prepare response
         output.seek(0)
         filename = f'focused_room_subscribers_{datetime.now().strftime("%Y%m%d_%H%M%S")}.csv'
-        
+
         logger.info(f"CSV export complete: {filename}")
-        
+
         return Response(
             output.getvalue(),
-            mimetype='text/csv',
-            headers={
-                'Content-Disposition': f'attachment; filename={filename}'
-            }
+            mimetype="text/csv",
+            headers={"Content-Disposition": f"attachment; filename={filename}"},
         )
-        
+
     except Exception as e:
         logger.error(f"Error exporting subscribers: {str(e)}")
         return jsonify({"success": False, "error": "Failed to export subscribers"}), 500
@@ -405,20 +409,21 @@ def export_subscribers():
 # BLOG ROUTES - WORLD-CLASS CONTENT SYSTEM
 # ============================================
 
+
 @main_bp.route("/blog")
 def blog_list():
     """Display blog post listing."""
     try:
         # Load blog data from JSON
         blog_data_path = Path(__file__).parent / "static" / "blog_data.json"
-        with open(blog_data_path, 'r', encoding='utf-8') as f:
+        with open(blog_data_path, encoding="utf-8") as f:
             blog_data = json.load(f)
-        
+
         posts = blog_data.get("posts", [])
         logger.info(f"Loaded {len(posts)} blog posts")
-        
+
         return render_template("blog_list.html", posts=posts)
-    
+
     except Exception as e:
         logger.error(f"Error loading blog list: {str(e)}")
         return render_template("blog_list.html", posts=[])
@@ -430,38 +435,35 @@ def blog_post(slug):
     try:
         # Load blog data
         blog_data_path = Path(__file__).parent / "static" / "blog_data.json"
-        with open(blog_data_path, 'r', encoding='utf-8') as f:
+        with open(blog_data_path, encoding="utf-8") as f:
             blog_data = json.load(f)
-        
+
         # Find the post
         posts = blog_data.get("posts", [])
         post = next((p for p in posts if p["slug"] == slug), None)
-        
+
         if not post:
             logger.warning(f"Blog post not found: {slug}")
             return "Blog post not found", 404
-        
+
         # Load post content
         content_path = Path(__file__).parent / "blog_content" / f"{slug}.html"
         if not content_path.exists():
             logger.error(f"Blog content file not found: {content_path}")
             return "Blog content not found", 404
-        
-        with open(content_path, 'r', encoding='utf-8') as f:
+
+        with open(content_path, encoding="utf-8") as f:
             content = f.read()
-        
+
         # Get related posts (all posts except current)
         related_posts = [p for p in posts if p["slug"] != slug]
-        
+
         logger.info(f"Serving blog post: {slug}")
-        
+
         return render_template(
-            "blog_post.html",
-            post=post,
-            content=content,
-            related_posts=related_posts
+            "blog_post.html", post=post, content=content, related_posts=related_posts
         )
-    
+
     except Exception as e:
         logger.error(f"Error loading blog post {slug}: {str(e)}")
         return "Error loading blog post", 500
@@ -471,12 +473,14 @@ def blog_post(slug):
 # Blog Engagement API Endpoints
 # ============================================================================
 
+
 def _get_user_identifier():
     """Generate a user identifier for anonymous engagement tracking."""
     import hashlib
+
     # Use IP + User Agent hash for anonymous but consistent tracking
-    ip = request.headers.get('X-Forwarded-For', request.remote_addr)
-    user_agent = request.headers.get('User-Agent', '')
+    ip = request.headers.get("X-Forwarded-For", request.remote_addr)
+    user_agent = request.headers.get("User-Agent", "")
     identifier = f"{ip}:{user_agent}"
     return hashlib.sha256(identifier.encode()).hexdigest()
 
@@ -486,48 +490,62 @@ def get_blog_engagement(slug):
     """Get engagement stats for a blog post."""
     try:
         from sqlalchemy import func
-        
+
         # Get counts for each engagement type
-        likes_count = db.session.query(func.count(BlogEngagement.id))\
-            .filter(BlogEngagement.post_slug == slug)\
-            .filter(BlogEngagement.engagement_type == 'like')\
-            .scalar() or 0
-        
-        helpful_yes_count = db.session.query(func.count(BlogEngagement.id))\
-            .filter(BlogEngagement.post_slug == slug)\
-            .filter(BlogEngagement.engagement_type == 'helpful_yes')\
-            .scalar() or 0
-        
-        helpful_no_count = db.session.query(func.count(BlogEngagement.id))\
-            .filter(BlogEngagement.post_slug == slug)\
-            .filter(BlogEngagement.engagement_type == 'helpful_no')\
-            .scalar() or 0
-        
+        likes_count = (
+            db.session.query(func.count(BlogEngagement.id))
+            .filter(BlogEngagement.post_slug == slug)
+            .filter(BlogEngagement.engagement_type == "like")
+            .scalar()
+            or 0
+        )
+
+        helpful_yes_count = (
+            db.session.query(func.count(BlogEngagement.id))
+            .filter(BlogEngagement.post_slug == slug)
+            .filter(BlogEngagement.engagement_type == "helpful_yes")
+            .scalar()
+            or 0
+        )
+
+        helpful_no_count = (
+            db.session.query(func.count(BlogEngagement.id))
+            .filter(BlogEngagement.post_slug == slug)
+            .filter(BlogEngagement.engagement_type == "helpful_no")
+            .scalar()
+            or 0
+        )
+
         # Check if current user has engaged
         user_id = _get_user_identifier()
-        user_engagement = db.session.query(BlogEngagement)\
-            .filter(BlogEngagement.post_slug == slug)\
-            .filter(BlogEngagement.user_identifier == user_id)\
+        user_engagement = (
+            db.session.query(BlogEngagement)
+            .filter(BlogEngagement.post_slug == slug)
+            .filter(BlogEngagement.user_identifier == user_id)
             .all()
-        
-        user_liked = any(e.engagement_type == 'like' for e in user_engagement)
-        user_voted_helpful = any(e.engagement_type in ['helpful_yes', 'helpful_no'] 
-                                for e in user_engagement)
-        
-        return jsonify({
-            'success': True,
-            'data': {
-                'likes': likes_count,
-                'helpful_yes': helpful_yes_count,
-                'helpful_no': helpful_no_count,
-                'user_liked': user_liked,
-                'user_voted_helpful': user_voted_helpful
+        )
+
+        user_liked = any(e.engagement_type == "like" for e in user_engagement)
+        user_voted_helpful = any(
+            e.engagement_type in ["helpful_yes", "helpful_no"] for e in user_engagement
+        )
+
+        return jsonify(
+            {
+                "success": True,
+                "data": {
+                    "likes": likes_count,
+                    "helpful_yes": helpful_yes_count,
+                    "helpful_no": helpful_no_count,
+                    "user_liked": user_liked,
+                    "user_voted_helpful": user_voted_helpful,
+                },
             }
-        })
-    
+        )
+
     except Exception as e:
         logger.error(f"Error getting engagement for {slug}: {str(e)}")
-        return jsonify({'success': False, 'error': 'Server error'}), 500
+        return jsonify({"success": False, "error": "Server error"}), 500
 
 
 @main_bp.route("/api/blog/engagement/<slug>/like", methods=["POST"])
@@ -536,49 +554,47 @@ def toggle_blog_like(slug):
     """Toggle like on a blog post."""
     try:
         user_id = _get_user_identifier()
-        
+
         # Check if user already liked
-        existing_like = db.session.query(BlogEngagement)\
-            .filter(BlogEngagement.post_slug == slug)\
-            .filter(BlogEngagement.engagement_type == 'like')\
-            .filter(BlogEngagement.user_identifier == user_id)\
+        existing_like = (
+            db.session.query(BlogEngagement)
+            .filter(BlogEngagement.post_slug == slug)
+            .filter(BlogEngagement.engagement_type == "like")
+            .filter(BlogEngagement.user_identifier == user_id)
             .first()
-        
+        )
+
         if existing_like:
             # Unlike
             db.session.delete(existing_like)
             db.session.commit()
-            action = 'unliked'
+            action = "unliked"
         else:
             # Like
             new_like = BlogEngagement(
-                post_slug=slug,
-                engagement_type='like',
-                user_identifier=user_id
+                post_slug=slug, engagement_type="like", user_identifier=user_id
             )
             db.session.add(new_like)
             db.session.commit()
-            action = 'liked'
-        
+            action = "liked"
+
         # Get updated count
         from sqlalchemy import func
-        likes_count = db.session.query(func.count(BlogEngagement.id))\
-            .filter(BlogEngagement.post_slug == slug)\
-            .filter(BlogEngagement.engagement_type == 'like')\
-            .scalar() or 0
-        
-        return jsonify({
-            'success': True,
-            'data': {
-                'action': action,
-                'likes': likes_count
-            }
-        })
-    
+
+        likes_count = (
+            db.session.query(func.count(BlogEngagement.id))
+            .filter(BlogEngagement.post_slug == slug)
+            .filter(BlogEngagement.engagement_type == "like")
+            .scalar()
+            or 0
+        )
+
+        return jsonify({"success": True, "data": {"action": action, "likes": likes_count}})
+
     except Exception as e:
         logger.error(f"Error toggling like for {slug}: {str(e)}")
         db.session.rollback()
-        return jsonify({'success': False, 'error': 'Server error'}), 500
+        return jsonify({"success": False, "error": "Server error"}), 500
 
 
 @main_bp.route("/api/blog/engagement/<slug>/helpful", methods=["POST"])
@@ -587,43 +603,37 @@ def vote_blog_helpful(slug):
     """Vote on whether blog post was helpful."""
     try:
         data = request.get_json()
-        is_helpful = data.get('helpful', True)
-        feedback = data.get('feedback', '')
-        
+        is_helpful = data.get("helpful", True)
+        feedback = data.get("feedback", "")
+
         user_id = _get_user_identifier()
-        
+
         # Check if user already voted
-        existing_vote = db.session.query(BlogEngagement)\
-            .filter(BlogEngagement.post_slug == slug)\
-            .filter(BlogEngagement.engagement_type.in_(['helpful_yes', 'helpful_no']))\
-            .filter(BlogEngagement.user_identifier == user_id)\
+        existing_vote = (
+            db.session.query(BlogEngagement)
+            .filter(BlogEngagement.post_slug == slug)
+            .filter(BlogEngagement.engagement_type.in_(["helpful_yes", "helpful_no"]))
+            .filter(BlogEngagement.user_identifier == user_id)
             .first()
-        
+        )
+
         if existing_vote:
-            return jsonify({
-                'success': False,
-                'error': 'You already voted on this post'
-            }), 400
-        
+            return jsonify({"success": False, "error": "You already voted on this post"}), 400
+
         # Add vote
-        engagement_type = 'helpful_yes' if is_helpful else 'helpful_no'
+        engagement_type = "helpful_yes" if is_helpful else "helpful_no"
         new_vote = BlogEngagement(
             post_slug=slug,
             engagement_type=engagement_type,
             user_identifier=user_id,
-            feedback_text=feedback if not is_helpful else None
+            feedback_text=feedback if not is_helpful else None,
         )
         db.session.add(new_vote)
         db.session.commit()
-        
-        return jsonify({
-            'success': True,
-            'data': {
-                'voted': engagement_type
-            }
-        })
-    
+
+        return jsonify({"success": True, "data": {"voted": engagement_type}})
+
     except Exception as e:
         logger.error(f"Error voting helpful for {slug}: {str(e)}")
         db.session.rollback()
-        return jsonify({'success': False, 'error': 'Server error'}), 500
+        return jsonify({"success": False, "error": "Server error"}), 500

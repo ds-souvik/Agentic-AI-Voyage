@@ -217,20 +217,20 @@
   const apiBase = '/api/blog/engagement/' + postSlug;
   let hasVoted = false;
   let thankYouTimeout = null;
-  
+
   // Load engagement stats on page load
   async function loadEngagement() {
     try {
       const response = await fetch(apiBase);
       const result = await response.json();
-      
+
       if (result.success) {
         const data = result.data;
-        
+
         // Update helpful vote counts
         document.getElementById('helpful-yes-count').textContent = data.helpful_yes;
         document.getElementById('helpful-no-count').textContent = data.helpful_no;
-        
+
         // Check if user already voted
         if (data.user_voted_helpful) {
           hasVoted = true;
@@ -241,25 +241,25 @@
       console.error('Error loading engagement:', error);
     }
   }
-  
+
   // Show thank you message for 10 seconds
   function showTemporaryThanks() {
     const thanksEl = document.getElementById('helpful-thanks');
     const buttonsEl = document.getElementById('helpful-buttons');
     const feedbackEl = document.getElementById('helpful-feedback');
-    
+
     // Hide buttons and feedback
     buttonsEl.style.display = 'none';
     feedbackEl.style.display = 'none';
-    
+
     // Show thanks message
     thanksEl.style.display = 'flex';
-    
+
     // Clear any existing timeout
     if (thankYouTimeout) {
       clearTimeout(thankYouTimeout);
     }
-    
+
     // Hide after 10 seconds and show buttons again
     thankYouTimeout = setTimeout(() => {
       thanksEl.style.display = 'none';
@@ -267,25 +267,25 @@
       hasVoted = false;
     }, 10000);
   }
-  
+
   // Show permanent thank you (for already voted users)
   function showPermanentThanks() {
     const thanksEl = document.getElementById('helpful-thanks');
     const buttonsEl = document.getElementById('helpful-buttons');
     const feedbackEl = document.getElementById('helpful-feedback');
-    
+
     buttonsEl.style.display = 'none';
     feedbackEl.style.display = 'none';
     thanksEl.style.display = 'flex';
   }
-  
+
   // Handle helpful buttons
   document.querySelectorAll('.btn-helpful').forEach(btn => {
     btn.addEventListener('click', function() {
       if (hasVoted) return;
-      
+
       const isHelpful = this.dataset.helpful === 'true';
-      
+
       if (isHelpful) {
         // Submit helpful yes immediately
         submitHelpfulVote(true);
@@ -296,13 +296,13 @@
       }
     });
   });
-  
+
   // Handle feedback submission
   document.getElementById('submit-feedback').addEventListener('click', function() {
     const feedback = document.getElementById('feedback-text').value;
     submitHelpfulVote(false, feedback);
   });
-  
+
   async function submitHelpfulVote(isHelpful, feedback = '') {
     try {
       const response = await fetch(apiBase + '/helpful', {
@@ -314,10 +314,10 @@
         })
       });
       const result = await response.json();
-      
+
       if (result.success) {
         hasVoted = true;
-        
+
         // Update counters
         if (isHelpful) {
           const currentCount = parseInt(document.getElementById('helpful-yes-count').textContent);
@@ -326,7 +326,7 @@
           const currentCount = parseInt(document.getElementById('helpful-no-count').textContent);
           document.getElementById('helpful-no-count').textContent = currentCount + 1;
         }
-        
+
         // Show thank you message for 10 seconds
         showTemporaryThanks();
       } else {
@@ -342,20 +342,20 @@
       alert('Unable to submit feedback. Please try again.');
     }
   }
-  
+
   // Handle share buttons
   const currentUrl = window.location.href;
   const postTitle = '{{ post.title|replace("'", "\\'") }}';
-  
+
   // WhatsApp share
   document.getElementById('share-whatsapp').href = `https://wa.me/?text=${encodeURIComponent(postTitle + ' ' + currentUrl)}`;
-  
+
   // LinkedIn share
   document.getElementById('share-linkedin').href = `https://www.linkedin.com/sharing/share-offsite/?url=${encodeURIComponent(currentUrl)}`;
-  
+
   // X (Twitter) share
   document.getElementById('share-twitter').href = `https://twitter.com/intent/tweet?url=${encodeURIComponent(currentUrl)}&text=${encodeURIComponent(postTitle)}`;
-  
+
   // Copy link
   document.getElementById('share-copy').addEventListener('click', async function() {
     try {
@@ -371,7 +371,7 @@
       alert('Unable to copy link');
     }
   });
-  
+
   // Load engagement on page load
   loadEngagement();
 })();

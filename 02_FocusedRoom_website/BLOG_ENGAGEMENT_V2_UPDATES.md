@@ -244,11 +244,11 @@ Accepts:
 ### Database Queries:
 ```sql
 -- Helpful vote distribution
-SELECT 
+SELECT
   post_slug,
   SUM(CASE WHEN engagement_type = 'helpful_yes' THEN 1 ELSE 0 END) as yes_votes,
   SUM(CASE WHEN engagement_type = 'helpful_no' THEN 1 ELSE 0 END) as no_votes,
-  ROUND(100.0 * SUM(CASE WHEN engagement_type = 'helpful_yes' THEN 1 ELSE 0 END) / 
+  ROUND(100.0 * SUM(CASE WHEN engagement_type = 'helpful_yes' THEN 1 ELSE 0 END) /
         NULLIF(SUM(CASE WHEN engagement_type IN ('helpful_yes', 'helpful_no') THEN 1 ELSE 0 END), 0), 1) as yes_percentage
 FROM blog_engagement
 WHERE engagement_type IN ('helpful_yes', 'helpful_no')
@@ -310,4 +310,3 @@ A: Verify JavaScript is enabled. Check for console errors.
 **Last Updated:** October 12, 2025  
 **Author:** Focused Room Development Team  
 **Status:** ✅ Production Ready
-

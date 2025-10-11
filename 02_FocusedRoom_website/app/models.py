@@ -50,6 +50,7 @@ class BlogEngagement(db.Model):  # type: ignore[name-defined]
 
     # Composite unique constraint to prevent duplicate engagement from same user
     __table_args__ = (
-        db.UniqueConstraint('post_slug', 'engagement_type', 'user_identifier', 
-                           name='unique_engagement'),
+        db.UniqueConstraint(
+            "post_slug", "engagement_type", "user_identifier", name="unique_engagement"
+        ),
     )
