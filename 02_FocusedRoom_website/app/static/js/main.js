@@ -35,7 +35,77 @@ function isValidEmail(email) {
 }
 
 // ============================================
-// 1. NEWSLETTER FORM VALIDATION & SUBMISSION
+// 1. MOBILE MENU TOGGLE
+// ============================================
+
+(function() {
+  'use strict';
+
+  // Wait for DOM to be ready
+  document.addEventListener('DOMContentLoaded', function() {
+    const menuBtn = document.querySelector('.mobile-menu-btn');
+    const navLinks = document.querySelector('.nav-links');
+    const body = document.body;
+
+    if (!menuBtn || !navLinks) return;
+
+    /**
+     * Toggle mobile menu open/closed
+     */
+    function toggleMenu() {
+      const isOpen = navLinks.classList.contains('active');
+
+      if (isOpen) {
+        // Close menu
+        navLinks.classList.remove('active');
+        menuBtn.classList.remove('active');
+        body.classList.remove('menu-open');
+        menuBtn.setAttribute('aria-expanded', 'false');
+      } else {
+        // Open menu
+        navLinks.classList.add('active');
+        menuBtn.classList.add('active');
+        body.classList.add('menu-open');
+        menuBtn.setAttribute('aria-expanded', 'true');
+      }
+    }
+
+    /**
+     * Close menu when clicking outside
+     */
+    function closeMenuOnOutsideClick(event) {
+      if (navLinks.classList.contains('active') &&
+          !navLinks.contains(event.target) &&
+          !menuBtn.contains(event.target)) {
+        toggleMenu();
+      }
+    }
+
+    /**
+     * Close menu when clicking on a nav link
+     */
+    function closeMenuOnNavClick(event) {
+      if (event.target.tagName === 'A') {
+        toggleMenu();
+      }
+    }
+
+    // Event listeners
+    menuBtn.addEventListener('click', toggleMenu);
+    document.addEventListener('click', closeMenuOnOutsideClick);
+    navLinks.addEventListener('click', closeMenuOnNavClick);
+
+    // Close menu on Escape key
+    document.addEventListener('keydown', function(event) {
+      if (event.key === 'Escape' && navLinks.classList.contains('active')) {
+        toggleMenu();
+      }
+    });
+  });
+})();
+
+// ============================================
+// 2. NEWSLETTER FORM VALIDATION & SUBMISSION
 // ============================================
 
 (function() {

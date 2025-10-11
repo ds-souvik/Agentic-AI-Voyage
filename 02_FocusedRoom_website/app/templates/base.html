@@ -98,6 +98,15 @@
         <img src="{{ url_for('static', filename='assets/logo_1.png') }}" alt="Focused Room logo" class="logo-icon">
         <span class="logo-text">Focused Room</span>
       </a>
+
+      <!-- Hamburger Menu Button (Mobile Only) -->
+      <button class="mobile-menu-btn" aria-label="Toggle navigation menu" aria-expanded="false">
+        <span class="hamburger-line"></span>
+        <span class="hamburger-line"></span>
+        <span class="hamburger-line"></span>
+      </button>
+
+      <!-- Navigation Links -->
       <div class="nav-links">
         <a href="{{ url_for('main.index') }}#features">Features</a>
         <a href="{{ url_for('main.index') }}#testimonials">Testimonials</a>
