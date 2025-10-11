@@ -28,8 +28,6 @@ email-validator==2.1.0
 google-generativeai==0.8.3
 # PDF Report Generation
 reportlab==4.0.7
-# PostgreSQL Database Adapter
-psycopg2-binary==2.9.9
 # Development and CI/CD dependencies
 pytest-cov==4.1.0
 black==24.3.0
