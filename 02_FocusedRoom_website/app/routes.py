@@ -169,6 +169,7 @@ def big_five():
 
         # Validate email if provided (email is optional for anonymous tests)
         subscriber_id = None
+        is_new_subscriber = False  # Track if this is a brand new subscriber
         if email:
             # Validate email format using existing validator
             email_validation = validate_subscription_request({"email": email})
@@ -182,6 +183,7 @@ def big_five():
                     subscriber = Subscriber(email=email, opt_in=True)
                     db.session.add(subscriber)
                     db.session.flush()  # Get subscriber.id without committing
+                    is_new_subscriber = True  # Mark as new subscriber
                     logger.info(f"Created new subscriber: {email}")
                 else:
                     logger.info(f"Found existing subscriber: {email}")
@@ -229,8 +231,10 @@ def big_five():
             user_type = f"subscriber {subscriber_id}" if subscriber_id else "anonymous user"
             logger.info(f"Stored Big Five result (ID: {result.id}) for {user_type}")
 
-            # Send Big Five report email if email was provided
-            email_sent = False
+            # Send emails if email was provided
+            welcome_email_sent = False
+            report_email_sent = False
+            
             if email and subscriber_id:
                 try:
                     # Extract name from Big Five report (best source!)
@@ -239,7 +243,19 @@ def big_five():
                         # Fallback to email-based name extraction
                         user_name = extract_name_from_email(email)
                     
-                    # Send the NEW Big Five Report email
+                    # NEW SUBSCRIBERS: Send Welcome email first
+                    if is_new_subscriber:
+                        try:
+                            welcome_result = email_service.send_welcome_vision_email(email, user_name)
+                            welcome_email_sent = welcome_result.get("success", False)
+                            if welcome_email_sent:
+                                logger.info(f"Sent Welcome email to new subscriber: {email} (Name: {user_name})")
+                            else:
+                                logger.error(f"Failed to send Welcome email to {email}: {welcome_result.get('error')}")
+                        except Exception as welcome_error:
+                            logger.error(f"Exception sending Welcome email to {email}: {str(welcome_error)}")
+                    
+                    # ALWAYS: Send Big Five Report email
                     email_result = email_service.send_big_five_report_email(
                         email=email,
                         user_name=user_name,
@@ -247,16 +263,18 @@ def big_five():
                         scores=scores
                     )
                     
-                    email_sent = email_result.get("success", False)
-                    if email_sent:
+                    report_email_sent = email_result.get("success", False)
+                    if report_email_sent:
                         logger.info(f"Sent Big Five report email to {email} (Name: {user_name})")
                     else:
                         logger.error(f"Failed to send Big Five email to {email}: {email_result.get('error')}")
                         
                 except Exception as email_error:
                     # Don't fail the request if email fails - just log it
-                    logger.error(f"Exception sending Big Five email to {email}: {str(email_error)}")
-                    email_sent = False
+                    logger.error(f"Exception sending emails to {email}: {str(email_error)}")
+            
+            # Track overall email success
+            email_sent = welcome_email_sent or report_email_sent
 
             # Return comprehensive response
             return jsonify(
