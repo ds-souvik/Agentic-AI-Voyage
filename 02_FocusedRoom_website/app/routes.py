@@ -11,10 +11,14 @@ from app.utils.gemini_client import generate_personality_suggestions, get_gemini
 
 from .models import BigFiveResult, BlogEngagement, Subscriber, db
 from .utils.bigfive import compute_bigfive_scores, validate_answers
-from .utils.emailer import send_subscription_confirmation
+from .utils.emailer import email_service, send_subscription_confirmation
 from .utils.rate_limiter import rate_limit
 from .utils.seo import generate_sitemap_xml
-from .utils.validators import validate_subscription_request
+from .utils.validators import (
+    extract_name_from_big_five_report,
+    extract_name_from_email,
+    validate_subscription_request,
+)
 
 # Configure logging
 logger = logging.getLogger(__name__)
@@ -78,13 +82,17 @@ def subscribe():
             existing.opt_in = True
             db.session.commit()
 
-            # Send confirmation email (idempotent - safe to resend)
-            email_result = send_subscription_confirmation(email)
+            # Extract name for personalized email
+            user_name = extract_name_from_email(email)
+            
+            # Send NEW Welcome + Vision email (idempotent - safe to resend)
+            email_result = email_service.send_welcome_vision_email(email, user_name)
+            logger.info(f"Re-sent welcome email to existing subscriber: {email}")
 
             return jsonify(
                 {
                     "success": True,
-                    "message": "Already subscribed - confirmation sent",
+                    "message": "Already subscribed - welcome email sent",
                     "email_sent": email_result.get("success", False),
                     "email_provider": email_result.get("provider", "unknown"),
                 }
@@ -95,8 +103,12 @@ def subscribe():
         db.session.add(subscriber)
         db.session.commit()
 
-        # Send confirmation email
-        email_result = send_subscription_confirmation(email)
+        # Extract name for personalized email
+        user_name = extract_name_from_email(email)
+        
+        # Send NEW Welcome + Vision email
+        email_result = email_service.send_welcome_vision_email(email, user_name)
+        logger.info(f"Sent welcome email to new subscriber: {email} (Name: {user_name})")
 
         return jsonify(
             {
@@ -217,6 +229,35 @@ def big_five():
             user_type = f"subscriber {subscriber_id}" if subscriber_id else "anonymous user"
             logger.info(f"Stored Big Five result (ID: {result.id}) for {user_type}")
 
+            # Send Big Five report email if email was provided
+            email_sent = False
+            if email and subscriber_id:
+                try:
+                    # Extract name from Big Five report (best source!)
+                    user_name = extract_name_from_big_five_report(suggestions)
+                    if not user_name:
+                        # Fallback to email-based name extraction
+                        user_name = extract_name_from_email(email)
+                    
+                    # Send the NEW Big Five Report email
+                    email_result = email_service.send_big_five_report_email(
+                        email=email,
+                        user_name=user_name,
+                        markdown_report=suggestions,
+                        scores=scores
+                    )
+                    
+                    email_sent = email_result.get("success", False)
+                    if email_sent:
+                        logger.info(f"Sent Big Five report email to {email} (Name: {user_name})")
+                    else:
+                        logger.error(f"Failed to send Big Five email to {email}: {email_result.get('error')}")
+                        
+                except Exception as email_error:
+                    # Don't fail the request if email fails - just log it
+                    logger.error(f"Exception sending Big Five email to {email}: {str(email_error)}")
+                    email_sent = False
+
             # Return comprehensive response
             return jsonify(
                 {
@@ -227,6 +268,7 @@ def big_five():
                     "suggestions": suggestions,
                     "email_captured": email is not None,
                     "subscriber_id": subscriber_id,
+                    "email_sent": email_sent,  # NEW: Track if email was sent
                 }
             )
 

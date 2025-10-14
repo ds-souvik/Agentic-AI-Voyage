@@ -187,3 +187,65 @@ def validate_rate_limit_headers(headers: dict[str, str]) -> dict[str, Any]:
             rate_limit_info["retry_after"] = int(headers["Retry-After"])
 
     return rate_limit_info
+
+
+def extract_name_from_big_five_report(report: str) -> str | None:
+    """
+    Extract user's actual name from Big Five report markdown.
+    Pattern: ## 🎯 NAME, Here's Your Unique Personality Blueprint
+    
+    Args:
+        report: Markdown report text from Big Five test
+    
+    Returns:
+        Extracted name or None if not found
+    """
+    if not report:
+        return None
+    
+    # Try pattern: ## 🎯 NAME,
+    match = re.search(r'##\s*🎯\s*([^,]+),', report)
+    if match:
+        name = match.group(1).strip()
+        # Remove any remaining emoji or special chars
+        name = re.sub(r'[^\w\s-]', '', name).strip()
+        return name if name else None
+    
+    # Fallback: Try HTML pattern
+    match = re.search(r'<h2>.*?>\s*([^,]+),\s*Here\'s Your Unique Personality Blueprint', report)
+    if match:
+        name = match.group(1).strip()
+        name = re.sub(r'[^\w\s-]', '', name).strip()
+        return name if name else None
+    
+    return None
+
+
+def extract_name_from_email(email: str) -> str:
+    """
+    Fallback: Extract a name from email address.
+    Only used if Big Five report doesn't have name.
+    
+    Args:
+        email: Email address
+    
+    Returns:
+        Extracted name (first part before @ or .)
+    """
+    if not email:
+        return "there"
+    
+    username = email.split("@")[0]
+    
+    # Handle common separators (. _ -)
+    if "." in username:
+        return username.split(".")[0].title()
+    elif "_" in username:
+        return username.split("_")[0].title()
+    elif "-" in username:
+        return username.split("-")[0].title()
+    else:
+        # For combined names or usernames, use generic greeting
+        if len(username) >= 10:
+            return "there"
+        return username.title()
