@@ -16,7 +16,7 @@ from pathlib import Path
 sys.path.insert(0, ".")
 
 from app import create_app
-from app.models import BigFiveResult, Subscriber
+from app.models import Subscriber
 from app.utils.emailer import email_service
 
 
@@ -46,7 +46,7 @@ def preview_emails():
             if big_five:
                 scores = big_five.scores.get("scores", {})
                 markdown_report = big_five.suggestions or "No report available"
-                print(f"🧠 Big Five Result: Found")
+                print("🧠 Big Five Result: Found")
             else:
                 print("⚠️  No Big Five result - using sample data")
                 scores = {
@@ -81,7 +81,7 @@ def preview_emails():
             f.write(welcome_html)
 
         print(f"✅ Preview saved to: {welcome_file}")
-        print(f"   Open in browser to view!")
+        print("   Open in browser to view!")
 
         # Generate Email #2: Big Five Report
         print("\n" + "=" * 70)
@@ -97,7 +97,7 @@ def preview_emails():
             f.write(report_html)
 
         print(f"✅ Preview saved to: {report_file}")
-        print(f"   Open in browser to view!")
+        print("   Open in browser to view!")
 
         # Summary
         print("\n" + "=" * 70)
@@ -117,4 +117,3 @@ def preview_emails():
 
 if __name__ == "__main__":
     preview_emails()
-

@@ -20,7 +20,7 @@ from datetime import datetime
 sys.path.insert(0, ".")
 
 from app import create_app
-from app.models import BigFiveResult, Subscriber
+from app.models import Subscriber
 from app.utils.emailer import email_service
 
 
@@ -195,4 +195,3 @@ Examples:
 
 if __name__ == "__main__":
     main()
-

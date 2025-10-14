@@ -1,0 +1,475 @@
+
+        <!DOCTYPE html>
+        <html>
+        <head>
+            <meta charset="utf-8">
+            <meta name="viewport" content="width=device-width, initial-scale=1.0">
+            <title>Your Big Five Personality Report</title>
+            <style>
+                body {
+                    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+                    line-height: 1.6;
+                    color: #2d3748;
+                    max-width: 650px;
+                    margin: 0 auto;
+                    background-color: #FAF9F5;
+                }
+                .container {
+                    background: white;
+                    margin: 20px auto;
+                    border-radius: 12px;
+                    overflow: hidden;
+                    box-shadow: 0 8px 30px rgba(15, 23, 36, 0.08);
+                }
+                .header {
+                    background: linear-gradient(135deg, #7A9E9F 0%, #6B8B8C 100%);
+                    color: white;
+                    padding: 45px 35px;
+                    text-align: center;
+                    position: relative;
+                }
+                .header h1 {
+                    margin: 0;
+                    font-size: 32px;
+                    font-weight: 700;
+                    letter-spacing: -0.5px;
+                }
+                .header p {
+                    margin: 15px 0 0 0;
+                    font-size: 18px;
+                    opacity: 0.95;
+                    font-weight: 500;
+                }
+                .content {
+                    padding: 40px 35px;
+                }
+                .scores-box {
+                    background: linear-gradient(135deg, rgba(122, 158, 159, 0.08) 0%, rgba(56, 161, 105, 0.08) 100%);
+                    border-radius: 12px;
+                    border: 2px solid #7A9E9F;
+                    padding: 30px;
+                    margin: 30px 0;
+                }
+                .scores-box h2 {
+                    margin: 0 0 25px 0;
+                    color: #7A9E9F;
+                    font-size: 24px;
+                    text-align: center;
+                }
+                .celebration-box {
+                    background: linear-gradient(135deg, rgba(122, 158, 159, 0.1) 0%, rgba(56, 161, 105, 0.1) 100%);
+                    border: 2px solid #7A9E9F;
+                    border-radius: 12px;
+                    padding: 25px;
+                    margin: 30px 0;
+                    text-align: center;
+                }
+                .celebration-box h2 {
+                    margin: 0 0 10px 0;
+                    color: #7A9E9F;
+                    font-size: 24px;
+                }
+                .celebration-box p {
+                    margin: 0;
+                    font-size: 17px;
+                    color: #2d3748;
+                    line-height: 1.7;
+                }
+                .report-content {
+                    margin-top: 30px;
+                    font-size: 15px;
+                    line-height: 1.8;
+                    color: #4a5568;
+                }
+                .report-content h2 {
+                    color: #7A9E9F;
+                    font-size: 22px;
+                    margin-top: 35px;
+                    margin-bottom: 15px;
+                    border-bottom: 2px solid #7A9E9F;
+                    padding-bottom: 8px;
+                }
+                .report-content h3 {
+                    color: #38a169;
+                    font-size: 18px;
+                    margin-top: 25px;
+                    margin-bottom: 12px;
+                }
+                .report-content p {
+                    margin-bottom: 15px;
+                }
+                .report-content ul {
+                    margin: 15px 0;
+                    padding-left: 25px;
+                }
+                .report-content li {
+                    margin-bottom: 8px;
+                }
+                .report-content strong {
+                    color: #2d3748;
+                    font-weight: 600;
+                }
+                .quote-box {
+                    background: linear-gradient(135deg, rgba(122, 158, 159, 0.05) 0%, rgba(56, 161, 105, 0.05) 100%);
+                    border-left: 4px solid #7A9E9F;
+                    padding: 20px 25px;
+                    margin: 25px 0;
+                    font-style: italic;
+                    color: #4a5568;
+                    font-size: 16px;
+                    line-height: 1.7;
+                }
+                .cta-button {
+                    display: inline-block;
+                    padding: 16px 32px;
+                    background: #7A9E9F;
+                    color: white !important;
+                    text-decoration: none;
+                    border-radius: 10px;
+                    font-weight: 600;
+                    font-size: 16px;
+                    margin: 15px 0;
+                    text-align: center;
+                    transition: all 0.2s ease;
+                    box-shadow: 0 4px 12px rgba(122, 158, 159, 0.25);
+                }
+                .cta-button:hover {
+                    background: #6B8B8C;
+                    transform: translateY(-2px);
+                    box-shadow: 0 6px 20px rgba(122, 158, 159, 0.3);
+                }
+                .footer {
+                    text-align: center;
+                    padding: 30px;
+                    background: #FAF9F5;
+                    font-size: 14px;
+                    color: #718096;
+                }
+                .signature {
+                    margin-top: 40px;
+                    padding-top: 30px;
+                    border-top: 2px solid #E2E8F0;
+                    color: #4a5568;
+                }
+                .signature strong {
+                    color: #2d3748;
+                }
+            </style>
+        </head>
+        <body>
+            <div class="container">
+                <div class="header">
+                    <h1>🧠 Your Personality Blueprint</h1>
+                    <p>Souvik, this is your unique roadmap to peak productivity</p>
+                </div>
+                
+                <div class="content">
+                    <div class="celebration-box">
+                        <h2>🎉 You Did It!</h2>
+                        <p>Most people never understand WHY they struggle with focus. <strong>You just unlocked your personalized operating manual.</strong></p>
+                    </div>
+                    
+                    <div class="quote-box">"The greatest weapon against stress is our ability to choose one thought over another. — William James"</div>
+                    
+                    <div class="scores-box">
+                        <h2>📊 Your Big Five Personality Traits</h2>
+                        <p style="text-align: center; margin: 0 0 20px 0; color: #4a5568;">These scores reveal how YOUR brain works best</p>
+                        
+            <div style="margin: 20px 0;">
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
+                    <span style="font-weight: 600; font-size: 16px; color: #2d3748;">
+                        🎨 Openness
+                    </span>
+                    <span style="font-weight: 700; color: #7A9E9F; font-size: 20px;">78/100</span>
+                </div>
+                <div style="background: #E2E8F0; height: 16px; border-radius: 8px; overflow: hidden; box-shadow: inset 0 2px 4px rgba(0,0,0,0.06);">
+                    <div style="background: linear-gradient(90deg, #7A9E9F 0%, #7A9E9F 100%); width: 77.77777777777777%; height: 100%; border-radius: 8px; transition: width 0.3s ease;"></div>
+                </div>
+            </div>
+            
+            <div style="margin: 20px 0;">
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
+                    <span style="font-weight: 600; font-size: 16px; color: #2d3748;">
+                        ✅ Conscientiousness
+                    </span>
+                    <span style="font-weight: 700; color: #38a169; font-size: 20px;">75/100</span>
+                </div>
+                <div style="background: #E2E8F0; height: 16px; border-radius: 8px; overflow: hidden; box-shadow: inset 0 2px 4px rgba(0,0,0,0.06);">
+                    <div style="background: linear-gradient(90deg, #38a169 0%, #38a169 100%); width: 75.0%; height: 100%; border-radius: 8px; transition: width 0.3s ease;"></div>
+                </div>
+            </div>
+            
+            <div style="margin: 20px 0;">
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
+                    <span style="font-weight: 600; font-size: 16px; color: #2d3748;">
+                        ⚡ Extraversion
+                    </span>
+                    <span style="font-weight: 700; color: #667eea; font-size: 20px;">69/100</span>
+                </div>
+                <div style="background: #E2E8F0; height: 16px; border-radius: 8px; overflow: hidden; box-shadow: inset 0 2px 4px rgba(0,0,0,0.06);">
+                    <div style="background: linear-gradient(90deg, #667eea 0%, #667eea 100%); width: 69.44444444444444%; height: 100%; border-radius: 8px; transition: width 0.3s ease;"></div>
+                </div>
+            </div>
+            
+            <div style="margin: 20px 0;">
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
+                    <span style="font-weight: 600; font-size: 16px; color: #2d3748;">
+                        🤝 Agreeableness
+                    </span>
+                    <span style="font-weight: 700; color: #4facfe; font-size: 20px;">72/100</span>
+                </div>
+                <div style="background: #E2E8F0; height: 16px; border-radius: 8px; overflow: hidden; box-shadow: inset 0 2px 4px rgba(0,0,0,0.06);">
+                    <div style="background: linear-gradient(90deg, #4facfe 0%, #4facfe 100%); width: 72.22222222222221%; height: 100%; border-radius: 8px; transition: width 0.3s ease;"></div>
+                </div>
+            </div>
+            
+            <div style="margin: 20px 0;">
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
+                    <span style="font-weight: 600; font-size: 16px; color: #2d3748;">
+                        🧘 Neuroticism
+                    </span>
+                    <span style="font-weight: 700; color: #e53e3e; font-size: 20px;">69/100</span>
+                </div>
+                <div style="background: #E2E8F0; height: 16px; border-radius: 8px; overflow: hidden; box-shadow: inset 0 2px 4px rgba(0,0,0,0.06);">
+                    <div style="background: linear-gradient(90deg, #e53e3e 0%, #e53e3e 100%); width: 69.44444444444444%; height: 100%; border-radius: 8px; transition: width 0.3s ease;"></div>
+                </div>
+            </div>
+            
+                    </div>
+                    
+                    <p style="font-size: 17px; font-weight: 600; color: #2d3748; margin-top: 35px;">Hey Souvik,</p>
+                    
+                    <p style="font-size: 16px; color: #4a5568;">Below is your complete personality analysis—generated by AI and customized to YOUR unique traits. This isn't generic advice. <strong>This is your personal blueprint for building unshakeable focus.</strong></p>
+                    
+                    <div class="report-content">
+                        <p>"The greatest weapon against stress is our ability to choose one thought over another." — William James</p>
+<h2>🎯 Souvik, Here's Your Unique Personality Blueprint</h2>
+<p>Souvik, you're a fascinating blend of creative explorer and meticulous planner, energized by connection but also deeply affected by stress. This unique combination explains why you're making steady progress in personal growth, but perhaps not feeling fully fulfilled by a job that simply "pays the bills". Your high agreeableness and extraversion, coupled with low emotional stability, create a potent mix of empathy and vulnerability that needs careful tending.</p>
+<h2>📊 Your Trait Deep-Dive</h2>
+<h3>Openness to Experience: 78/100</h3>
+<p>You approach new ideas with genuine curiosity and a desire to understand how they fit into the bigger picture. You're not afraid to experiment with new technologies or methodologies in data science, but you prefer to do so in a structured and thoughtful way, carefully considering the potential impact and benefits. Your high score means you're always seeking innovative solutions, which is invaluable in a rapidly evolving field like data science. You probably enjoy attending conferences and workshops to stay abreast of the latest trends.</p>
+<h3>Conscientiousness: 75/100</h3>
+<p>When you commit to something, you see it through to the end, meticulously planning each step along the way. Your workspace probably reflects a desire for order and efficiency, with clearly defined areas for different tasks. You feel most productive when you have a clear roadmap and the resources necessary to execute your plan. You thrive in environments where expectations are clearly defined, and you have the autonomy to manage your own workflow.</p>
+<h3>Extraversion: 69/100</h3>
+<p>You recharge through meaningful social interaction, enjoying collaborative projects and brainstorming sessions. You're at your best when you can bounce ideas off colleagues and receive constructive feedback. After a long social event, you might need some quiet time to decompress, but you generally find that connecting with others energizes you and helps you stay motivated. Your high score means you're comfortable presenting your findings and engaging in discussions, which is vital for a data scientist.</p>
+<h3>Agreeableness: 72/100</h3>
+<p>In disagreements, you tend to prioritize harmony and seek mutually agreeable solutions. You value empathy and understanding, and you genuinely care about the well-being of your colleagues. When someone asks for help, you readily offer your assistance, often going above and beyond to support their success. You might sometimes find it challenging to assert your own needs in the face of conflict, but your strong sense of compassion makes you a valuable team player.</p>
+<h3>Emotional Stability: 31/100</h3>
+<p>Under pressure, you tend to experience heightened anxiety and self-doubt, which can sometimes impact your performance. Your emotional baseline is sensitive and easily affected by external stressors. When things go wrong, you might ruminate on negative thoughts and struggle to maintain a positive outlook. Souvik, it's important to develop healthy coping mechanisms to manage your stress levels and build resilience.</p>
+<h2>💪 Your Natural Superpowers</h2>
+<ul>
+<li><strong>Collaborative Innovation:</strong> Your high openness and extraversion combined with conscientiousness means you excel at generating innovative solutions within a team setting and ensuring they're implemented effectively. You can bridge the gap between creative vision and practical execution.</li>
+<li><strong>Empathetic Problem Solving:</strong> Your strong agreeableness, coupled with your analytical skills as a data scientist, allows you to approach problems with both logic and empathy, considering the human impact of your findings.</li>
+<li><strong>Driven to Improve</strong>: Your steady progress in personal growth, fueled by high openness and conscientiousness, showcases an incredible ability to continuously improve yourself, and push the limits of your understanding.</li>
+</ul>
+<h2>⚠️ Your Growth Edges</h2>
+<ul>
+<li><strong>Overcommitment & Burnout</strong>: Your high agreeableness can lead you to overcommit and take on too much, increasing your stress levels and potential for burnout, especially given your low emotional stability. Learn to say "no" and prioritize your well-being.</li>
+<li><strong>Emotional Reactivity:</strong> Souvik, your low emotional stability means you can be easily triggered by stressful situations or negative feedback, which can impact your focus and productivity. Develop strategies for managing your emotional responses in the moment.</li>
+</ul>
+<h2>🚀 Productivity System Designed for YOUR Brain</h2>
+<h3>Deep Work & Focus</h3>
+<p>Your low emotional stability means you thrive with shorter, more frequent deep work blocks (45-60 minutes) with short breaks in between. Minimize distractions by working in a quiet environment and using noise-canceling headphones. Your high conscientiousness means you'll appreciate a structured schedule with clearly defined goals for each block.</p>
+<h3>Energy Management</h3>
+<p>As a moderate extravert, you recharge through selective social interaction. Schedule collaborative work for mid-morning or early afternoon, when you're feeling most energized. Dedicate early mornings and late afternoons to solo deep work. Remember to take regular breaks throughout the day to step away from your computer and connect with nature or engage in a relaxing activity.</p>
+<h3>Task Management</h3>
+<p>Your high conscientiousness benefits from structured to-do lists and project management tools. Break down large tasks into smaller, more manageable steps, and track your progress along the way. Avoid perfectionism and focus on making steady progress rather than striving for unattainable ideals. A digital project management tool like Asana or Trello can be beneficial for you.</p>
+<h2>🌍 Your Life Domain Blueprint</h2>
+<h3>💼 Career & Professional Growth</h3>
+<p><strong>Current Status:</strong> It's okay - pays the bills</p>
+<p>Souvik, the fact that you feel "okay" about your job, but not truly *fulfilled*, speaks volumes. Your high conscientiousness needs a sense of achievement and clear progress, while your openness craves intellectual stimulation and the opportunity to innovate. Your current role likely lacks one or both of these elements. As a data scientist with 4-10 years of experience, you're in a prime position to seek out more challenging and rewarding opportunities. Consider roles that involve leading data science projects, developing new algorithms, or working with cutting-edge technologies. A smaller, more innovative company might provide the autonomy and intellectual freedom you crave. You could also look at roles focusing on how AI can be used for social good, combining your values with your career. To manage stress, proactively carve out time for learning and professional development, even if it's just 30 minutes a day.</p>
+<p><strong>Recommended Resources:</strong></p>
+<ul>
+<li><strong>Book</strong>: "Deep Work: Rules for Focused Success in a Distracted World" by Cal Newport - This book will give you actionable strategies to find time to work on the things that matter most to you, minimizing external interferences.</li>
+<li><strong>YouTube</strong>: "365 Data Science" - Provides skill-based learnings for you to improve in your role.</li>
+<li><strong>Action</strong>: Identify one skill you want to develop that could lead to a promotion or a new role, and dedicate 30 minutes each day this week to learning about it.</li>
+</ul>
+<h3>❤️ Relationships & Communication</h3>
+<p><strong>Current Status:</strong> Good - I have supportive people around me</p>
+<p>Your good relationships are a testament to your high agreeableness and extraversion, Souvik. You genuinely care about the people in your life and enjoy connecting with them on a personal level. However, your low emotional stability can sometimes make you more sensitive to criticism or conflict, leading to misunderstandings. Be mindful of your communication style and strive to express your needs and feelings in a clear and assertive manner. Practice active listening and empathy to build stronger and more resilient connections.</p>
+<p><strong>Recommended Resources:</strong></p>
+<ul>
+<li><strong>Book</strong>: "Nonviolent Communication: A Language of Life" by Marshall B. Rosenberg - This book will help you develop effective communication skills based on empathy and compassion.</li>
+<li><strong>YouTube</strong>: "The School of Life" - Offers insightful videos on relationships, communication, and emotional intelligence.</li>
+<li><strong>Action</strong>: This week, make a conscious effort to actively listen to a friend or family member without interrupting or judging. Ask clarifying questions and show genuine interest in what they have to say.</li>
+</ul>
+<h3>🏥 Health & Stress Management</h3>
+<p><strong>Current Status:</strong> Good - mostly healthy with minor issues</p>
+<p>Your "mostly healthy" status is good, but your low emotional stability makes stress management a top priority, Souvik. You're prone to anxiety and rumination, which can negatively impact your physical and mental well-being. It's crucial to develop a consistent stress-reduction routine that incorporates relaxation techniques, regular exercise, and sufficient sleep. Explore mindfulness meditation, yoga, or spending time in nature to calm your mind and body. Prioritize activities that bring you joy and help you disconnect from work-related stressors.</p>
+<p><strong>Recommended Resources:</strong></p>
+<ul>
+<li><strong>Book</strong>: "Why Zebras Don't Get Ulcers" by Robert Sapolsky - This book explains the science of stress and provides practical strategies for managing it.</li>
+<li><strong>YouTube</strong>: "Headspace" - Offers guided meditations and mindfulness exercises for stress reduction.</li>
+<li><strong>Action</strong>: Dedicate 15 minutes each day this week to practicing mindfulness meditation. Focus on your breath and observe your thoughts without judgment.</li>
+</ul>
+<h3>💰 Wealth & Financial Success</h3>
+<p><strong>Current Status:</strong> Comfortable - meeting needs with some savings</p>
+<p>Your comfortable financial situation is likely a result of your conscientiousness, which helps you manage your money responsibly, Souvik. However, your openness to experience might lead you to take calculated risks in your investments, seeking opportunities for growth. Review your budget and investment portfolio to ensure they align with your long-term financial goals. Consider consulting with a financial advisor to develop a comprehensive plan that takes into account your risk tolerance and financial aspirations.</p>
+<p><strong>Recommended Resources:</strong></p>
+<ul>
+<li><strong>Book</strong>: "The Psychology of Money" by Morgan Housel - Offers insights into the emotional and psychological aspects of money management.</li>
+<li><strong>YouTube</strong>: "The Ramsey Show" - Provides practical advice on budgeting, debt management, and investing.</li>
+<li><strong>Action</strong>: This week, track your spending and identify areas where you can cut back to save more money.</li>
+</ul>
+<h3>🌱 Personal Growth & Learning</h3>
+<p><strong>Current Status:</strong> Growing - making steady progress</p>
+<p>Your steady progress in personal growth is a testament to your high openness to experience, Souvik. You're always seeking new knowledge and experiences, and you're not afraid to challenge yourself. Continue to nurture your intellectual curiosity by reading books, taking online courses, and engaging in stimulating conversations. Set clear goals for your personal development and track your progress along the way.</p>
+<p><strong>Recommended Resources:</strong></p>
+<ul>
+<li><strong>Book</strong>: "Mindset: The New Psychology of Success" by Carol S. Dweck - This book explores the power of a growth mindset and how it can help you achieve your goals.</li>
+<li><strong>YouTube</strong>: "TED" - Offers a vast library of inspiring and informative talks on a wide range of topics.</li>
+<li><strong>Action</strong>: This week, identify one new skill or area of knowledge you'd like to explore and dedicate 30 minutes each day to learning about it.</li>
+</ul>
+<h2>📅 Your Personalized Daily Routine</h2>
+<p>Souvik, here's a daily routine scientifically designed for YOUR personality + life situation. This isn't generic advice - it's built specifically for your 75/100 conscientiousness, 78/100 openness, and 31/100 emotional stability.</p>
+<h3>🌅 Morning Routine (5:30 AM - 9:00 AM)</h3>
+<ul>
+<li><strong>5:30 AM - Wake Up & Mindfulness</strong> (10 min): Your 31/100 emotional stability means you handle early mornings well. Start with 10 deep breaths using the Calm app.</li>
+<li><strong>5:40 AM - Movement</strong> (20 min): Given Good - mostly healthy with minor issues, try a brisk walk or a quick yoga routine to get your blood flowing.</li>
+<li><strong>6:00 AM - Deep Work Block</strong> (60 min): Your peak focus time. Tackle your most important Manage stress & burnout task. This should be a task that requires deep concentration and will lead to a strong feeling of accomplishment.</li>
+<li><strong>7:00 AM - Breakfast & Connection</strong> (30 min): Given Good - I have supportive people around me, call a family member or housemate to connect before the workday.</li>
+<li><strong>7:30 AM - Commute/Transition</strong> (30 min): Listen to an audiobook or podcast related to data science to further your personal growth.</li>
+<li><strong>8:00 AM - Work Begins</strong>: Start the day by reviewing and prioritizing your to-do list. Break down larger tasks into smaller, more manageable steps.</li>
+</ul>
+<h3>☀️ Midday Routine (12:00 PM - 2:00 PM)</h3>
+<ul>
+<li><strong>12:00 PM - Lunch</strong> (30 min): Eat a healthy lunch away from your desk.</li>
+<li><strong>12:30 PM - Social Interaction</strong> (30 min): Your 69/100 extraversion means you need to socialize. Connect with colleagues, grab coffee, or participate in a team activity.</li>
+<li><strong>1:00 PM - Mindfulness Break</strong> (15 min): Find a quiet space and practice mindfulness meditation.</li>
+<li><strong>1:15 PM - Active Reading</strong> (45 min): Use the Pomodoro technique to read a non-fiction book.</li>
+</ul>
+<h3>🌆 Evening Routine (6:00 PM - 10:00 PM)</h3>
+<ul>
+<li><strong>6:00 PM - Exercise</strong> (30 min): If you haven't already exercised, now's a good time to get your body moving.</li>
+<li><strong>6:30 PM - Dinner</strong> (30 min): Eat a healthy and balanced dinner.</li>
+<li><strong>7:00 PM - Family Time/Hobbies</strong> (2 hours): Spend time with loved ones or engage in a relaxing hobby. Avoid work-related activities.</li>
+<li><strong>9:00 PM - Prepare for Tomorrow</strong> (30 min): Review your to-do list for tomorrow and prepare any necessary materials. This is where your conscientiousness will shine.</li>
+<li><strong>9:30 PM - Unplug & Relax</strong> (30 min): Put away your electronic devices and engage in a relaxing activity, such as reading a book or taking a bath.</li>
+</ul>
+<h3>🌙 Night Routine (10:00 PM - 10:30 PM)</h3>
+<ul>
+<li><strong>10:00 PM - Prepare for Sleep</strong> (30 min): Dim the lights, turn off electronic devices, and practice relaxation techniques, such as deep breathing or progressive muscle relaxation.</li>
+<li><strong>10:30 PM - Bedtime</strong>: Get at least 7-8 hours of sleep each night to support your physical and mental health.</li>
+</ul>
+<p><strong>KEY PRINCIPLES FOR Souvik:</strong></p>
+<ul>
+<li>Your moderate conscientiousness (75/100) means rigid routines will fail. Build in 20% flexibility to accommodate unexpected events or changes in your schedule.</li>
+<li>Your low emotional stability (31/100) requires you to be proactive about stress management. Incorporate relaxation techniques and mindfulness practices into your daily routine.</li>
+<li>Your high agreeableness (72/100) means you need to prioritize self-care and set boundaries to avoid overcommitment.</li>
+</ul>
+<h2>🎯 90-Day Incremental Improvement Plan</h2>
+<p>This is your roadmap from It's okay - pays the bills, Good - I have supportive people around me, Good - mostly healthy with minor issues, Comfortable - meeting needs with some savings, and Growing - making steady progress to where you want to be. Small, daily actions compound into massive change.</p>
+<h3>Month 1: Stabilize & Build Foundation</h3>
+<p><strong>💼 Career (It's okay - pays the bills → Better)</strong></p>
+<ul>
+<li><strong>Week 1</strong>: Identify 3 skills that are highly valued in your field and that you enjoy learning about.</li>
+<li><strong>Week 2</strong>: Dedicate 30 minutes each day to learning one of these skills through online courses, books, or mentorship.</li>
+<li><strong>Week 3</strong>: Look for opportunities to apply your new skills at work, even in small ways.</li>
+<li><strong>Week 4</strong>: Update your resume and LinkedIn profile to reflect your new skills and accomplishments.</li>
+<li><strong>Daily Habit</strong>: Spend 5 minutes each day networking with people in your industry on LinkedIn.</li>
+</ul>
+<p><strong>❤️ Relationships (Good - I have supportive people around me → Better)</strong></p>
+<ul>
+<li><strong>Week 1</strong>: Identify 3 people in your life who make you feel good and supported.</li>
+<li><strong>Week 2</strong>: Schedule a time to connect with each of these people, whether it's for coffee, lunch, or a phone call.</li>
+<li><strong>Week 3</strong>: Practice active listening and empathy when interacting with these people.</li>
+<li><strong>Week 4</strong>: Express your appreciation for their presence in your life.</li>
+<li><strong>Daily Habit</strong>: Send a short text message to one person each day, expressing your gratitude or simply checking in.</li>
+</ul>
+<p><strong>🏥 Health (Good - mostly healthy with minor issues → Better)</strong></p>
+<ul>
+<li><strong>Week 1</strong>: Identify 3 stress triggers in your life.</li>
+<li><strong>Week 2</strong>: Develop strategies for managing these triggers, such as deep breathing exercises, mindfulness meditation, or taking a break from the situation.</li>
+<li><strong>Week 3</strong>: Dedicate 15 minutes each day to practicing one of these stress-management techniques.</li>
+<li><strong>Week 4</strong>: Track your stress levels throughout the day and identify patterns.</li>
+<li><strong>Daily Habit</strong>: Take 5 minutes each day to practice deep breathing exercises.</li>
+</ul>
+<p><strong>💰 Finances (Comfortable - meeting needs with some savings → Better)</strong></p>
+<ul>
+<li><strong>Week 1</strong>: Review your budget and identify areas where you can cut back to save more money.</li>
+<li><strong>Week 2</strong>: Set a savings goal for the next 3 months.</li>
+<li><strong>Week 3</strong>: Automate your savings so that a fixed amount is transferred from your checking account to your savings account each month.</li>
+<li><strong>Week 4</strong>: Track your progress towards your savings goal.</li>
+<li><strong>Daily Habit</strong>: Review your spending for the day and identify any unnecessary expenses.</li>
+</ul>
+<p><strong>🌱 Growth (Growing - making steady progress → Better)</strong></p>
+<ul>
+<li><strong>Week 1</strong>: Identify 3 areas in your life where you'd like to grow and improve.</li>
+<li><strong>Week 2</strong>: Set a goal for each of these areas.</li>
+<li><strong>Week 3</strong>: Develop an action plan for achieving your goals.</li>
+<li><strong>Week 4</strong>: Track your progress towards your goals.</li>
+<li><strong>Daily Habit</strong>: Dedicate 15 minutes each day to working towards one of your goals.</li>
+</ul>
+<h3>Month 2: Momentum & Optimization</h3>
+<p>[For each pillar: intermediate challenges that build on Month 1 foundation. More specific to their Manage stress & burnout]</p>
+<ul>
+<li><strong>Career:</strong> Apply for one job per week that aligns with your new skills.</li>
+<li><strong>Relationships:</strong> Join a social group or club that aligns with your interests.</li>
+<li><strong>Health:</strong> Add a new, more challenging exercise to your routine.</li>
+<li><strong>Finances:</strong> Research new investment opportunities.</li>
+<li><strong>Growth:</strong> Attend a conference or workshop in your field.</li>
+</ul>
+<h3>Month 3: Transformation & Integration</h3>
+<p>[For each pillar: advanced actions that require the foundation from Months 1-2. Show how pillars interconnect.]</p>
+<ul>
+<li><strong>Career:</strong> Take on a leadership role at work.</li>
+<li><strong>Relationships:</strong> Volunteer your time to a cause you care about.</li>
+<li><strong>Health:</strong> Plan a relaxing vacation or getaway.</li>
+<li><strong>Finances:</strong> Create a financial plan for the next 5 years.</li>
+<li><strong>Growth:</strong> Mentor someone in your field.</li>
+</ul>
+<p><strong>🎯 Success Metrics for Souvik:</strong></p>
+<ul>
+<li>Feeling more fulfilled and engaged at work (from It's okay - pays the bills to Liking your job)</li>
+<li>Experiencing less stress and anxiety in your daily life</li>
+<li>Achieving your savings goal for the next 3 months</li>
+</ul>
+<h2>🛠️ Focused Room: Your Personalized Setup</h2>
+<p>Your high conscientiousness means you'll love the streak tracking — set a goal of 5 focused sessions per week in Focused Room. Your moderate openness suggests you'll benefit from blocking social media but ALLOWING educational YouTube for learning breaks. Given your relatively low emotional stability, set up a "rescue list" of pre-approved websites for when you are feeling overwhelmed. Be sure to take full advantage of the "deep work" and "focused breaks" so your mind doesn't get overloaded.</p>
+<h2>💎 Final Insight for Souvik</h2>
+<p>Souvik, you are a deeply empathetic and creative individual with the potential to make a significant impact in your field and in the lives of others. Your greatest challenge is to manage your stress and protect your emotional well-being. By prioritizing self-care, setting boundaries, and developing healthy coping mechanisms, you can unlock your full potential and create a life that is both fulfilling and meaningful. Remember your good relationships and build on them - a support structure will be crucial to your success.</p>
+                    </div>
+                    
+                    <div style="margin-top: 40px; padding: 30px; background: linear-gradient(135deg, rgba(122, 158, 159, 0.08) 0%, rgba(56, 161, 105, 0.08) 100%); border-radius: 12px; border-left: 4px solid #7A9E9F;">
+                        <h3 style="margin-top: 0; color: #7A9E9F; font-size: 22px;">🚀 Ready to Apply These Insights?</h3>
+                        <p style="margin-bottom: 20px; color: #4a5568;">Your personality analysis is most powerful when combined with the right tools. Install the Focused Room Chrome extension to start building focus sessions designed for <strong>YOUR unique brain</strong>:</p>
+                        <div style="text-align: center;">
+                            <a href="https://chromewebstore.google.com/detail/focused-room" class="cta-button">
+                                Install Chrome Extension (Free) →
+                            </a>
+                        </div>
+                        <p style="margin-top: 20px; margin-bottom: 0; color: #4a5568; font-size: 14px; text-align: center;">✨ Personalized blocking · Deep work timer · Progress tracking ✨</p>
+                    </div>
+                    
+                    <div style="background: #FAF9F5; border-radius: 12px; padding: 25px; margin-top: 35px; text-align: center;">
+                        <p style="margin: 0; font-size: 16px; color: #4a5568; line-height: 1.7;">
+                            <strong style="color: #7A9E9F;">What's Next?</strong><br>
+                            Every Sunday, you'll receive <strong>"The Focus Formula"</strong> newsletter with strategies personalized to YOUR personality type. Watch for it in your inbox!
+                        </p>
+                    </div>
+                    
+                    <div class="signature">
+                        <p style="margin: 0 0 10px 0;">Questions about your report? Hit reply—I read every message personally.</p>
+                        <p style="margin: 10px 0;"><strong>Souvik Ganguly</strong><br>
+                        Founder, Focused Room<br>
+                        <a href="mailto:founder@focusedroom.com" style="color: #7A9E9F; text-decoration: none;">founder@focusedroom.com</a></p>
+                        
+                        <p style="font-size: 14px; color: #718096; margin-top: 25px;">
+                            P.S. Save this email! You'll want to reference your personality insights as you build your focus habits. Consider it your personal operating manual.
+                        </p>
+                    </div>
+                </div>
+                
+                <div class="footer">
+                    <p style="font-weight: 600; color: #2d3748;">Focused Room</p>
+                    <p>Backed by cognitive behavioral psychology | Privacy-first | Community-driven</p>
+                    <p style="font-size: 12px; color: #9aa6b2; margin-top: 15px;">
+                        <a href="https://focusedroom.com" style="color: #7A9E9F;">Visit Focused Room</a> | 
+                        <a href="https://focusedroom.com/unsubscribe" style="color: #7A9E9F;">Unsubscribe</a> | 
+                        <a href="https://focusedroom.com/privacy" style="color: #7A9E9F;">Privacy</a>
+                    </p>
+                </div>
+            </div>
+        </body>
+        </html>
+        

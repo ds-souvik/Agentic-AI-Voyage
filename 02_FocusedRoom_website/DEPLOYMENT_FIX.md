@@ -4,7 +4,7 @@
 
 **Error**: `ModuleNotFoundError: No module named 'psycopg2'`
 
-**Root Cause**: 
+**Root Cause**:
 - Render provisions PostgreSQL database in production
 - SQLAlchemy tries to connect using PostgreSQL dialect
 - `psycopg2` driver was missing from `requirements.txt`
@@ -222,4 +222,3 @@ Desktop users will see:
 **Commit**: `6b74254`  
 **Branch**: `main`  
 **Status**: ✅ READY FOR PRODUCTION
-

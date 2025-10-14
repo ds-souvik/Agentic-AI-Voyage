@@ -25,7 +25,7 @@ But this isn't a willpower problem. **It's a design problem.**
 
 **Our Defense**: The Focused Room ecosystem is **backed by cognitive behavioral psychology, behavioral science, and evidence-based habit formation research**. We fight fire with fire—using the same psychological principles to help you BUILD focus instead of destroy it.
 
-**The result?** 
+**The result?**
 - Dreams deferred
 - Potential unrealized
 - Careers stagnated
@@ -74,7 +74,7 @@ A scientifically-validated personality assessment that reveals **HOW your brain 
 ### **Why It Matters**
 You can't optimize what you don't understand. Traditional productivity advice fails because it's one-size-fits-all.
 
-**The Truth**: 
+**The Truth**:
 - An introvert needs different deep work strategies than an extrovert
 - High conscientiousness people thrive with detailed schedules
 - Low neuroticism people handle stress differently than high neuroticism people
@@ -82,7 +82,7 @@ You can't optimize what you don't understand. Traditional productivity advice fa
 ### **What We Deliver**
 - **The Big Five personality traits**: Openness, Conscientiousness, Extraversion, Agreeableness, Neuroticism
 - **AI-powered insights**: Personalized recommendations based on YOUR unique personality profile
-- **Actionable strategies**: 
+- **Actionable strategies**:
   - Customized daily routines
   - Energy management tactics
   - Stress management techniques
@@ -142,7 +142,7 @@ Instead of hard blocks, we make distractions **annoying enough** that you think 
 - Gamification (streaks, achievements, progress tracking)
 - Privacy-first (all data local, never leaves your device)
 
-**Limitations**: 
+**Limitations**:
 - ⚠️ Desktop/laptop only (Chrome browser)
 - ⚠️ Users can bypass by switching to phone
 - ⚠️ No cross-device sync
@@ -283,7 +283,7 @@ PHASE 4: AI-Powered Focus Coach
 
 **Format**:
 - **Length**: 8-12 minute read (respects your time)
-- **Structure**: 
+- **Structure**:
   - Problem (relatable story)
   - Science (evidence-based research)
   - Solution (actionable step)
@@ -312,28 +312,28 @@ Example:
 ```
 DAY 1: Discovery
   └─> User finds Focused Room (blog, social media, word-of-mouth)
-  
+
 DAY 1-2: Understanding
   └─> Takes Big Five Test → Gets personalized report
   └─> "Aha! This is why I struggle with [specific issue]"
-  
+
 DAY 3-7: Implementation
   └─> Installs Chrome extension (desktop focus)
   └─> Installs mobile app (complete protection)
   └─> Receives first personalized article
-  
+
 WEEK 2-4: Habit Formation
   └─> Daily focus sessions
   └─> Weekly articles with incremental improvements
   └─> Sees progress in analytics
   └─> Feels small wins compounding
-  
+
 MONTH 2-3: Community Integration
   └─> Joins focus challenge
   └─> Finds accountability partner
   └─> Shares wins in community
   └─> Becomes advocate
-  
+
 MONTH 6+: Transformation
   └─> Distraction is no longer default
   └─> Deep work is natural
@@ -531,4 +531,3 @@ And we're just getting started.
 **Next**: Crystallize this vision in all user touchpoints (emails, website, app)  
 **Owner**: Souvik Ganguly, Founder  
 **Last Updated**: October 14, 2025
-

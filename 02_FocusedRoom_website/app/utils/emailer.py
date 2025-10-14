@@ -453,7 +453,6 @@ class EmailService:
             import sendgrid
             from sendgrid.helpers.mail import (
                 Attachment,
-                Content,
                 Email,
                 FileContent,
                 FileName,
@@ -518,48 +517,48 @@ class EmailService:
             return ""
 
         import re
-        
+
         # Split into lines for processing
         lines = markdown_text.split("\n")
         html_lines = []
         in_list = False
-        
+
         for i, line in enumerate(lines):
             stripped = line.strip()
-            
+
             # Skip completely empty lines
             if not stripped:
                 if in_list:
                     html_lines.append("</ul>")
                     in_list = False
                 continue
-            
+
             # Headers - strip ALL leading # and whitespace
             if stripped.startswith("###"):
                 if in_list:
                     html_lines.append("</ul>")
                     in_list = False
                 # Remove all # characters and strip
-                text = re.sub(r'^#+\s*', '', stripped)
+                text = re.sub(r"^#+\s*", "", stripped)
                 # Convert bold
-                text = re.sub(r'\*\*(.*?)\*\*', r'<strong>\1</strong>', text)
+                text = re.sub(r"\*\*(.*?)\*\*", r"<strong>\1</strong>", text)
                 html_lines.append(f"<h3>{text}</h3>")
             elif stripped.startswith("##"):
                 if in_list:
                     html_lines.append("</ul>")
                     in_list = False
                 # Remove all # characters and strip
-                text = re.sub(r'^#+\s*', '', stripped)
+                text = re.sub(r"^#+\s*", "", stripped)
                 # Convert bold
-                text = re.sub(r'\*\*(.*?)\*\*', r'<strong>\1</strong>', text)
+                text = re.sub(r"\*\*(.*?)\*\*", r"<strong>\1</strong>", text)
                 html_lines.append(f"<h2>{text}</h2>")
             elif stripped.startswith("#"):
                 # Handle single # as well
                 if in_list:
                     html_lines.append("</ul>")
                     in_list = False
-                text = re.sub(r'^#+\s*', '', stripped)
-                text = re.sub(r'\*\*(.*?)\*\*', r'<strong>\1</strong>', text)
+                text = re.sub(r"^#+\s*", "", stripped)
+                text = re.sub(r"\*\*(.*?)\*\*", r"<strong>\1</strong>", text)
                 html_lines.append(f"<h2>{text}</h2>")
             # List items
             elif stripped.startswith("- ") or stripped.startswith("* "):
@@ -569,7 +568,7 @@ class EmailService:
                 # Get list item text
                 text = stripped[2:].strip()
                 # Convert bold
-                text = re.sub(r'\*\*(.*?)\*\*', r'<strong>\1</strong>', text)
+                text = re.sub(r"\*\*(.*?)\*\*", r"<strong>\1</strong>", text)
                 html_lines.append(f"<li>{text}</li>")
             # Regular paragraphs
             else:
@@ -577,13 +576,13 @@ class EmailService:
                     html_lines.append("</ul>")
                     in_list = False
                 # Convert bold
-                text = re.sub(r'\*\*(.*?)\*\*', r'<strong>\1</strong>', stripped)
+                text = re.sub(r"\*\*(.*?)\*\*", r"<strong>\1</strong>", stripped)
                 html_lines.append(f"<p>{text}</p>")
-        
+
         # Close any open list
         if in_list:
             html_lines.append("</ul>")
-        
+
         return "\n".join(html_lines)
 
     def send_welcome_vision_email(self, email: str, user_name: str = "") -> dict[str, Any]:
@@ -806,19 +805,19 @@ class EmailService:
                     <h1>🎯 Welcome to Focused Room, {greeting}!</h1>
                     <p>You just took the first step toward reclaiming your attention</p>
                 </div>
-                
+
                 <div class="content">
                     <div class="welcome-badge">
                         <h2>✨ This is Your Moment</h2>
                         <p>You're not here by accident. You're here because you know there's more to life than endless scrolling. <strong>You're ready to build something extraordinary.</strong></p>
                     </div>
-                    
+
                     <p>Hi {greeting},</p>
-                    
+
                     <p>I'm <strong>Souvik</strong>, and I built Focused Room because I was drowning in the same digital chaos you're fighting.</p>
-                    
+
                     <p>Brilliant ideas, big dreams, genuine potential—but <strong>hemorrhaging my attention</strong> to infinite scroll, notification pings, and the dopamine slot machine of social media.</p>
-                    
+
                     <div class="stats-box">
                         <h3>⚠️ The Attention War (And Why You're Losing)</h3>
                         <p><strong>Here's what you're up against:</strong></p>
@@ -828,10 +827,10 @@ class EmailService:
                         • Your goal: Build a meaningful life</p>
                         <p style="margin-top: 15px;"><strong>It's not a fair fight. Until now.</strong></p>
                     </div>
-                    
+
                     <h2 style="color: #7A9E9F; margin: 35px 0 20px 0;">🌟 The Focused Room Ecosystem</h2>
                     <p>You didn't just sign up for a tool. You joined a <strong>complete system</strong> built to help you develop focus, discipline, and deep work—one intentional step at a time.</p>
-                    
+
                     <div class="pillar-box">
                         <h3><span class="pillar-number">1</span> Understand Your Brain</h3>
                         <p><strong>The Big Five Personality Test (8 minutes)</strong> reveals how YOUR brain is wired for focus, productivity, and growth. No generic advice—personalized strategies based on your unique personality.</p>
@@ -842,7 +841,7 @@ class EmailService:
                             </a>
                         </p>
                     </div>
-                    
+
                     <div class="pillar-box">
                         <h3><span class="pillar-number">2</span> Protect Your Attention</h3>
                         <p><strong>Chrome Extension + Mobile Apps (coming soon)</strong> block distractions across ALL your devices. We maintain <strong>one of the world's largest blocklists</strong>—covering social media, news, entertainment, shopping, and adult content (protecting children and adults from addiction).</p>
@@ -853,39 +852,39 @@ class EmailService:
                             </a>
                         </p>
                     </div>
-                    
+
                     <div class="pillar-box">
                         <h3><span class="pillar-number">3</span> Build Your Practice</h3>
                         <p><strong>"The Focus Formula"</strong> weekly newsletter delivers science-backed strategies for deep work. No information overload—one focused lesson every Sunday, personalized to YOUR personality type.</p>
                         <p style="margin-top: 15px; color: #38a169; font-weight: 600;">✅ You're already subscribed!</p>
                         <p style="margin-top: 12px; color: #4a5568;"><strong>First issue this Sunday:</strong> "The Science of Deep Work" — the neuroscience of attention and why most people fail at focus.</p>
                     </div>
-                    
+
                     <div class="welcome-badge" style="margin-top: 35px;">
                         <h2>💪 Remember This</h2>
                         <p>Every hour you invest in deep focus today <strong>compounds into a better future tomorrow</strong>. Your focused self is your future self.</p>
                         <p style="margin-top: 15px;">You're not lazy. You're not broken. <strong>You're fighting a rigged game.</strong></p>
                         <p style="margin-top: 10px;"><strong>Now you have the tools to win.</strong></p>
                     </div>
-                    
+
                     <div class="signature">
                         <p>With deep respect for your potential,</p>
                         <p><strong>Souvik Ganguly</strong><br>
                         Founder, Focused Room<br>
                         <a href="mailto:founder@focusedroom.com" style="color: #7A9E9F; text-decoration: none;">founder@focusedroom.com</a></p>
-                        
+
                         <p style="font-size: 14px; color: #718096; margin-top: 25px;">
                             P.S. Reply to this email anytime. I read every message personally. I'd love to hear what brought you to Focused Room—and what you're building with your reclaimed attention.
                         </p>
                     </div>
                 </div>
-                
+
                 <div class="footer">
                     <p style="font-weight: 600; color: #2d3748;">Focused Room</p>
                     <p>Backed by cognitive behavioral psychology | Privacy-first | Community-driven</p>
                     <p style="font-size: 12px; color: #9aa6b2; margin-top: 15px;">
                         You received this because you subscribed to The Focus Formula Newsletter<br>
-                        <a href="https://focusedroom.com/unsubscribe" style="color: #7A9E9F;">Unsubscribe</a> | 
+                        <a href="https://focusedroom.com/unsubscribe" style="color: #7A9E9F;">Unsubscribe</a> |
                         <a href="https://focusedroom.com/privacy" style="color: #7A9E9F;">Privacy</a>
                     </p>
                 </div>
@@ -906,15 +905,15 @@ You just took the first step toward reclaiming your attention
 
 THIS IS YOUR MOMENT
 
-You're not here by accident. You're here because you know there's more to life 
+You're not here by accident. You're here because you know there's more to life
 than endless scrolling. You're ready to build something extraordinary.
 
 Hi {greeting},
 
-I'm Souvik, and I built Focused Room because I was drowning in the same digital 
+I'm Souvik, and I built Focused Room because I was drowning in the same digital
 chaos you're fighting.
 
-Brilliant ideas, big dreams, genuine potential—but hemorrhaging my attention to 
+Brilliant ideas, big dreams, genuine potential—but hemorrhaging my attention to
 infinite scroll, notification pings, and the dopamine slot machine of social media.
 
 ------------------------------------------------------------------------------
@@ -934,30 +933,30 @@ It's not a fair fight. Until now.
 THE FOCUSED ROOM ECOSYSTEM
 ==============================================================================
 
-You didn't just sign up for a tool. You joined a complete system built to help 
+You didn't just sign up for a tool. You joined a complete system built to help
 you develop focus, discipline, and deep work—one intentional step at a time.
 
 PILLAR 1: UNDERSTAND YOURSELF
 
-The Big Five Personality Test reveals how YOUR brain is wired for focus, 
-productivity, and growth. No generic advice—strategies customized to your unique 
+The Big Five Personality Test reveals how YOUR brain is wired for focus,
+productivity, and growth. No generic advice—strategies customized to your unique
 personality.
 
 → Take the test (8 minutes): https://focusedroom.com/big-five
 
 PILLAR 2: PROTECT YOUR FOCUS
 
-Our Chrome Extension + Mobile Apps (coming soon) block distractions across ALL 
-your devices. We maintain one of the largest blocklists—social media, news, 
+Our Chrome Extension + Mobile Apps (coming soon) block distractions across ALL
+your devices. We maintain one of the largest blocklists—social media, news,
 entertainment, shopping, adult content—protecting you from the attention hijackers.
 
-→ Install Chrome Extension (Free): 
+→ Install Chrome Extension (Free):
   https://chromewebstore.google.com/detail/focused-room
 
 PILLAR 3: GROW ONE STEP AT A TIME
 
-"The Focus Formula" weekly newsletter delivers science-backed strategies for 
-building deep work habits. No information overload—one focused lesson per week, 
+"The Focus Formula" weekly newsletter delivers science-backed strategies for
+building deep work habits. No information overload—one focused lesson per week,
 personalized to YOUR personality.
 
 ✅ You're already subscribed!
@@ -967,22 +966,22 @@ YOUR NEXT STEPS (Start Today)
 ------------------------------------------------------------------------------
 
 1. Take the Big Five Test (8 minutes)
-   Discover how your personality shapes your productivity. Get your personalized 
+   Discover how your personality shapes your productivity. Get your personalized
    report with strategies that actually work for YOU.
 
 2. Install the Chrome Extension (2 minutes)
-   Start blocking distractions on your laptop/desktop today. We've curated 
+   Start blocking distractions on your laptop/desktop today. We've curated
    blocklists for the most addictive sites—you just click "Enable."
 
 3. Read Your First Article
-   Check your inbox this Sunday for "The Science of Deep Work" — the foundation 
+   Check your inbox this Sunday for "The Science of Deep Work" — the foundation
    of everything we do.
 
 ==============================================================================
 REMEMBER THIS
 ==============================================================================
 
-Every hour you invest in deep focus today compounds into a better future tomorrow. 
+Every hour you invest in deep focus today compounds into a better future tomorrow.
 Your focused self is your future self.
 
 You're not lazy. You're not broken. You're fighting a rigged game.
@@ -997,8 +996,8 @@ Souvik Ganguly
 Founder, Focused Room
 founder@focusedroom.com
 
-P.S. Reply to this email anytime. I read every message personally. I'd love to 
-hear what brought you to Focused Room—and what you're building with your reclaimed 
+P.S. Reply to this email anytime. I read every message personally. I'd love to
+hear what brought you to Focused Room—and what you're building with your reclaimed
 attention.
 
 ==============================================================================
@@ -1019,8 +1018,8 @@ Privacy: https://focusedroom.com/privacy
         quote = ""
         if "## QUOTE" in markdown_report:
             quote_section = markdown_report.split("## QUOTE")[1].split("##")[0].strip()
-            quote = quote_section.replace('"', '').strip()
-        
+            quote = quote_section.replace('"', "").strip()
+
         # Convert markdown to HTML (clean version without ##)
         clean_markdown = markdown_report.replace("## QUOTE", "").strip()
         report_html = self._convert_markdown_to_html(clean_markdown)
@@ -1225,29 +1224,29 @@ Privacy: https://focusedroom.com/privacy
                     <h1>🧠 Your Personality Blueprint</h1>
                     <p>{user_name}, this is your unique roadmap to peak productivity</p>
                 </div>
-                
+
                 <div class="content">
                     <div class="celebration-box">
                         <h2>🎉 You Did It!</h2>
                         <p>Most people never understand WHY they struggle with focus. <strong>You just unlocked your personalized operating manual.</strong></p>
                     </div>
-                    
+
                     {f'<div class="quote-box">"{quote}"</div>' if quote else ''}
-                    
+
                     <div class="scores-box">
                         <h2>📊 Your Big Five Personality Traits</h2>
                         <p style="text-align: center; margin: 0 0 20px 0; color: #4a5568;">These scores reveal how YOUR brain works best</p>
                         {score_bars}
                     </div>
-                    
+
                     <p style="font-size: 17px; font-weight: 600; color: #2d3748; margin-top: 35px;">Hey {user_name},</p>
-                    
+
                     <p style="font-size: 16px; color: #4a5568;">Below is your complete personality analysis—generated by AI and customized to YOUR unique traits. This isn't generic advice. <strong>This is your personal blueprint for building unshakeable focus.</strong></p>
-                    
+
                     <div class="report-content">
                         {report_html}
                     </div>
-                    
+
                     <div style="margin-top: 40px; padding: 30px; background: linear-gradient(135deg, rgba(122, 158, 159, 0.08) 0%, rgba(56, 161, 105, 0.08) 100%); border-radius: 12px; border-left: 4px solid #7A9E9F;">
                         <h3 style="margin-top: 0; color: #7A9E9F; font-size: 22px;">🚀 Ready to Apply These Insights?</h3>
                         <p style="margin-bottom: 20px; color: #4a5568;">Your personality analysis is most powerful when combined with the right tools. Install the Focused Room Chrome extension to start building focus sessions designed for <strong>YOUR unique brain</strong>:</p>
@@ -1258,32 +1257,32 @@ Privacy: https://focusedroom.com/privacy
                         </div>
                         <p style="margin-top: 20px; margin-bottom: 0; color: #4a5568; font-size: 14px; text-align: center;">✨ Personalized blocking · Deep work timer · Progress tracking ✨</p>
                     </div>
-                    
+
                     <div style="background: #FAF9F5; border-radius: 12px; padding: 25px; margin-top: 35px; text-align: center;">
                         <p style="margin: 0; font-size: 16px; color: #4a5568; line-height: 1.7;">
                             <strong style="color: #7A9E9F;">What's Next?</strong><br>
                             Every Sunday, you'll receive <strong>"The Focus Formula"</strong> newsletter with strategies personalized to YOUR personality type. Watch for it in your inbox!
                         </p>
                     </div>
-                    
+
                     <div class="signature">
                         <p style="margin: 0 0 10px 0;">Questions about your report? Hit reply—I read every message personally.</p>
                         <p style="margin: 10px 0;"><strong>Souvik Ganguly</strong><br>
                         Founder, Focused Room<br>
                         <a href="mailto:founder@focusedroom.com" style="color: #7A9E9F; text-decoration: none;">founder@focusedroom.com</a></p>
-                        
+
                         <p style="font-size: 14px; color: #718096; margin-top: 25px;">
                             P.S. Save this email! You'll want to reference your personality insights as you build your focus habits. Consider it your personal operating manual.
                         </p>
                     </div>
                 </div>
-                
+
                 <div class="footer">
                     <p style="font-weight: 600; color: #2d3748;">Focused Room</p>
                     <p>Backed by cognitive behavioral psychology | Privacy-first | Community-driven</p>
                     <p style="font-size: 12px; color: #9aa6b2; margin-top: 15px;">
-                        <a href="https://focusedroom.com" style="color: #7A9E9F;">Visit Focused Room</a> | 
-                        <a href="https://focusedroom.com/unsubscribe" style="color: #7A9E9F;">Unsubscribe</a> | 
+                        <a href="https://focusedroom.com" style="color: #7A9E9F;">Visit Focused Room</a> |
+                        <a href="https://focusedroom.com/unsubscribe" style="color: #7A9E9F;">Unsubscribe</a> |
                         <a href="https://focusedroom.com/privacy" style="color: #7A9E9F;">Privacy</a>
                     </p>
                 </div>

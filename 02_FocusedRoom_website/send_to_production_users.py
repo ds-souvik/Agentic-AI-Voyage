@@ -28,7 +28,7 @@ sys.path.insert(0, ".")
 from sqlalchemy import create_engine
 from sqlalchemy.orm import scoped_session, sessionmaker
 
-from app.models import BigFiveResult, Subscriber, db
+from app.models import BigFiveResult, Subscriber
 from app.utils.emailer import email_service
 
 
@@ -65,7 +65,7 @@ def send_to_all_users(db_url: str = None, dry_run: bool = False):
     print("=" * 80)
 
     # Connect to production database
-    print(f"\n🔗 Connecting to database...")
+    print("\n🔗 Connecting to database...")
     engine = create_engine(db_url)
     Session = scoped_session(sessionmaker(bind=engine))
     session = Session()
@@ -75,7 +75,7 @@ def send_to_all_users(db_url: str = None, dry_run: bool = False):
         subscribers = session.query(Subscriber).order_by(Subscriber.created_at).all()
         total_subscribers = len(subscribers)
 
-        print(f"✅ Connected successfully!")
+        print("✅ Connected successfully!")
         print(f"📊 Found {total_subscribers} subscribers in database")
 
         # Count subscribers with Big Five results
@@ -166,11 +166,11 @@ def send_to_all_users(db_url: str = None, dry_run: bool = False):
         print("\n" + "=" * 80)
         print("✅ EMAIL CAMPAIGN COMPLETE!")
         print("=" * 80)
-        print(f"\n📊 RESULTS:")
-        print(f"   Welcome Emails:")
+        print("\n📊 RESULTS:")
+        print("   Welcome Emails:")
         print(f"     ✅ Sent: {results['welcome_success']}")
         print(f"     ❌ Failed: {results['welcome_fail']}")
-        print(f"\n   Big Five Reports:")
+        print("\n   Big Five Reports:")
         print(f"     ✅ Sent: {results['report_success']}")
         print(f"     ❌ Failed: {results['report_fail']}")
         print(f"\n   TOTAL EMAILS SENT: {results['welcome_success'] + results['report_success']}")
@@ -226,4 +226,3 @@ Environment Variables:
 
 if __name__ == "__main__":
     main()
-
