@@ -189,7 +189,7 @@ def validate_rate_limit_headers(headers: dict[str, str]) -> dict[str, Any]:
     return rate_limit_info
 
 
-def extract_name_from_big_five_report(report: str) -> str | None:
+def extract_name_from_big_five_report(report: str) -> Optional[str]:
     """
     Extract user's actual name from Big Five report markdown.
     Pattern: ## 🎯 NAME, Here's Your Unique Personality Blueprint
