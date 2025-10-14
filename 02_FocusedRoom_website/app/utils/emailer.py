@@ -30,7 +30,11 @@ class EmailService:
         self.mail_port = os.environ.get("MAIL_PORT")
         self.mail_username = os.environ.get("MAIL_USERNAME")
         self.mail_password = os.environ.get("MAIL_PASSWORD")
-        self.mail_sender = os.environ.get("MAIL_DEFAULT_SENDER", "noreply@focusedroom.com")
+
+        # Primary sender with display name
+        self.mail_sender = "Focused Room <founder@focusedroom.com>"
+        # Fallback sender if primary fails
+        self.fallback_sender = "Focused Room <noreply@focusedroom.com>"
 
         # Determine email provider
         self.provider = self._determine_provider()
@@ -128,25 +132,33 @@ class EmailService:
         )
 
     def _send_email(
-        self, to_email: str, subject: str, html_content: str, text_content: str
+        self, to_email: str, subject: str, html_content: str, text_content: str, sender: str = None
     ) -> dict[str, Any]:
         """
-        Send email using the configured provider.
+        Send email using the configured provider with fallback support.
 
         Args:
             to_email: Recipient email address
             subject: Email subject line
             html_content: HTML email content
             text_content: Plain text email content
+            sender: Custom sender (optional, defaults to self.mail_sender)
 
         Returns:
             Dict with success status and details
         """
+        # Use custom sender or default
+        sender_to_use = sender or self.mail_sender
+
         try:
             if self.provider == "sendgrid":
-                return self._send_via_sendgrid(to_email, subject, html_content, text_content)
+                return self._send_via_sendgrid(
+                    to_email, subject, html_content, text_content, sender_to_use
+                )
             elif self.provider == "smtp":
-                return self._send_via_smtp(to_email, subject, html_content, text_content)
+                return self._send_via_smtp(
+                    to_email, subject, html_content, text_content, sender_to_use
+                )
             else:
                 return self._send_via_console(to_email, subject, html_content, text_content)
 
@@ -154,8 +166,50 @@ class EmailService:
             logger.error(f"Failed to send email to {to_email}: {str(e)}")
             return {"success": False, "error": str(e), "provider": self.provider}
 
-    def _send_via_sendgrid(
+    def _send_email_with_fallback(
         self, to_email: str, subject: str, html_content: str, text_content: str
+    ) -> dict[str, Any]:
+        """
+        Send email with automatic fallback from founder@ to noreply@.
+
+        Strategy:
+        1. Try sending from founder@focusedroom.com
+        2. If fails, retry from noreply@focusedroom.com
+        3. Track which sender worked for logging
+
+        Returns:
+            Dict with success status, sender used, and error details
+        """
+        # Try primary sender first
+        result = self._send_email(to_email, subject, html_content, text_content, self.mail_sender)
+
+        if result.get("success"):
+            result["sender_used"] = "founder@focusedroom.com"
+            return result
+
+        # Primary failed - try fallback
+        logger.warning(f"Primary sender failed for {to_email}, trying fallback sender...")
+        fallback_result = self._send_email(
+            to_email, subject, html_content, text_content, self.fallback_sender
+        )
+
+        if fallback_result.get("success"):
+            fallback_result["sender_used"] = "noreply@focusedroom.com"
+            fallback_result["fallback_used"] = True
+            logger.info(f"Fallback sender succeeded for {to_email}")
+            return fallback_result
+
+        # Both failed
+        logger.error(f"Both primary and fallback senders failed for {to_email}")
+        return {
+            "success": False,
+            "error": f"Primary error: {result.get('error')}; Fallback error: {fallback_result.get('error')}",
+            "provider": self.provider,
+            "sender_used": None,
+        }
+
+    def _send_via_sendgrid(
+        self, to_email: str, subject: str, html_content: str, text_content: str, sender: str = None
     ) -> dict[str, Any]:
         """Send email via SendGrid API."""
         try:
@@ -164,7 +218,7 @@ class EmailService:
 
             sg = sendgrid.SendGridAPIClient(api_key=self.sendgrid_api_key)
 
-            from_email = Email(self.mail_sender)
+            from_email = Email(sender or self.mail_sender)
             to_email_obj = To(to_email)
 
             # Create mail object
@@ -200,7 +254,7 @@ class EmailService:
             return {"success": False, "error": str(e), "provider": "sendgrid"}
 
     def _send_via_smtp(
-        self, to_email: str, subject: str, html_content: str, text_content: str
+        self, to_email: str, subject: str, html_content: str, text_content: str, sender: str = None
     ) -> dict[str, Any]:
         """Send email via SMTP."""
         try:
@@ -211,7 +265,7 @@ class EmailService:
             # Create message
             msg = MIMEMultipart("alternative")
             msg["Subject"] = subject
-            msg["From"] = self.mail_sender
+            msg["From"] = sender or self.mail_sender
             msg["To"] = to_email
 
             # Add text and HTML parts
@@ -587,7 +641,7 @@ class EmailService:
 
     def send_welcome_vision_email(self, email: str, user_name: str = "") -> dict[str, Any]:
         """
-        Send welcome + vision email from founder.
+        Send welcome + vision email from founder with automatic fallback.
 
         Args:
             email: Recipient email address
@@ -600,7 +654,7 @@ class EmailService:
         html_content = self._get_welcome_vision_email_html(user_name)
         text_content = self._get_welcome_vision_email_text(user_name)
 
-        return self._send_email(
+        return self._send_email_with_fallback(
             to_email=email, subject=subject, html_content=html_content, text_content=text_content
         )
 
@@ -608,7 +662,7 @@ class EmailService:
         self, email: str, user_name: str, markdown_report: str, scores: dict[str, float]
     ) -> dict[str, Any]:
         """
-        Send Big Five personality report via email (markdown formatted as HTML).
+        Send Big Five personality report via email with automatic fallback.
 
         Args:
             email: Recipient email address
@@ -623,7 +677,7 @@ class EmailService:
         html_content = self._get_big_five_report_email_html(user_name, markdown_report, scores)
         text_content = self._get_big_five_report_email_text(user_name, markdown_report)
 
-        return self._send_email(
+        return self._send_email_with_fallback(
             to_email=email, subject=subject, html_content=html_content, text_content=text_content
         )
 
@@ -731,16 +785,10 @@ class EmailService:
                     gap: 10px;
                 }}
                 .pillar-number {{
-                    background: #7A9E9F;
-                    color: white;
-                    width: 32px;
-                    height: 32px;
-                    border-radius: 50%;
-                    display: inline-flex;
-                    align-items: center;
-                    justify-content: center;
+                    color: #7A9E9F;
                     font-weight: 700;
-                    font-size: 16px;
+                    font-size: 20px;
+                    margin-right: 8px;
                 }}
                 .pillar-box p {{
                     margin: 0;

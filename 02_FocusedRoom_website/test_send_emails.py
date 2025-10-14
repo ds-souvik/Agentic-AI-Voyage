@@ -24,13 +24,50 @@ from app.models import Subscriber
 from app.utils.emailer import email_service
 
 
+def extract_name_from_big_five_report(report: str) -> str | None:
+    """
+    Extract user's actual name from Big Five report markdown.
+    Pattern: ## 🎯 NAME, Here's Your Unique Personality Blueprint
+    """
+    import re
+
+    # Try pattern: ## 🎯 NAME,
+    match = re.search(r"##\s*🎯\s*([^,]+),", report)
+    if match:
+        name = match.group(1).strip()
+        # Remove any remaining emoji or special chars
+        name = re.sub(r"[^\w\s-]", "", name).strip()
+        return name if name else None
+
+    # Fallback: Try HTML pattern
+    match = re.search(r"<h2>.*?>\s*([^,]+),\s*Here\'s Your Unique Personality Blueprint", report)
+    if match:
+        name = match.group(1).strip()
+        name = re.sub(r"[^\w\s-]", "", name).strip()
+        return name if name else None
+
+    return None
+
+
 def extract_name_from_email(email: str) -> str:
-    """Extract a name from email address."""
-    name = email.split("@")[0]
-    # Handle common patterns like firstname.lastname or firstname_lastname
-    name = name.replace(".", " ").replace("_", " ").title()
-    # Get first name only
-    return name.split()[0] if " " in name else name
+    """
+    Fallback: Extract a name from email address.
+    Only used if Big Five report doesn't have name.
+    """
+    username = email.split("@")[0]
+
+    # Handle common separators (. _ -)
+    if "." in username:
+        return username.split(".")[0].title()
+    elif "_" in username:
+        return username.split("_")[0].title()
+    elif "-" in username:
+        return username.split("-")[0].title()
+    else:
+        # For combined names or usernames, use generic greeting
+        if len(username) >= 10:
+            return "there"
+        return username.title()
 
 
 def send_test_emails(target_email: str = None, use_db: bool = True):
@@ -61,10 +98,8 @@ def send_test_emails(target_email: str = None, use_db: bool = True):
                     print("   Creating mock subscriber for testing...")
                     subscriber = None
                     email = target_email
-                    user_name = extract_name_from_email(target_email)
                 else:
                     email = subscriber.email
-                    user_name = extract_name_from_email(email)
             else:
                 # Get first subscriber from database
                 subscriber = Subscriber.query.first()
@@ -73,23 +108,37 @@ def send_test_emails(target_email: str = None, use_db: bool = True):
                     print("   Please provide an email address with --email")
                     return
                 email = subscriber.email
-                user_name = extract_name_from_email(email)
 
-            print(f"\n📧 Target Email: {email}")
-            print(f"👤 User Name: {user_name}")
-
-            # Get Big Five result if exists
+            # Get Big Five result if exists (GET THE LATEST ONE!)
             if subscriber:
-                big_five = subscriber.big_five_results.first()
+                from app.models import BigFiveResult
+
+                big_five = subscriber.big_five_results.order_by(
+                    BigFiveResult.created_at.desc()
+                ).first()
                 if big_five:
                     print(f"🧠 Big Five Result Found: ID {big_five.id}")
                     print(f"   Scores: {big_five.scores.get('scores', {})}")
                     print(f"   Report Length: {len(big_five.suggestions)} characters")
+                    # Extract name from Big Five report (BEST SOURCE!)
+                    user_name = extract_name_from_big_five_report(big_five.suggestions)
+                    if user_name:
+                        print(f"👤 Name from Big Five: '{user_name}' ✅")
+                    else:
+                        print("⚠️  Could not extract name from report, using email fallback")
+                        user_name = extract_name_from_email(email)
+                        print(f"👤 Name from Email: '{user_name}'")
                 else:
                     print("⚠️  No Big Five result found for this user")
                     big_five = None
+                    user_name = extract_name_from_email(email)
+                    print(f"👤 Name from Email: '{user_name}'")
             else:
                 big_five = None
+                user_name = extract_name_from_email(email)
+                print(f"👤 Name from Email: '{user_name}'")
+
+            print(f"\n📧 Target Email: {email}")
         else:
             email = target_email or "test@example.com"
             user_name = extract_name_from_email(email)
