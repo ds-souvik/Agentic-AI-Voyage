@@ -110,9 +110,6 @@ class GeminiClient:
                     logger.error("All Gemini API attempts failed, using fallback")
                     return self._generate_fallback_suggestions(scores, percentiles)
 
-                    # This return is for type checker (unreachable in practice)
-                    return self._generate_fallback_suggestions(scores, percentiles)
-
     def _call_gemini_api(
         self,
         scores: dict[str, float],

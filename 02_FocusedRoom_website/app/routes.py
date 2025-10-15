@@ -11,7 +11,7 @@ from app.utils.gemini_client import generate_personality_suggestions, get_gemini
 
 from .models import BigFiveResult, BlogEngagement, Subscriber, db
 from .utils.bigfive import compute_bigfive_scores, validate_answers
-from .utils.emailer import email_service, send_subscription_confirmation
+from .utils.emailer import email_service
 from .utils.rate_limiter import rate_limit
 from .utils.seo import generate_sitemap_xml
 from .utils.validators import (
@@ -84,7 +84,7 @@ def subscribe():
 
             # Extract name for personalized email
             user_name = extract_name_from_email(email)
-            
+
             # Send NEW Welcome + Vision email (idempotent - safe to resend)
             email_result = email_service.send_welcome_vision_email(email, user_name)
             logger.info(f"Re-sent welcome email to existing subscriber: {email}")
@@ -105,7 +105,7 @@ def subscribe():
 
         # Extract name for personalized email
         user_name = extract_name_from_email(email)
-        
+
         # Send NEW Welcome + Vision email
         email_result = email_service.send_welcome_vision_email(email, user_name)
         logger.info(f"Sent welcome email to new subscriber: {email} (Name: {user_name})")
@@ -169,28 +169,68 @@ def big_five():
 
         # Validate email if provided (email is optional for anonymous tests)
         subscriber_id = None
-        is_new_subscriber = False  # Track if this is a brand new subscriber
+        is_new_subscriber = False  # Track if this is a brand new customer
+        report_id = 1  # Default for new customers or anonymous tests
+
         if email:
             # Validate email format using existing validator
             email_validation = validate_subscription_request({"email": email})
             if not email_validation[0]:
                 return jsonify({"success": False, "error": email_validation[1]}), 400
 
-            # Get or create subscriber (idempotent)
+            # Get or create customer (no duplicate email_ids!)
             try:
-                subscriber = Subscriber.query.filter_by(email=email).first()
-                if not subscriber:
-                    subscriber = Subscriber(email=email, opt_in=True)
-                    db.session.add(subscriber)
-                    db.session.flush()  # Get subscriber.id without committing
-                    is_new_subscriber = True  # Mark as new subscriber
-                    logger.info(f"Created new subscriber: {email}")
-                else:
-                    logger.info(f"Found existing subscriber: {email}")
+                from .models import Customer
 
-                subscriber_id = subscriber.id
+                customer = Customer.query.filter_by(email_id=email).first()
+                if not customer:
+                    # New customer - create with demographics from form
+                    customer = Customer(
+                        email_id=email,
+                        name=demographics.get("name"),
+                        age=int(demographics.get("age")) if demographics.get("age") else None,
+                        profession=demographics.get("profession") or demographics.get("career"),
+                        career_stage=demographics.get("careerStage"),
+                        purpose=demographics.get("primaryGoal"),
+                        channel_id=1,  # Big Five Test
+                        opt_in=True,
+                    )
+                    db.session.add(customer)
+                    db.session.flush()  # Get customer.customer_id without committing
+                    is_new_subscriber = True  # Mark as new customer
+                    report_id = 1  # First test
+                    logger.info(f"Created new customer: {email} with demographics")
+                else:
+                    # Existing customer - update demographics if provided
+                    logger.info(f"Found existing customer: {email}")
+
+                    # Update demographics if new data provided
+                    if demographics.get("name"):
+                        customer.name = demographics["name"]
+                    if demographics.get("age"):
+                        customer.age = int(demographics["age"])
+                    # Handle both 'profession' and 'career' field names
+                    profession_value = demographics.get("profession") or demographics.get("career")
+                    if profession_value:
+                        customer.profession = profession_value
+                    if demographics.get("careerStage"):
+                        customer.career_stage = demographics["careerStage"]
+                    if demographics.get("primaryGoal"):
+                        customer.purpose = demographics["primaryGoal"]
+
+                    # Calculate report_id for returning customer
+                    last_result = (
+                        BigFiveResult.query.filter_by(customer_id=customer.customer_id)
+                        .order_by(BigFiveResult.report_id.desc())
+                        .first()
+                    )
+
+                    report_id = (last_result.report_id + 1) if last_result else 1
+                    logger.info(f"Returning customer - this is test #{report_id}")
+
+                subscriber_id = customer.customer_id
             except Exception as e:
-                logger.error(f"Error managing subscriber: {str(e)}")
+                logger.error(f"Error managing customer: {str(e)}")
                 db.session.rollback()
                 return jsonify({"success": False, "error": "Failed to process email"}), 500
 
@@ -215,9 +255,10 @@ def big_five():
 
             logger.info(f"Generated personality suggestions using {_get_gemini_provider()}")
 
-            # Store result in database with subscriber link
+            # Store result in database with customer link and report_id
             result = BigFiveResult(
-                subscriber_id=subscriber_id,
+                customer_id=subscriber_id,
+                report_id=report_id,
                 scores={
                     "scores": scores,
                     "percentiles": percentiles,
@@ -234,7 +275,7 @@ def big_five():
             # Send emails if email was provided
             welcome_email_sent = False
             report_email_sent = False
-            
+
             if email and subscriber_id:
                 try:
                     # Extract name from Big Five report (best source!)
@@ -242,37 +283,46 @@ def big_five():
                     if not user_name:
                         # Fallback to email-based name extraction
                         user_name = extract_name_from_email(email)
-                    
+
                     # NEW SUBSCRIBERS: Send Welcome email first
                     if is_new_subscriber:
                         try:
-                            welcome_result = email_service.send_welcome_vision_email(email, user_name)
+                            welcome_result = email_service.send_welcome_vision_email(
+                                email, user_name
+                            )
                             welcome_email_sent = welcome_result.get("success", False)
                             if welcome_email_sent:
-                                logger.info(f"Sent Welcome email to new subscriber: {email} (Name: {user_name})")
+                                logger.info(
+                                    f"Sent Welcome email to new subscriber: {email} "
+                                    f"(Name: {user_name})"
+                                )
                             else:
-                                logger.error(f"Failed to send Welcome email to {email}: {welcome_result.get('error')}")
+                                error_msg = welcome_result.get("error")
+                                logger.error(
+                                    f"Failed to send Welcome email to {email}: " f"{error_msg}"
+                                )
                         except Exception as welcome_error:
-                            logger.error(f"Exception sending Welcome email to {email}: {str(welcome_error)}")
-                    
+                            logger.error(
+                                f"Exception sending Welcome email to {email}: {str(welcome_error)}"
+                            )
+
                     # ALWAYS: Send Big Five Report email
                     email_result = email_service.send_big_five_report_email(
-                        email=email,
-                        user_name=user_name,
-                        markdown_report=suggestions,
-                        scores=scores
+                        email=email, user_name=user_name, markdown_report=suggestions, scores=scores
                     )
-                    
+
                     report_email_sent = email_result.get("success", False)
                     if report_email_sent:
                         logger.info(f"Sent Big Five report email to {email} (Name: {user_name})")
                     else:
-                        logger.error(f"Failed to send Big Five email to {email}: {email_result.get('error')}")
-                        
+                        logger.error(
+                            f"Failed to send Big Five email to {email}: {email_result.get('error')}"
+                        )
+
                 except Exception as email_error:
                     # Don't fail the request if email fails - just log it
                     logger.error(f"Exception sending emails to {email}: {str(email_error)}")
-            
+
             # Track overall email success
             email_sent = welcome_email_sent or report_email_sent
 

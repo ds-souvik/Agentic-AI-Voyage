@@ -5,32 +5,61 @@ from flask_sqlalchemy import SQLAlchemy
 db = SQLAlchemy()
 
 
-class Subscriber(db.Model):  # type: ignore[name-defined]
-    """Subscriber model for newsletter subscriptions."""
+class ChannelDetails(db.Model):  # type: ignore[name-defined]
+    """Reference table for customer acquisition channels."""
 
-    id = db.Column(db.Integer, primary_key=True)
-    email = db.Column(db.String(255), unique=True, nullable=False)
-    created_at = db.Column(db.DateTime, default=datetime.utcnow)
-    opt_in = db.Column(db.Boolean, default=True)
+    __tablename__ = "channel_details"
+
+    channel_id = db.Column(db.Integer, primary_key=True)
+    channel_name = db.Column(db.String(100), unique=True, nullable=False)
+    channel_description = db.Column(db.String(255), nullable=True)
+
+    # Relationship to customers
+    customers = db.relationship("Customer", backref="channel", lazy="dynamic")
+
+
+class Customer(db.Model):  # type: ignore[name-defined]
+    """Customer model (formerly Subscriber) with demographic information."""
+
+    __tablename__ = "customer"
+
+    customer_id = db.Column(db.Integer, primary_key=True)
+    email_id = db.Column(db.String(255), unique=True, nullable=False, index=True)
+    name = db.Column(db.String(255), nullable=True)
+    age = db.Column(db.Integer, nullable=True)
+    profession = db.Column(db.Text, nullable=True)
+    career_stage = db.Column(db.String(100), nullable=True)
+    purpose = db.Column(db.Text, nullable=True)  # Primary goal
+    channel_id = db.Column(
+        db.Integer, db.ForeignKey("channel_details.channel_id"), nullable=True, index=True
+    )
+    create_dt = db.Column(db.DateTime, default=datetime.utcnow, nullable=False, index=True)
+    opt_in = db.Column(db.Boolean, default=True, nullable=False)
+
+    # Relationship to BigFiveResult
+    big_five_results = db.relationship("BigFiveResult", backref="customer", lazy="dynamic")
+
+
+# Backward compatibility alias (will be removed after migration)
+Subscriber = Customer
 
 
 class BigFiveResult(db.Model):  # type: ignore[name-defined]
     """Big Five personality test result model."""
 
     id = db.Column(db.Integer, primary_key=True)
-    # Foreign key to link result to subscriber (optional for anonymous tests)
-    subscriber_id = db.Column(db.Integer, db.ForeignKey("subscriber.id"), nullable=True, index=True)
+    # Foreign key to link result to customer (formerly subscriber_id)
+    customer_id = db.Column(
+        db.Integer, db.ForeignKey("customer.customer_id"), nullable=True, index=True
+    )
+    # Report number for this customer (1st test, 2nd test, etc.)
+    report_id = db.Column(db.Integer, nullable=False, default=1)
     # Store normalized trait scores as JSON (scores, percentiles, raw_scores)
     scores = db.Column(db.JSON, nullable=False)
     # AI-generated personality suggestions (from Gemini or fallback)
     suggestions = db.Column(db.Text)
     # Timestamp for analytics and sorting
     created_at = db.Column(db.DateTime, default=datetime.utcnow, index=True)
-
-    # Relationship to Subscriber (enables result.subscriber.email access)
-    subscriber = db.relationship(
-        "Subscriber", backref=db.backref("big_five_results", lazy="dynamic")
-    )
 
 
 class BlogEngagement(db.Model):  # type: ignore[name-defined]
