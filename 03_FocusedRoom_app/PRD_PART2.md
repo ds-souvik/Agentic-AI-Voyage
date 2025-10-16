@@ -623,5 +623,36 @@ Response: {
 
 ---
 
+## 4.J SOCIAL & COMMUNITY FEATURES
+
+**📖 Complete Specification**: See **[PRD_COMMUNITY_FEATURES.md](./PRD_COMMUNITY_FEATURES.md)** for full details.
+
+**Priority**: Phase 2-4 (Post-MVP, but architected now)  
+**Vision**: Transform Focused Room into a thriving social productivity ecosystem where users connect, compete, and grow together.
+
+### Quick Overview
+
+**Core Social Features:**
+- ✅ **Friends System**: Connect with accountability partners, see real-time progress
+- ✅ **Accountability Pods**: Small groups (2-8 people) with daily check-ins
+- ✅ **Communities**: Join niche groups (Medical Students, Developers, Writers, etc.)
+- ✅ **Social Challenges**: Compete with friends, pods, or globally
+- ✅ **Enhanced Leaderboards**: Global, friends, pods, communities, local
+- ✅ **Real-Time Feed**: Celebrate friends' wins, milestones, level-ups
+- ✅ **Social Sharing**: Auto-generated profile cards with stats
+
+**Key Insight**: Research shows **65% higher goal achievement** with accountability partners. Social features will:
+- Increase retention by **2-3x**
+- Drive viral growth (**5x** referrals)
+- Boost conversion by **1.5x** (social users convert more)
+
+**Privacy-First**: Granular controls per stat, opt-in social features, block/report tools.
+
+**Rollout**: Phase 2 (Friends & Pods) → Phase 3 (Communities) → Phase 4 (Advanced Social)
+
+👉 **Read PRD_COMMUNITY_FEATURES.md for complete specifications, UI flows, database schema, and API endpoints.**
+
+---
+
 *[CONTINUED IN NEXT FILE: PRD_PART3.md]*
 
